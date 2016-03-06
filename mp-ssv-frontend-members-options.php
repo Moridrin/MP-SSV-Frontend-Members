@@ -93,18 +93,6 @@ function mp_ssv_frontend_members_settings_page_profile_page() {
 					"SELECT *
 						FROM $table_name"
 				);
-				$fields2 = array(
-					array(
-						"title" => "First Name",
-						"component" => '<input type="text" name="first_name" readonly>',
-						"is_mandatory" => 1
-					),
-					array(
-						"title" => "Last Name",
-						"component" => '<input type="text" name="last_name" readonly>',
-						"is_mandatory" => 0
-					)
-				);
 				foreach ($fields as $field) {
 					$field = json_decode(json_encode($field),true);
 
@@ -113,11 +101,11 @@ function mp_ssv_frontend_members_settings_page_profile_page() {
 					$title_value = str_replace("_", " ", $title);
 					$component = stripslashes($field["component"]);
 					$role_group = "";
-					$is_mandatory = $field["is_mandatory"] == 1;
 					$is_role = $component == "[role]";
 					$is_role_group = $component == "multi_select" || $component == "radio";
 					$is_header = $component == "[header]";
 					$is_tab = $component == "[tab]";
+					$is_image = strpos($component, "[image]") !== false;
 
 					if (($component) != "" && strpos($component, "name=\"") !== false) {
 						$identifier = preg_replace("/.*name=\"/","",stripslashes($component));
@@ -174,6 +162,17 @@ function mp_ssv_frontend_members_settings_page_profile_page() {
 								</select>
 								<input type="hidden" name="submit_option_<?php echo $identifier; ?>">
 							</td>
+						<?php } else if ($is_image) { ?>
+							<td>
+								<input type="text" id="<?php echo $identifier."_title"; ?>" name="title_option_<?php echo $identifier; ?>" value="<?php echo $title_value; ?>"/>
+							</td>
+							<td>
+								<input type="text" value="[image]" disabled>
+								<input type="hidden" name="component_option_<?php echo $identifier; ?>" value="[image]">
+								<input type="checkbox" name="is_required_option_<?php echo $identifier; ?>" <?php if (strpos($component, "required")) { echo "checked"; } ?> style="margin: 0 10px;" value="on">Required
+								<input type="checkbox" name="show_preview_option_<?php echo $identifier; ?>" <?php if (strpos($component, "show_preview")) { echo "checked"; } ?> style="margin: 0 10px;" value="on">Show Preview
+								<input type="hidden" name="submit_option_<?php echo $identifier; ?>">
+							</td>
 						<?php } else { ?>
 							<td>
 								<input type="text" id="<?php echo $identifier."_title"; ?>" name="title_option_<?php echo $identifier; ?>" value="<?php echo $title_value; ?>"/>
@@ -193,6 +192,7 @@ function mp_ssv_frontend_members_settings_page_profile_page() {
 			<button type="button" id="add_user_role_button" onclick="add_new_user_role()">Add User Role</button>
 		<?php } ?>
 		<button type="button" id="add_header_button" onclick="add_new_header()">Add Header</button>
+		<button type="button" id="add_image_button" onclick="add_new_image()">Add Image</button>
 		<?php
 		if (get_theme_support('mui')) {
 			?>
@@ -253,6 +253,38 @@ function mp_ssv_frontend_members_settings_page_profile_page() {
 					'<input type="text" id="' + id + '_component" name="component_option_' + id + '" value="[role]" disabled/>'
 				).append (
 					'<input type="hidden" name="component_option_' + id + '" value="[role]">'
+				)
+			).append(
+				'<td>'
+			).append(
+				'<td>'
+			).append(
+				$('<td>').append(
+					'<input type="hidden" name="submit_option_' + id + '">'
+				)
+			)
+		);
+	}
+	function add_new_image() {
+		var id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+		$("#container > tbody:last-child").append(
+			$('<tr id="' + id + '">').append(
+				$('<td style="cursor: move;">').append(
+					'<img style="padding-right: 15px;" src="<?php echo plugins_url("icon-menu.svg", __FILE__); ?>"/>'
+				)
+			).append(
+				$('<td>').append(
+					'<input type="text" id="' + id + '_title" name="title_option_' + id + '"/>'
+				)
+			).append(
+				$('<td>').append(
+					'<input type="text" value="[image]" disabled>'
+				).append (
+					'<input type="hidden" name="component_option_' + id + '" value="[image]">'
+				).append (
+					'<input type="checkbox" id="is_required_option_' + id + '" name="is_required_option_' + id + '" style="margin: 0 10px;" value="on"><label for="is_required_option_' + id + '">required</label>'
+				).append (
+					'<input type="checkbox" id="show_preview_option_' + id + '" name="show_preview_option_' + id + '" style="margin: 0 10px;" value="on"><label for="show_preview_option_' + id + '">Show Preview</label>'
 				)
 			).append(
 				'<td>'
@@ -374,7 +406,6 @@ function mp_ssv_frontend_members_settings_save() {
 		$wpdb->delete($table_name, array('is_deletable' => 1));
 		$title = "";
 		$component = "";
-		$is_mandatory = 0;
 		$tab = "";
 		foreach( $_POST as $id => $val ) {
 			if (strpos($id, "title_option_") !== false) {
@@ -384,9 +415,13 @@ function mp_ssv_frontend_members_settings_save() {
 				if ($component == "[tab]") {
 					$tab = $title;
 				}
-			} else if (strpos($id, "is_mandatory_option_") !== false) {
+			} else if (strpos($id, "is_required_option_") !== false) {
 				if ($val == "on") {
-					$is_mandatory = 1;
+					$component .= "[image]required";
+				}
+			} else if (strpos($id, "show_preview_option_") !== false) {
+				if ($val == "on") {
+					$component .= "[image]show_preview";
 				}
 			} else if (strpos($id, "submit_option_") !== false) {
 				if ($title != "" && $component != "") {
@@ -395,20 +430,17 @@ function mp_ssv_frontend_members_settings_save() {
 						array(
 							'title' => $title,
 							'component' => $component,
-							'is_mandatory' => $is_mandatory,
 							'tab' => $tab
 						),
 						array(
 							'%s',
 							'%s',
-							'%d',
 							'%s'
 						) 
 					);
 				}
 				$title = "";
 				$component = "";
-				$is_mandatory = 0;
 			}
 		}
 	}

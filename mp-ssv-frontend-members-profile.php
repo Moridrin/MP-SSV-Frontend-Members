@@ -28,7 +28,7 @@ function profile_page_content() {
 		$content .= profile_page_content_all_tabs();
 		$content .= '</div>';
 	} else {
-		$content .= profile_page_content_all_tabs();
+		$content .= profile_page_content_all_tabs_non_mui();
 	}
 	return $content;
 }
@@ -64,7 +64,6 @@ function profile_page_content_single_tab() {
 			$identifier = preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $tab_title));
 			$title_value = str_replace("_", " ", $tab_title);
 			$component = stripslashes($tab["component"]);
-			$is_mandatory = $tab["is_mandatory"] == 1;
 			$is_role = $component == "[role]";
 			$is_header = $component == "[header]";
 			$is_tab = $component == "[tab]";
@@ -83,11 +82,11 @@ function profile_page_content_single_tab() {
 							$role_group = $database_component;
 							$role_title = strtolower(str_replace(" ", "_", $title));
 						}
-						$is_mandatory = $field["is_mandatory"] == 1;
 						$is_role = $database_component == "[role]";
 						$is_role_group = $database_component == "multi_select" || $database_component == "radio";
 						$is_header = $database_component == "[header]";
 						$is_tab = $database_component == "[tab]";
+						$is_image = strpos($database_component, "[image]") !== false;
 						if ($is_tab) {
 						} else if ($is_header || $is_role_group) {
 							echo '<legend>'.$title.'</legend>';
@@ -105,6 +104,19 @@ function profile_page_content_single_tab() {
 								<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>								
 							</div>
 							<?php
+						} else if ($is_image) {
+							$required = strpos($database_component, "required") !== false && strlen(get_user_meta($current_user->ID, $identifier, true)) < 1;
+							?>
+							<div class="mui-textfield">
+								<input id="<?php echo $identifier; ?>" type="file" name="<?php echo $identifier; ?>" accept="image/*" <?php if($required) { echo "required"; } ?>/>
+								<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>
+							</div>
+							<?php
+							if (strpos($database_component, "show_preview") !== false) {
+								?>
+								<img class="image-preview" src="<?php echo get_user_meta($current_user->ID, $identifier, true); ?>"/>
+								<?php
+							}
 						} else {
 							if (($database_component) != "" && strpos($database_component, "name=\"") !== false) {
 								$identifier = preg_replace("/.*name=\"/","",stripslashes($database_component));
@@ -126,6 +138,7 @@ function profile_page_content_single_tab() {
 								?>
 								<div class="mui-textfield">
 									<?php echo $database_component; ?>
+									<label><?php echo $title; ?></label>
 								</div>
 								<?php
 							} else if (substr($database_component, 0, 4) == '<img') {
@@ -201,7 +214,6 @@ function profile_page_content_all_tabs() {
 			$identifier = preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $tab_title));
 			$title_value = str_replace("_", " ", $tab_title);
 			$component = stripslashes($tab["component"]);
-			$is_mandatory = $tab["is_mandatory"] == 1;
 			$is_role = $component == "[role]";
 			$is_header = $component == "[header]";
 			$is_tab = $component == "[tab]";
@@ -217,7 +229,6 @@ function profile_page_content_all_tabs() {
 					$role_group = $database_component;
 					$role_title = strtolower(str_replace(" ", "_", $title));
 				}
-				$is_mandatory = $field["is_mandatory"] == 1;
 				$is_role = $database_component == "[role]";
 				$is_role_group = $database_component == "multi_select" || $database_component == "radio";
 				$is_header = $database_component == "[header]";
@@ -260,6 +271,7 @@ function profile_page_content_all_tabs() {
 								?>
 								<div class="mui-textfield">
 									<?php echo $database_component; ?>
+									<label><?php echo $title; ?></label>
 								</div>
 								<?php
 							} else if (substr($database_component, 0, 4) == '<img') {
@@ -300,6 +312,125 @@ function profile_page_content_all_tabs() {
 	return $content;
 }
 
+function profile_page_content_all_tabs_non_mui() {
+	global $wpdb;
+	$current_user = wp_get_current_user();
+	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
+	$role_group = "";
+	
+	$url = (is_ssl() ? 'https://' : 'http://').$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'?logout=success';
+		$tabs = $wpdb->get_results("SELECT * FROM $table_name WHERE component = '[tab]'");
+		$content = '';
+		ob_start();
+		?>
+		<a class="mui-btn mui-btn--flat mui-btn--danger" href="<?php echo wp_logout_url($url); ?>" style="float: right;">Logout</a>
+		<form name="members_profile_form" id="member_form" action="/profile" method="post">
+		<?php
+		$content .= ob_get_clean();
+		for ($i = 0; $i < count($tabs); $i++) {
+			$tab = json_decode(json_encode($tabs[$i]),true);
+			$tab_title = stripslashes($tab["title"]);
+			$identifier = preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $tab_title));
+			$title_value = str_replace("_", " ", $tab_title);
+			$component = stripslashes($tab["component"]);
+			$is_role = $component == "[role]";
+			$is_header = $component == "[header]";
+			$is_tab = $component == "[tab]";
+			ob_start();
+			$fields_in_tab = $wpdb->get_results("SELECT * FROM $table_name WHERE tab = '$tab_title'");
+			foreach ($fields_in_tab as $field) {
+				$field = json_decode(json_encode($field),true);
+				$title = stripslashes($field["title"]);
+				$identifier = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $title)));
+				$title_value = str_replace("_", " ", $title);
+				$database_component = stripslashes($field["component"]);
+				if ($database_component == "multi_select" || $database_component == "radio") {
+					$role_group = $database_component;
+					$role_title = strtolower(str_replace(" ", "_", $title));
+				}
+				$is_role = $database_component == "[role]";
+				$is_role_group = $database_component == "multi_select" || $database_component == "radio";
+				$is_header = $database_component == "[header]";
+				$is_tab = $database_component == "[tab]";
+				if ($is_tab) {
+				} else if ($is_header || $is_role_group) {
+					echo '<h2>'.$title.'</h2>';
+				} else if ($is_role && $role_group == "radio") {
+					?>
+					<div>
+						<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>								
+						<input id="<?php echo $identifier; ?>" type="radio" name="<?php echo "role_group_".$role_title; ?>" value="<?php echo $title; ?>" style="width: auto; margin-right: 10px;" <?php if (get_user_meta($current_user->ID, "role_group_".$role_title, true) == $title) { echo "checked"; } ?>/>
+					</div>
+					<?php
+				} else if ($is_role && $role_group == "multi_select") {
+					?>
+					<div>
+						<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>								
+						<input id="<?php echo $identifier; ?>" type="checkbox" name="<?php echo $identifier; ?>" value="<?php echo $title; ?>" style="width: auto; margin-right: 10px;" <?php if(get_user_meta($current_user->ID, $identifier, true) == 1) { echo "checked"; } ?>/>
+					</div>
+					<?php
+				} else {
+							if (($database_component) != "" && strpos($database_component, "name=\"") !== false) {
+								$identifier = preg_replace("/.*name=\"/","",stripslashes($database_component));
+								$identifier = preg_replace("/\".*/","",$identifier);
+								$identifier = strtolower($identifier);
+							}
+							if ($identifier == "user_login") {
+								$component_value = get_userdata($current_user->ID)->user_login;
+							} else if ($identifier == "user_nicename") {
+								$component_value = get_userdata($current_user->ID)->user_nicename;
+							} else if ($identifier == "user_email") {
+								$component_value = get_userdata($current_user->ID)->user_email;
+							} else if ($identifier == "display_name") {
+								$component_value = get_userdata($current_user->ID)->display_name;
+							} else {
+								$component_value = get_user_meta($current_user->ID, $identifier, true);
+							}
+							if (strpos($database_component, 'type="file"') !== false) {
+								?>
+								<div class="mui-textfield">
+									<label><?php echo $title; ?></label>
+									<?php echo $database_component; ?>
+								</div>
+								<?php
+							} else if (substr($database_component, 0, 4) == '<img') {
+								if (($database_component) != "" && strpos($database_component, "src=\"") !== false) {
+									$identifier = preg_replace("/.*src=\"/","",stripslashes($database_component));
+									$identifier = preg_replace("/\".*/","",$identifier);
+									$identifier = strtolower($identifier);
+								}
+								$component = str_replace($identifier, get_user_meta($current_user->ID, $identifier, true), $database_component);
+								?>
+								<div class="mui-textfield">
+									<?php echo $component; ?>
+								</div>
+								<?php
+							} else {
+								$component = explode(">", $database_component)[0];
+								$component .= ' value="'.$component_value.'"';
+								$component .= str_replace(explode(">", $database_component)[0], "", $database_component);
+								?>
+								<div class="mui-textfield mui-textfield--float-label">
+									<label><?php echo $title; ?></label>
+									<?php echo $component; ?>
+								</div>
+								<?php
+							}
+						}
+			}
+			$content .= ob_get_clean();
+		}
+	$content .= profile_page_registrations_table_content();
+	ob_start();
+	?>
+	<button class="mui-btn mui-btn--primary" type="submit" name="submit" id="submit" class="button-primary">Save</button>
+	<input type="hidden" name="what-to-save" value="all"/>
+	</form>
+	<?php
+	$content .= ob_get_clean();
+	return $content;
+}
+
 function save_members_profile($what_to_save) {
 	global $wpdb;
 	$current_user = wp_get_current_user();
@@ -318,7 +449,6 @@ function save_members_profile($what_to_save) {
 				$identifier = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $title)));
 				$title_value = str_replace("_", " ", $title);
 				$database_component = stripslashes($field["component"]);
-				$is_mandatory = $field["is_mandatory"] == 1;
 				$is_role_group = $database_component == "multi_select" || $database_component == "radio";
 				$is_role = $database_component == "[role]";
 				$is_header = $database_component == "[header]";

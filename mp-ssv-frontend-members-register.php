@@ -33,7 +33,6 @@ function register_page_content() {
 				$identifier = preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $tab_title));
 				$title_value = str_replace("_", " ", $tab_title);
 				$component = stripslashes($tab["component"]);
-				$is_mandatory = $tab["is_mandatory"] == 1;
 				$is_role = $component == "[role]";
 				$is_header = $component == "[header]";
 				$is_tab = $component == "[tab]";
@@ -49,11 +48,11 @@ function register_page_content() {
 						$role_group = $database_component;
 						$role_title = strtolower(str_replace(" ", "_", $title));
 					}
-					$is_mandatory = $field["is_mandatory"] == 1;
 					$is_role = $database_component == "[role]";
 					$is_role_group = $database_component == "multi_select" || $database_component == "radio";
 					$is_header = $database_component == "[header]";
 					$is_tab = $database_component == "[tab]";
+					$is_image = strpos($database_component, "[image]") !== false;
 					if ($is_tab) {
 					} else if ($is_header || $is_role_group) {
 						echo '<legend>'.$title.'</legend>';
@@ -71,6 +70,14 @@ function register_page_content() {
 					<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>
 				</div>
 				<?php
+					} else if ($is_image) {
+						$required = strpos($database_component, "required") !== false;
+						?>
+						<div class="mui-textfield">
+							<input id="<?php echo $identifier; ?>" type="file" name="<?php echo $identifier; ?>" accept="image/*" <?php if($required) { echo "required"; } ?>/>
+							<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>
+						</div>
+						<?php
 					} else {
 						if (($database_component) != "" && strpos($database_component, "name=\"") !== false) {
 							$identifier = preg_replace("/.*name=\"/","",stripslashes($database_component));
@@ -150,7 +157,6 @@ function save_member_registration($what_to_save) {
 				$identifier = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $title)));
 				$title_value = str_replace("_", " ", $title);
 				$database_component = stripslashes($field["component"]);
-				$is_mandatory = $field["is_mandatory"] == 1;
 				$is_role_group = $database_component == "multi_select" || $database_component == "radio";
 				$is_role = $database_component == "[role]";
 				$is_header = $database_component == "[header]";
