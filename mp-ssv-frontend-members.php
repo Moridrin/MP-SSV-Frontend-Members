@@ -15,10 +15,10 @@
 * License URI: http://www.wtfpl.net/txt/copying/
 */
 
-include_once "mp-ssv-frontend-members-login.php";
-include_once "mp-ssv-frontend-members-profile.php";
-include_once "mp-ssv-frontend-members-options.php";
-include_once "mp-ssv-frontend-members-register.php";
+include_once "login-page.php";
+include_once "profile-page.php";
+include_once "register-page.php";
+include_once "options/options.php";
 
 function register_mp_ssv_frontend_members() {
 	/* Database */
@@ -129,4 +129,37 @@ function frontend_members_avatar($avatar, $id_or_email, $size, $default, $alt) {
     return $avatar;
 }
 add_filter( 'get_avatar', 'frontend_members_avatar' , 1 , 5 );
+
+function update_mailchimp_frontend_member($memberId, $listID) {
+	$apiKey = get_option('mp_ssv_mailchimp_api_key');
+
+	$memberId = md5(strtolower(get_userdata($memberId)->user_email));
+	$memberCenter = substr($apiKey,strpos($apiKey,'-')+1);
+	$url = 'https://' . $memberCenter . '.api.mailchimp.com/3.0/lists/' . $listID . '/members/' . $memberId;
+
+	$json = json_encode([
+		'email_address' => $member['email'],
+		'status'        => $member['status'], // "subscribed","unsubscribed","cleaned","pending"
+		'merge_fields'  => [
+			'FNAME'     => $member['firstname'],
+			'LNAME'     => $member['lastname']
+		]
+	]);
+
+	$ch = curl_init($url);
+
+	curl_setopt($ch, CURLOPT_USERPWD, 'user:' . $apiKey);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+
+	$result = curl_exec($ch);
+	$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+	curl_close($ch);
+
+	return $result;
+}
 ?>
