@@ -1,7 +1,6 @@
 <?php
 function profile_page_setup($content) {
 	global $post;
-	/* Return */
 	if ($post->post_name != 'profile') {
 		return $content;
 	} else if (strpos($content, '[mp-ssv-frontend-members-profile]') === false) {

@@ -302,12 +302,4 @@ function add_new_tab() {
 		)
 	);
 }
-function sync_preview(id) {
-	var title = document.getElementById(id + "_title");
-	var component = document.getElementById(id + "_component");
-	var preview = document.getElementById(id + "_component_preview");
-	preview.innerHTML = component.value;
-	title.setAttribute("name", "title_option_" + preview.childNodes[0].getAttribute("name"));
-	component.setAttribute("name", "component_option_" + preview.childNodes[0].getAttribute("name"));
-}
 </script>

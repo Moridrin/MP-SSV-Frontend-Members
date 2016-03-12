@@ -68,17 +68,28 @@ if (!function_exists("add_mp_ssv_mailchimp_menu")) {
 
 if (!function_exists("get_merge_fields_select")) {
 	function get_merge_fields_select($id, $tag_name, $disabled, $mailchimp_merge_tags) {
-		?>
-		<select name="mailchimp_<?php echo $id; ?>" <?php if ($disabled) { echo "disabled"; } ?>>
-			<?php
+		if ($id == "") {
+			$s = uniqid('', true);
+			$id = base_convert($s, 16, 36);
+		}
+		?><select name="mailchimp_<?php echo $id; ?>" <?php if ($disabled) { echo "disabled"; } ?>><?php
 			foreach ($mailchimp_merge_tags as $tag) {
 				echo '<option value="'.$tag.'" ';
 				if ($tag == $tag_name) { echo "selected"; }
 				echo '>'.$tag.'</option>';
 			}
-			?>
-		</select>
-		<?php
+			?></select><?php
+	}
+}
+
+if (!function_exists("get_merge_fields_select_for_javascript")) {
+	function get_merge_fields_select_for_javascript($disabled, $mailchimp_merge_tags) {
+		?><select name="mailchimp_' + id + '" <?php if ($disabled) { echo "disabled"; } ?>><?php
+			foreach ($mailchimp_merge_tags as $tag) {
+				echo '<option value="'.$tag.'" ';
+				echo '>'.$tag.'</option>';
+			}
+			?></select><?php
 	}
 }
 
