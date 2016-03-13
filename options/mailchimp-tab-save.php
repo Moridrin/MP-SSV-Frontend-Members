@@ -13,17 +13,19 @@ function mp_ssv_mailchimp_settings_page_frontend_members_tab_save() {
 		} else if (strpos($id, "mailchimp_") !== false) {
 			$mailchimp_tag = $val;
 		} else if (strpos($id, "submit_option_") !== false) {
-			$wpdb->insert(
-				$table_name,
-				array(
-					'member_tag' => $member_tag,
-					'mailchimp_tag' => $mailchimp_tag
-				),
-				array(
-					'%s',
-					'%s'
-				) 
-			);
+			if ($member_tag != "") {
+				$wpdb->insert(
+					$table_name,
+					array(
+						'member_tag' => $member_tag,
+						'mailchimp_tag' => $mailchimp_tag
+					),
+					array(
+						'%s',
+						'%s'
+					) 
+				);
+			}
 		}
 	}
 }

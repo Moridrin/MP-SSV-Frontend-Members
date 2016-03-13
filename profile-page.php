@@ -36,10 +36,10 @@ function profile_page_content_single_tab() {
 	global $wpdb;
 	$current_user = wp_get_current_user();
 	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
-	$role_group = "";
+	$group = "";
 	
 	$url = (is_ssl() ? 'https://' : 'http://').$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'?logout=success';
-		$tabs = $wpdb->get_results("SELECT * FROM $table_name WHERE component = '[tab]'");
+		$tabs = $wpdb->get_results("SELECT title FROM $table_name WHERE component = '[tab]'");
 		$content = '<div class="mui--hidden-xs">';
 		$content .= '<ul id="profile-menu" class="mui-tabs__bar mui-tabs__bar--justified">';
 		for ($i = 0; $i < count($tabs); $i++) {
@@ -62,10 +62,6 @@ function profile_page_content_single_tab() {
 			$tab_title = stripslashes($tab["title"]);
 			$identifier = preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $tab_title));
 			$title_value = str_replace("_", " ", $tab_title);
-			$component = stripslashes($tab["component"]);
-			$is_role = $component == "[role]";
-			$is_header = $component == "[header]";
-			$is_tab = $component == "[tab]";
 			ob_start(); ?>
 			<div class="mui-tabs__pane<?php if ($i == 0) { echo " mui--is-active"; } ?>" id="pane-<?php echo $identifier; ?>">
 				<form name="members_profile_form" id="member_<?php echo $tab_title; ?>_form" action="/profile" method="post">
@@ -77,30 +73,56 @@ function profile_page_content_single_tab() {
 						$identifier = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $title)));
 						$title_value = str_replace("_", " ", $title);
 						$database_component = stripslashes($field["component"]);
-						if ($database_component == "multi_select" || $database_component == "radio") {
-							$role_group = $database_component;
+						if ($database_component == "checkbox" || $database_component == "radio" || $database_component == "select") {
+							$group = $database_component;
 							$role_title = strtolower(str_replace(" ", "_", $title));
 						}
-						$is_role = $database_component == "[role]";
-						$is_role_group = $database_component == "multi_select" || $database_component == "radio";
+						$is_role = $database_component == "[role checkbox]";
+						$is_group = $database_component == "radio" || $database_component == "select";
 						$is_header = $database_component == "[header]";
 						$is_tab = $database_component == "[tab]";
 						$is_image = strpos($database_component, "[image]") !== false;
 						if ($is_tab) {
-						} else if ($is_header || $is_role_group) {
+						} else if ($is_header) {
 							echo '<legend>'.$title.'</legend>';
-						} else if ($is_role && $role_group == "radio") {
-							?>
-							<div>
-								<input id="<?php echo $identifier; ?>" type="radio" name="<?php echo "role_group_".$role_title; ?>" value="<?php echo $title; ?>" style="width: auto; margin-right: 10px;" <?php if (get_user_meta($current_user->ID, "role_group_".$role_title, true) == $title) { echo "checked"; } ?>/>
-								<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>								
-							</div>
-							<?php
-						} else if ($is_role && $role_group == "multi_select") {
+						} else if ($is_group) {
+							$group_items_table_name = $wpdb->prefix."mp_ssv_frontend_members_fields_group_options";
+							$group_options = $wpdb->get_results( 
+								"SELECT *
+									FROM $group_items_table_name"
+							);
+							if ($database_component == "select") {
+								echo '<div class="mui-select mui-textfield">';
+								echo '<select id="'.$identifier.'" name="group_'.$identifier.'">';
+							} else {
+								
+							}
+							foreach ($group_options as $group_option) {
+								$group_option = json_decode(json_encode($group_option),true);
+								$group_option = stripslashes($group_option["option_text"]);
+								if (strpos($group_option, ";[role]") !== false) {
+									$group_option = str_replace(";[role]", "", $group_option);
+									$group_option_label = $group_option;
+									$group_option = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $group_option)));
+									?><option value="<?php echo $group_option; ?>;[role]" <?php if($group_option.";[role]" == get_user_meta($current_user->ID, "group_".$identifier, true)) { echo "selected"; } ?>><?php echo $group_option_label; ?></option><?php
+								} else {
+									$group_option_label = $group_option;
+									$group_option = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $group_option)));
+									?><option value="<?php echo $group_option; ?>" <?php if($group_option."" == get_user_meta($current_user->ID, "group_".$identifier, true)) { echo "selected"; } ?>><?php echo $group_option_label; ?></option><?php
+								}
+							}
+							if ($database_component == "select") {
+								echo '</select>';
+								echo '<label for="group_'.$identifier.'">'.$title.'</label>';
+								echo '</div>';
+							} else {
+								
+							}
+						} else if ($is_role) {
 							?>
 							<div>
 								<input id="<?php echo $identifier; ?>" type="checkbox" name="<?php echo $identifier; ?>" value="<?php echo $title; ?>" style="width: auto; margin-right: 10px;" <?php if(get_user_meta($current_user->ID, $identifier, true) == 1) { echo "checked"; } ?>/>
-								<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>								
+								<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>
 							</div>
 							<?php
 						} else if ($is_image) {
@@ -113,7 +135,7 @@ function profile_page_content_single_tab() {
 							<?php
 							if (strpos($database_component, "show_preview") !== false) {
 								?>
-								<img class="image-preview" src="<?php echo get_user_meta($current_user->ID, $identifier, true); ?>"/>
+								<img class="image-preview" src="<?php echo get_user_meta($current_user->ID, $identifier, true); ?>"/><br/>
 								<?php
 							}
 						} else {
@@ -157,7 +179,7 @@ function profile_page_content_single_tab() {
 								$component .= ' value="'.$component_value.'"';
 								$component .= str_replace(explode(">", $database_component)[0], "", $database_component);
 								?>
-								<div class="mui-textfield mui-textfield--float-label">
+								<div class="mui-textfield <?php if (strpos($component, 'type="date"') == false) { echo "mui-textfield--float-label"; } ?>">
 									<?php echo $component; ?>
 									<label><?php echo $title; ?></label>
 								</div>
@@ -196,7 +218,7 @@ function profile_page_content_all_tabs() {
 	global $wpdb;
 	$current_user = wp_get_current_user();
 	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
-	$role_group = "";
+	$group = "";
 	
 	$url = (is_ssl() ? 'https://' : 'http://').$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'?logout=success';
 		$tabs = $wpdb->get_results("SELECT * FROM $table_name WHERE component = '[tab]'");
@@ -224,25 +246,25 @@ function profile_page_content_all_tabs() {
 				$identifier = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $title)));
 				$title_value = str_replace("_", " ", $title);
 				$database_component = stripslashes($field["component"]);
-				if ($database_component == "multi_select" || $database_component == "radio") {
-					$role_group = $database_component;
+				if ($database_component == "checkbox" || $database_component == "radio") {
+					$group = $database_component;
 					$role_title = strtolower(str_replace(" ", "_", $title));
 				}
 				$is_role = $database_component == "[role]";
-				$is_role_group = $database_component == "multi_select" || $database_component == "radio";
+				$is_group = $database_component == "checkbox" || $database_component == "radio";
 				$is_header = $database_component == "[header]";
 				$is_tab = $database_component == "[tab]";
 				if ($is_tab) {
-				} else if ($is_header || $is_role_group) {
+				} else if ($is_header || $is_group) {
 					echo '<legend>'.$title.'</legend>';
-				} else if ($is_role && $role_group == "radio") {
+				} else if ($is_role && $group == "radio") {
 					?>
 					<div>
 						<input id="<?php echo $identifier; ?>" type="radio" name="<?php echo "role_group_".$role_title; ?>" value="<?php echo $title; ?>" style="width: auto; margin-right: 10px;" <?php if (get_user_meta($current_user->ID, "role_group_".$role_title, true) == $title) { echo "checked"; } ?>/>
 						<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>								
 					</div>
 					<?php
-				} else if ($is_role && $role_group == "multi_select") {
+				} else if ($is_role && $group == "checkbox") {
 					?>
 					<div>
 						<input id="<?php echo $identifier; ?>" type="checkbox" name="<?php echo $identifier; ?>" value="<?php echo $title; ?>" style="width: auto; margin-right: 10px;" <?php if(get_user_meta($current_user->ID, $identifier, true) == 1) { echo "checked"; } ?>/>
@@ -315,7 +337,7 @@ function profile_page_content_all_tabs_non_mui() {
 	global $wpdb;
 	$current_user = wp_get_current_user();
 	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
-	$role_group = "";
+	$group = "";
 	
 	$url = (is_ssl() ? 'https://' : 'http://').$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'?logout=success';
 		$tabs = $wpdb->get_results("SELECT * FROM $table_name WHERE component = '[tab]'");
@@ -343,25 +365,25 @@ function profile_page_content_all_tabs_non_mui() {
 				$identifier = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $title)));
 				$title_value = str_replace("_", " ", $title);
 				$database_component = stripslashes($field["component"]);
-				if ($database_component == "multi_select" || $database_component == "radio") {
-					$role_group = $database_component;
+				if ($database_component == "checkbox" || $database_component == "radio") {
+					$group = $database_component;
 					$role_title = strtolower(str_replace(" ", "_", $title));
 				}
 				$is_role = $database_component == "[role]";
-				$is_role_group = $database_component == "multi_select" || $database_component == "radio";
+				$is_group = $database_component == "checkbox" || $database_component == "radio";
 				$is_header = $database_component == "[header]";
 				$is_tab = $database_component == "[tab]";
 				if ($is_tab) {
-				} else if ($is_header || $is_role_group) {
+				} else if ($is_header || $is_group) {
 					echo '<h2>'.$title.'</h2>';
-				} else if ($is_role && $role_group == "radio") {
+				} else if ($is_role && $group == "radio") {
 					?>
 					<div>
 						<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>								
 						<input id="<?php echo $identifier; ?>" type="radio" name="<?php echo "role_group_".$role_title; ?>" value="<?php echo $title; ?>" style="width: auto; margin-right: 10px;" <?php if (get_user_meta($current_user->ID, "role_group_".$role_title, true) == $title) { echo "checked"; } ?>/>
 					</div>
 					<?php
-				} else if ($is_role && $role_group == "multi_select") {
+				} else if ($is_role && $group == "checkbox") {
 					?>
 					<div>
 						<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>								
@@ -439,8 +461,8 @@ function save_members_profile($what_to_save) {
 		$tab = json_decode(json_encode($tabs[$i]),true);
 		$tab_title = stripslashes($tab["title"]);
 		if ($what_to_save == $tab_title || $what_to_save == "all") {
-			$role_group = "";
-			$role_title = "";
+			$group_type = "";
+			$group = "";
 			$fields_in_tab = $wpdb->get_results("SELECT * FROM $table_name WHERE tab = '$tab_title'");
 			foreach ($fields_in_tab as $field) {
 				$field = json_decode(json_encode($field),true);
@@ -448,18 +470,27 @@ function save_members_profile($what_to_save) {
 				$identifier = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $title)));
 				$title_value = str_replace("_", " ", $title);
 				$database_component = stripslashes($field["component"]);
-				$is_role_group = $database_component == "multi_select" || $database_component == "radio";
-				$is_role = $database_component == "[role]";
+				$is_group = $database_component == "select" || $database_component == "radio";
+				$is_role = $database_component == "[role checkbox]";
 				$is_header = $database_component == "[header]";
 				$is_tab = $database_component == "[tab]";
-				if ($database_component == "multi_select" || $database_component == "radio") {
-					$role_group = $database_component;
-					$role_title = strtolower(str_replace(" ", "_", $title));
-				}
 				if (!$is_header && !$is_tab) {
-					if ($is_role_group && $role_group == "radio") {
-						update_user_meta($current_user->ID, "role_group_".$role_title, $_POST["role_group_".$role_title]);
-					} else if ($is_role && $role_group == "multi_select") {
+					if ($is_group) {
+						$group_type = $database_component;
+						$group = strtolower(str_replace(" ", "_", $title));
+						$group_value = $_POST["group_".$group];
+						$old_role = str_replace(";[role]", "", get_user_meta($current_user->ID, "group_".$group, true));
+						if (strpos($group_value, ";[role]") !== false) {
+							$group_value = str_replace(";[role]", "", $group_value);
+							$group_value = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $group_value)));
+							$current_user->remove_role($old_role);
+							$current_user->add_role($group_value);
+							update_user_meta($current_user->ID, "group_".$group, $group_value.";[role]");
+						} else {
+							$group_value = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $group_value)));
+							update_user_meta($current_user->ID, "group_".$group, $group_value);
+						}
+					} else if ($is_role) {
 						if (isset($_POST[$identifier])) {
 							update_user_meta($current_user->ID, $identifier, 1);
 							$current_user->add_role($identifier);

@@ -1,7 +1,3 @@
-<?php
-settings_fields( 'mp-ssv-frontend-members-options-group' );
-do_settings_sections( 'mp-ssv-frontend-members-options-group' );
-?>
 <form id="mp-ssv-frontend-members-options" name="mp-ssv-frontend-members-options" method="post" action="#">
 	<table id="container" style="width: 100%; border-spacing: 10px 0; margin-bottom: 20px; margin-top: 20px;">
 		<tbody class="sortable">
@@ -24,9 +20,9 @@ do_settings_sections( 'mp-ssv-frontend-members-options-group' );
 				$identifier = preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $title));
 				$title_value = str_replace("_", " ", $title);
 				$component = stripslashes($field["component"]);
-				$role_group = "";
-				$is_role = $component == "[role]";
-				$is_role_group = $component == "multi_select" || $component == "radio";
+				$group = "";
+				$is_role = $component == "[role checkbox]";
+				$is_group = $component == "select" || $component == "radio";
 				$is_header = $component == "[header]";
 				$is_tab = $component == "[tab]";
 				$is_image = strpos($component, "[image]") !== false;
@@ -36,9 +32,9 @@ do_settings_sections( 'mp-ssv-frontend-members-options-group' );
 					$identifier = preg_replace("/\".*/","",$identifier);
 				}
 				?>
-				<tr id="<?php echo $identifier; ?>">
+				<tr id="<?php echo $identifier; ?>" style="vertical-align: top;">
 					<td style="cursor: move;">
-						<img style="padding-right: 15px;" src="<?php echo plugins_url( '../images/icon-menu.svg', __FILE__ ); ?>"/>
+						<img style="padding-right: 15px; margin: 10px 0;" src="<?php echo plugins_url( '../images/icon-menu.svg', __FILE__ ); ?>"/>
 					</td>
 					<?php if ($is_tab) { ?>
 						<td>
@@ -70,11 +66,11 @@ do_settings_sections( 'mp-ssv-frontend-members-options-group' );
 							</select>
 						</td>
 						<td>
-							<input type="text" value="[role]" disabled>
-							<input type="hidden" name="component_option_<?php echo $identifier; ?>" value="[role]">
+							<input type="text" value="[role checkbox]" disabled>
+							<input type="hidden" name="component_option_<?php echo $identifier; ?>" value="[role checkbox]">
 							<input type="hidden" name="submit_option_<?php echo $identifier; ?>">
 						</td>
-					<?php } else if ($is_role_group) { ?>
+					<?php } else if ($is_group) { ?>
 						<td>
 							<input type="text" id="<?php echo $identifier."_title"; ?>" name="title_option_<?php echo $identifier; ?>" value="<?php echo $title_value; ?>"/>
 						</td>
@@ -82,8 +78,58 @@ do_settings_sections( 'mp-ssv-frontend-members-options-group' );
 							<select id="<?php echo $identifier."_title"; ?>" name="component_option_<?php echo $identifier; ?>">
 								<option value=""></option>
 								<option value="radio" <?php if($component == "radio") { echo "selected"; } ?>>Radio</option>
-								<option value="multi_select" <?php if($component == "multi_select") { echo "selected"; } ?>>Multi Select</option>
+								<option value="checkbox" <?php if($component == "checkbox") { echo "selected"; } ?>>Checkbox</option>
+								<option value="select" <?php if($component == "select") { echo "selected"; } ?>>Select</option>
 							</select>
+							<table id="container_<?php echo $identifier; ?>" style="width: 100%; border-spacing: 10px 0; margin-bottom: 20px; margin-top: 20px;">
+								<tr></tr>
+								<?php
+								$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields_group_options";
+								$group_options = $wpdb->get_results( 
+									"SELECT *
+										FROM $table_name"
+								);
+								foreach ($group_options as $group_option) {
+									$group_option = json_decode(json_encode($group_option),true);
+									$group_option = stripslashes($group_option["option_text"]);
+									if (strpos($group_option, ";[role]") !== false) {
+										$group_option = str_replace(";[role]", "", $group_option);
+										$group_option_identifier = preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $group_option));
+										$group_option_identifier = $identifier.$group_option_identifier;
+										?>
+										<tr>
+											<td>
+												<select id="<?php echo $group_option_identifier."_title"; ?>" name="group_option_item_<?php echo $group_option_identifier; ?>">
+													<option></option>
+													<?php
+													$roles = get_editable_roles();
+													foreach ($roles as $role_name => $role_info) { ?>
+														<option value="<?php echo $role_info['name']; ?>;[role]" <?php if($group_option == $role_info['name']) { echo "selected"; } ?>><?php echo $role_info['name']; ?></option>
+													<?php } ?>
+												</select>
+											</td>
+											<td><input type="hidden" name="<?php echo "submit_group_option_".$group_option_identifier ?>"></td>
+										</tr>
+										<?php
+									} else {
+										$group_option_identifier = preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $group_option));
+										$group_option_identifier = $identifier.$group_option_identifier;
+										?>
+										<tr>
+											<td>
+												<input id="<?php echo $group_option_identifier."_title"; ?>" name="group_option_item_<?php echo $group_option_identifier; ?>" value="<?php echo $group_option; ?>">
+											</td>
+											<td><input type="hidden" name="<?php echo "submit_group_option_".$group_option_identifier ?>"></td>
+										</tr>
+										<?php
+									}
+								}
+								?>
+							</table>
+							<button type="button" id="add_option_button" onclick="add_new_option(container_<?php echo $identifier; ?>)">Add Component</button>
+							<?php if (esc_attr(stripslashes(get_option('mp_ssv_frontend_members_guest_custom_roles_enabled'))) == 'true') { ?>
+								<button type="button" id="add_user_role_button" onclick="add_new_user_role(container_<?php echo $identifier; ?>)">Add User Role</button>
+							<?php } ?>
 							<input type="hidden" name="submit_option_<?php echo $identifier; ?>">
 						</td>
 					<?php } else if ($is_image) { ?>
@@ -91,10 +137,10 @@ do_settings_sections( 'mp-ssv-frontend-members-options-group' );
 							<input type="text" id="<?php echo $identifier."_title"; ?>" name="title_option_<?php echo $identifier; ?>" value="<?php echo $title_value; ?>"/>
 						</td>
 						<td>
-							<input type="text" value="[image]" disabled>
+							<input type="text" value="[image]" disabled><br/>
 							<input type="hidden" name="component_option_<?php echo $identifier; ?>" value="[image]">
-							<input type="checkbox" name="is_required_option_<?php echo $identifier; ?>" <?php if (strpos($component, "required")) { echo "checked"; } ?> style="margin: 0 10px;" value="on">Required
-							<input type="checkbox" name="show_preview_option_<?php echo $identifier; ?>" <?php if (strpos($component, "show_preview")) { echo "checked"; } ?> style="margin: 0 10px;" value="on">Show Preview
+							<input type="checkbox" name="is_required_option_<?php echo $identifier; ?>" <?php if (strpos($component, "required")) { echo "checked"; } ?> style="margin: 0 10px;" value="on">Required<br/>
+							<input type="checkbox" name="show_preview_option_<?php echo $identifier; ?>" <?php if (strpos($component, "show_preview")) { echo "checked"; } ?> style="margin: 0 10px;" value="on">Show Preview<br/>
 							<input type="hidden" name="submit_option_<?php echo $identifier; ?>">
 						</td>
 					<?php } else { ?>
@@ -110,19 +156,16 @@ do_settings_sections( 'mp-ssv-frontend-members-options-group' );
 			<?php } ?>
 		</tbody>
 	</table>
-	<button type="button" id="add_component_button" onclick="add_new_component()">Add Component</button>
-	<?php if (esc_attr(stripslashes(get_option('mp_ssv_frontend_members_guest_custom_roles_enabled'))) == 'true') { ?>
-		<button type="button" id="add_user_role_group_button" onclick="add_new_user_role_group()">Add Group</button>
-		<button type="button" id="add_user_role_button" onclick="add_new_user_role()">Add User Role</button>
+	<?php if (get_theme_support('mui')) { ?>
+		<button type="button" id="add_tab_button" onclick="add_new_tab()">Add Tab</button>
 	<?php } ?>
 	<button type="button" id="add_header_button" onclick="add_new_header()">Add Header</button>
+	<button type="button" id="add_component_button" onclick="add_new_component()">Add Component</button>
+	<button type="button" id="add_group_button" onclick="add_new_group()">Add Group</button>
 	<button type="button" id="add_image_button" onclick="add_new_image()">Add Image</button>
-	<?php
-	if (get_theme_support('mui')) {
-		?>
-		<button type="button" id="add_tab_button" onclick="add_new_tab()">Add Tab</button>
-		<?php
-	}
+	<?php if (esc_attr(stripslashes(get_option('mp_ssv_frontend_members_guest_custom_roles_enabled'))) == 'true') { ?>
+		<button type="button" id="add_user_role_button" onclick="add_new_user_role_checkbox()">Add User Role</button>
+	<?php }
 	submit_button();
 	?>
 </form>
@@ -135,12 +178,64 @@ $(function() {
 });
 </script>
 <script>
+function add_new_tab() {
+	var id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+	$("#container > tbody:last-child").append(
+		$('<tr id="' + id + '" style="vertical-align: top;">').append(
+			$('<td style="cursor: move;">').append(
+				'<img style="padding-right: 15px; margin: 10px 0;" src="<?php echo plugins_url("../images/icon-menu.svg", __FILE__); ?>"/>'
+			)
+		).append(
+			$('<td>').append(
+				'<input type="text" id="' + id + '_title" name="title_option_' + id + '"/>'
+			)
+		).append(
+			$('<td>').append(
+				'<input type="text" value="[tab]" disabled>'
+			).append (
+				'<input type="hidden" name="component_option_' + id + '" value="[tab]">'
+			)
+		).append(
+			$('<td>')
+		).append(
+			$('<td>').append(
+				'<input type="hidden" name="submit_option_' + id + '">'
+			)
+		)
+	);
+}
+function add_new_header() {
+	var id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+	$("#container > tbody:last-child").append(
+		$('<tr id="' + id + '" style="vertical-align: top;">').append(
+			$('<td style="cursor: move;">').append(
+				'<img style="padding-right: 15px; margin: 10px 0;" src="<?php echo plugins_url("../images/icon-menu.svg", __FILE__); ?>"/>'
+			)
+		).append(
+			$('<td>').append(
+				'<input type="text" id="' + id + '_title" name="title_option_' + id + '"/>'
+			)
+		).append(
+			$('<td>').append(
+				'<input type="text" value="[header]" disabled>'
+			).append (
+				'<input type="hidden" name="component_option_' + id + '" value="[header]">'
+			)
+		).append(
+			$('<td>')
+		).append(
+			$('<td>').append(
+				'<input type="hidden" name="submit_option_' + id + '">'
+			)
+		)
+	);
+}
 function add_new_component() {
 	var id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 	$("#container > tbody:last-child").append(
-		$('<tr id="' + id + '">').append(
+		$('<tr id="' + id + '" style="vertical-align: top;">').append(
 			$('<td style="cursor: move;">').append(
-				'<img style="padding-right: 15px;" src="<?php echo plugins_url("../images/icon-menu.svg", __FILE__); ?>"/>'
+				'<img style="padding-right: 15px; margin: 10px 0;" src="<?php echo plugins_url("../images/icon-menu.svg", __FILE__); ?>"/>'
 			)
 		).append(
 			$('<td>').append(
@@ -155,28 +250,31 @@ function add_new_component() {
 		)
 	);
 }
-function add_new_user_role() {
+function add_new_group() {
 	var id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 	$("#container > tbody:last-child").append(
-		$('<tr id="' + id + '">').append(
+		$('<tr id="' + id + '" style="vertical-align: top;">').append(
 			$('<td style="cursor: move;">').append(
-				'<img style="padding-right: 15px;" src="<?php echo plugins_url("../images/icon-menu.svg", __FILE__); ?>"/>'
+				'<img style="padding-right: 15px; margin: 10px 0;" src="<?php echo plugins_url("../images/icon-menu.svg", __FILE__); ?>"/>'
 			)
 		).append(
 			$('<td>').append(
-				$('<select id="' + id + '_title" name="title_option_' + id + '"/>')
-					.append('<option></option>')
-					<?php
-					$roles = get_editable_roles();
-					foreach ($roles as $role_name => $role_info) { ?>
-						.append('<option value="<?php echo $role_info['name']; ?>"><?php echo $role_info['name']; ?></option>')
-					<?php } ?>
+				'<input type="text" id="' + id + '_title" name="title_option_' + id + '"/>'
 			)
 		).append(
 			$('<td>').append(
-				'<input type="text" id="' + id + '_component" name="component_option_' + id + '" value="[role]" disabled/>'
-			).append (
-				'<input type="hidden" name="component_option_' + id + '" value="[role]">'
+				$('<select id="' + id + '_title" name="component_option_' + id + '"/><br/>')
+					.append('<option value=""></option>')
+					.append('<option value="radio">Radio</option>')
+					.append('<option value="select" selected>Select</option>')
+			).append(
+				$('<table id="container_' + id + '" style="width: 100%; border-spacing: 10px 0; margin-bottom: 20px; margin-top: 20px;">').append(
+					'<tbody>'
+				)
+			).append(
+				'<button type="button" id="add_option_button" onclick="add_new_option(container_' + id + ')">Add Component</button>'
+			).append(
+				<?php if (esc_attr(stripslashes(get_option('mp_ssv_frontend_members_guest_custom_roles_enabled'))) == 'true') { ?>'<button type="button" id="add_user_role_button" onclick="add_new_user_role(container_' + id + ')">Add User Role</button>'<?php } ?>
 			)
 		).append(
 			'<td>'
@@ -192,9 +290,9 @@ function add_new_user_role() {
 function add_new_image() {
 	var id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 	$("#container > tbody:last-child").append(
-		$('<tr id="' + id + '">').append(
+		$('<tr id="' + id + '" style="vertical-align: top;">').append(
 			$('<td style="cursor: move;">').append(
-				'<img style="padding-right: 15px;" src="<?php echo plugins_url("../images/icon-menu.svg", __FILE__); ?>"/>'
+				'<img style="padding-right: 15px; margin: 10px 0;" src="<?php echo plugins_url("../images/icon-menu.svg", __FILE__); ?>"/>'
 			)
 		).append(
 			$('<td>').append(
@@ -221,83 +319,66 @@ function add_new_image() {
 		)
 	);
 }
-function add_new_user_role_group() {
+function add_new_user_role_checkbox() {
 	var id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-	$("#container > tbody:last-child").append(
-		$('<tr id="' + id + '">').append(
-			$('<td style="cursor: move;">').append(
-				'<img style="padding-right: 15px;" src="<?php echo plugins_url("../images/icon-menu.svg", __FILE__); ?>"/>'
-			)
+	$("#" + container.id + " > tbody:last-child").append(
+		$('<tr id="' + container.id + "_" + id + '" style="vertical-align: top;">').append(
+				$('<td style="cursor: move;">').append(
+					'<img style="padding-right: 15px; margin: 10px 0;" src="<?php echo plugins_url("../images/icon-menu.svg", __FILE__); ?>"/>'
+				)
 		).append(
 			$('<td>').append(
-				'<input type="text" id="' + id + '_title" name="title_option_' + id + '"/>'
+				$('<select id="' + container.id + "_" + id + '_title" name="title_option_' + container.id + "_" + id + '"/>')
+					.append('<option></option>')
+					<?php
+					$roles = get_editable_roles();
+					foreach ($roles as $role_name => $role_info) { ?>
+						.append('<option value="<?php echo $role_info['name']; ?>"><?php echo $role_info['name']; ?></option>')
+					<?php } ?>
 			)
 		).append(
-			$('<td>').append(
-				$('<select id="' + id + '_title" name="component_option_' + id + '"/>')
-					.append('<option value=""></option>')
-					.append('<option value="radio">Radio</option>')
-					.append('<option value="multi_select" selected>Multi Select</option>')
-			)
-		).append(
-			'<td>'
-		).append(
-			'<td>'
+				$('<td>').append(
+					'<input type="text" value="[role checkbox]" disabled>'
+				).append (
+					'<input type="hidden" name="component_option_' + id + '" value="[role checkbox]">'
+				)
 		).append(
 			$('<td>').append(
-				'<input type="hidden" name="submit_option_' + id + '">'
+				'<input type="hidden" name="submit_option_' + container.id + "_" + id + '">'
 			)
 		)
 	);
 }
-function add_new_header() {
+function add_new_option(container) {
 	var id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-	$("#container > tbody:last-child").append(
-		$('<tr id="' + id + '">').append(
-			$('<td style="cursor: move;">').append(
-				'<img style="padding-right: 15px;" src="<?php echo plugins_url("../images/icon-menu.svg", __FILE__); ?>"/>'
+	$("#" + container.id + " > tbody:last-child").append(
+		$('<tr id="' + container.id + "_" + id + '" style="vertical-align: top;">').append(
+			$('<td>').append(
+				'<input type="text" id="' + container.id + "_" + id + '_option" name="group_option_item_' + container.id + "_" + id + '"/>'
 			)
 		).append(
 			$('<td>').append(
-				'<input type="text" id="' + id + '_title" name="title_option_' + id + '"/>'
-			)
-		).append(
-			$('<td>').append(
-				'<input type="text" value="[header]" disabled>'
-			).append (
-				'<input type="hidden" name="component_option_' + id + '" value="[header]">'
-			)
-		).append(
-			$('<td>')
-		).append(
-			$('<td>').append(
-				'<input type="hidden" name="submit_option_' + id + '">'
+				'<input type="hidden" name="submit_group_option_' + container.id + "_" + id + '">'
 			)
 		)
 	);
 }
-function add_new_tab() {
+function add_new_user_role(container) {
 	var id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-	$("#container > tbody:last-child").append(
-		$('<tr id="' + id + '">').append(
-			$('<td style="cursor: move;">').append(
-				'<img style="padding-right: 15px;" src="<?php echo plugins_url("../images/icon-menu.svg", __FILE__); ?>"/>'
+	$("#" + container.id + " > tbody:last-child").append(
+		$('<tr id="' + container.id + "_" + id + '" style="vertical-align: top;">').append(
+			$('<td>').append(
+				$('<select id="' + container.id + "_" + id + '_title" name="group_option_item_' + container.id + "_" + id + '"/>')
+					.append('<option></option>')
+					<?php
+					$roles = get_editable_roles();
+					foreach ($roles as $role_name => $role_info) { ?>
+						.append('<option value="<?php echo $role_info['name']; ?>;[role]"><?php echo $role_info['name']; ?></option>')
+					<?php } ?>
 			)
 		).append(
 			$('<td>').append(
-				'<input type="text" id="' + id + '_title" name="title_option_' + id + '"/>'
-			)
-		).append(
-			$('<td>').append(
-				'<input type="text" value="[tab]" disabled>'
-			).append (
-				'<input type="hidden" name="component_option_' + id + '" value="[tab]">'
-			)
-		).append(
-			$('<td>')
-		).append(
-			$('<td>').append(
-				'<input type="hidden" name="submit_option_' + id + '">'
+				'<input type="hidden" name="submit_group_option_' + container.id + "_" + id + '">'
 			)
 		)
 	);
