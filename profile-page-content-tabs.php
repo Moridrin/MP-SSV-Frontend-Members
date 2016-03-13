@@ -1,5 +1,5 @@
 <?php
-function mp_ssv_profile_page_content_single_tab() {
+function mp_ssv_profile_page_content_tabs() {
 	global $wpdb;
 	$current_user = wp_get_current_user();
 	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
@@ -7,8 +7,7 @@ function mp_ssv_profile_page_content_single_tab() {
 	
 	$url = (is_ssl() ? 'https://' : 'http://').$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'?logout=success';
 		$tabs = $wpdb->get_results("SELECT title FROM $table_name WHERE component = '[tab]'");
-		$content = '<div class="mui--hidden-xs">';
-		$content .= '<ul id="profile-menu" class="mui-tabs__bar mui-tabs__bar--justified">';
+		$content = '<ul id="profile-menu" class="mui-tabs__bar mui-tabs__bar--justified">';
 		for ($i = 0; $i < count($tabs); $i++) {
 			$tab = json_decode(json_encode($tabs[$i]),true);
 			$title = stripslashes($tab["title"]);
@@ -51,7 +50,7 @@ function mp_ssv_profile_page_content_single_tab() {
 						$is_image = strpos($database_component, "[image]") !== false;
 						if ($is_tab) {
 						} else if ($is_header) {
-							mp_ssv_echo_tab($title);
+							mp_ssv_echo_header($title);
 						} else if ($is_group) {
 							mp_ssv_echo_group($database_component, $identifier, $title, $current_user);
 						} else if ($is_role) {
@@ -93,13 +92,12 @@ function mp_ssv_profile_page_content_single_tab() {
 			<input type="hidden" name="what-to-save" value="<?php echo $tab_title; ?>"/>
 		</form>
 	</div>
-	</div>
 	<?php
 	$content .= ob_get_clean();
 	return $content;
 }
 
-function mp_ssv_echo_tab($title) {
+function mp_ssv_echo_header($title) {
 	echo '<legend>'.$title.'</legend>';
 }
 
@@ -119,15 +117,16 @@ function mp_ssv_echo_group($database_component, $identifier, $title, $current_us
 	foreach ($group_options as $group_option) {
 		$group_option = json_decode(json_encode($group_option),true);
 		$group_option = stripslashes($group_option["option_text"]);
-		if (strpos($group_option, ";[role]") !== false) {
+		$is_role = strpos($group_option, ";[role]") !== false;
+		if ($is_role) {
 			$group_option = str_replace(";[role]", "", $group_option);
 			$group_option_label = $group_option;
 			$group_option = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $group_option)));
-			echo_group_option($group_option, $group_option_label, $current_user, $identifier, $is_role);
+			mp_ssv_echo_group_option($group_option, $group_option_label, $current_user, $identifier, $is_role);
 		} else {
 			$group_option_label = $group_option;
 			$group_option = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $group_option)));
-			?><option value="<?php echo $group_option; ?>" <?php if($group_option."" == get_user_meta($current_user->ID, "group_".$identifier, true)) { echo "selected"; } ?>><?php echo $group_option_label; ?></option><?php
+			mp_ssv_echo_group_option($group_option, $group_option_label, $current_user, $identifier, $is_role);
 		}
 	}
 	if ($database_component == "select") {
@@ -145,7 +144,7 @@ function mp_ssv_echo_group_option($group_option, $group_option_label, $current_u
 		$role_tag = ';[role]';
 	}
 	$option = '<option';
-	$option .= 'value="'.$group_option.$role_tag.'"';
+	$option .= ' value="'.$group_option.$role_tag.'"';
 	if($group_option.$role_tag == get_user_meta($current_user->ID, "group_".$identifier, true)) {
 		$option .= " selected";
 	}

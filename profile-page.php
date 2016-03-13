@@ -1,4 +1,14 @@
 <?php
+function mp_ssv_profile_page_login_redirect() {
+	global $post;
+	$post_name_correct = $post->post_name == 'profile';
+  if (!is_user_logged_in() && $post_name_correct) {
+		wp_redirect("/login");
+		exit;
+  }
+}
+add_action('wp_head','mp_ssv_profile_page_login_redirect');
+
 function mp_ssv_profile_page_setup($content) {
 	global $post;
 	if ($post->post_name != 'profile') {
@@ -6,15 +16,10 @@ function mp_ssv_profile_page_setup($content) {
 	} else if (strpos($content, '[mp-ssv-frontend-members-profile]') === false) {
 		return $content;
 	}
-	if (!is_user_logged_in()) {
-		wp_redirect("/login");
-		exit;
-	} else {
-		if (isset($_POST['what-to-save'])) {
-			save_members_profile($_POST['what-to-save']);
-		}
-		$content = mp_ssv_profile_page_content();
+	if (isset($_POST['what-to-save'])) {
+		save_members_profile($_POST['what-to-save']);
 	}
+	$content = mp_ssv_profile_page_content();
 	return $content;
 }
 add_filter( 'the_content', 'mp_ssv_profile_page_setup' );
@@ -22,255 +27,21 @@ add_filter( 'the_content', 'mp_ssv_profile_page_setup' );
 function mp_ssv_profile_page_content() {
 	$content = "";
 	if (current_theme_supports('mui')) {
-		$content .= mp_ssv_profile_page_content_single_tab();
-		//$content .= '<div class="mui--visible-xs-block">';
-		//$content .= mp_ssv_profile_page_content_all_tabs();
-		//$content .= '</div>';
+		$content = '<div class="mui--hidden-xs">';
+		$content .= mp_ssv_profile_page_content_tabs();
+		$content .= '</div>';
+		$content .= '<div class="mui--visible-xs-block">';
+		$content .= mp_ssv_profile_page_content_single_page();
+		$content .= '</div>';
 	} else {
-		//$content .= mp_ssv_profile_page_content_all_tabs_non_mui();
+		$content .= mp_ssv_profile_page_content_non_mui();
 	}
 	return $content;
 }
 
 include_once "profile-page-content-tabs.php";
-
-function mp_ssv_profile_page_content_all_tabs() {
-	global $wpdb;
-	$current_user = wp_get_current_user();
-	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
-	$group = "";
-	
-	$url = (is_ssl() ? 'https://' : 'http://').$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'?logout=success';
-		$tabs = $wpdb->get_results("SELECT * FROM $table_name WHERE component = '[tab]'");
-		$content = '';
-		ob_start();
-		?>
-		<a class="mui-btn mui-btn--flat mui-btn--danger" href="<?php echo wp_logout_url($url); ?>" style="float: right;">Logout</a>
-		<form name="members_profile_form" id="member_form" action="/profile" method="post">
-		<?php
-		$content .= ob_get_clean();
-		for ($i = 0; $i < count($tabs); $i++) {
-			$tab = json_decode(json_encode($tabs[$i]),true);
-			$tab_title = stripslashes($tab["title"]);
-			$identifier = preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $tab_title));
-			$title_value = str_replace("_", " ", $tab_title);
-			$component = stripslashes($tab["component"]);
-			$is_role = $component == "[role]";
-			$is_header = $component == "[header]";
-			$is_tab = $component == "[tab]";
-			ob_start();
-			$fields_in_tab = $wpdb->get_results("SELECT * FROM $table_name WHERE tab = '$tab_title'");
-			foreach ($fields_in_tab as $field) {
-				$field = json_decode(json_encode($field),true);
-				$title = stripslashes($field["title"]);
-				$identifier = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $title)));
-				$title_value = str_replace("_", " ", $title);
-				$database_component = stripslashes($field["component"]);
-				if ($database_component == "checkbox" || $database_component == "radio") {
-					$group = $database_component;
-					$role_title = strtolower(str_replace(" ", "_", $title));
-				}
-				$is_role = $database_component == "[role]";
-				$is_group = $database_component == "checkbox" || $database_component == "radio";
-				$is_header = $database_component == "[header]";
-				$is_tab = $database_component == "[tab]";
-				if ($is_tab) {
-				} else if ($is_header || $is_group) {
-					echo '<legend>'.$title.'</legend>';
-				} else if ($is_role && $group == "radio") {
-					?>
-					<div>
-						<input id="<?php echo $identifier; ?>" type="radio" name="<?php echo "role_group_".$role_title; ?>" value="<?php echo $title; ?>" style="width: auto; margin-right: 10px;" <?php if (get_user_meta($current_user->ID, "role_group_".$role_title, true) == $title) { echo "checked"; } ?>/>
-						<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>								
-					</div>
-					<?php
-				} else if ($is_role && $group == "checkbox") {
-					?>
-					<div>
-						<input id="<?php echo $identifier; ?>" type="checkbox" name="<?php echo $identifier; ?>" value="<?php echo $title; ?>" style="width: auto; margin-right: 10px;" <?php if(get_user_meta($current_user->ID, $identifier, true) == 1) { echo "checked"; } ?>/>
-						<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>								
-					</div>
-					<?php
-				} else {
-							if (($database_component) != "" && strpos($database_component, "name=\"") !== false) {
-								$identifier = preg_replace("/.*name=\"/","",stripslashes($database_component));
-								$identifier = preg_replace("/\".*/","",$identifier);
-								$identifier = strtolower($identifier);
-							}
-							if ($identifier == "user_login") {
-								$component_value = get_userdata($current_user->ID)->user_login;
-							} else if ($identifier == "user_nicename") {
-								$component_value = get_userdata($current_user->ID)->user_nicename;
-							} else if ($identifier == "user_email") {
-								$component_value = get_userdata($current_user->ID)->user_email;
-							} else if ($identifier == "display_name") {
-								$component_value = get_userdata($current_user->ID)->display_name;
-							} else {
-								$component_value = get_user_meta($current_user->ID, $identifier, true);
-							}
-							if (strpos($database_component, 'type="file"') !== false) {
-								?>
-								<div class="mui-textfield">
-									<?php echo $database_component; ?>
-									<label><?php echo $title; ?></label>
-								</div>
-								<?php
-							} else if (substr($database_component, 0, 4) == '<img') {
-								if (($database_component) != "" && strpos($database_component, "src=\"") !== false) {
-									$identifier = preg_replace("/.*src=\"/","",stripslashes($database_component));
-									$identifier = preg_replace("/\".*/","",$identifier);
-									$identifier = strtolower($identifier);
-								}
-								$component = str_replace($identifier, get_user_meta($current_user->ID, $identifier, true), $database_component);
-								?>
-								<div class="mui-textfield">
-									<?php echo $component; ?>
-								</div>
-								<?php
-							} else {
-								$component = explode(">", $database_component)[0];
-								$component .= ' value="'.$component_value.'"';
-								$component .= str_replace(explode(">", $database_component)[0], "", $database_component);
-								?>
-								<div class="mui-textfield mui-textfield--float-label">
-									<?php echo $component; ?>
-									<label><?php echo $title; ?></label>
-								</div>
-								<?php
-							}
-						}
-			}
-			$content .= ob_get_clean();
-		}
-	$content .= profile_page_registrations_table_content();
-	ob_start();
-	?>
-	<button class="mui-btn mui-btn--primary" type="submit" name="submit" id="submit" class="button-primary">Save</button>
-	<input type="hidden" name="what-to-save" value="all"/>
-	</form>
-	<?php
-	$content .= ob_get_clean();
-	return $content;
-}
-
-function mp_ssv_profile_page_content_all_tabs_non_mui() {
-	global $wpdb;
-	$current_user = wp_get_current_user();
-	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
-	$group = "";
-	
-	$url = (is_ssl() ? 'https://' : 'http://').$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'?logout=success';
-		$tabs = $wpdb->get_results("SELECT * FROM $table_name WHERE component = '[tab]'");
-		$content = '';
-		ob_start();
-		?>
-		<a class="mui-btn mui-btn--flat mui-btn--danger" href="<?php echo wp_logout_url($url); ?>" style="float: right;">Logout</a>
-		<form name="members_profile_form" id="member_form" action="/profile" method="post">
-		<?php
-		$content .= ob_get_clean();
-		for ($i = 0; $i < count($tabs); $i++) {
-			$tab = json_decode(json_encode($tabs[$i]),true);
-			$tab_title = stripslashes($tab["title"]);
-			$identifier = preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $tab_title));
-			$title_value = str_replace("_", " ", $tab_title);
-			$component = stripslashes($tab["component"]);
-			$is_role = $component == "[role]";
-			$is_header = $component == "[header]";
-			$is_tab = $component == "[tab]";
-			ob_start();
-			$fields_in_tab = $wpdb->get_results("SELECT * FROM $table_name WHERE tab = '$tab_title'");
-			foreach ($fields_in_tab as $field) {
-				$field = json_decode(json_encode($field),true);
-				$title = stripslashes($field["title"]);
-				$identifier = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $title)));
-				$title_value = str_replace("_", " ", $title);
-				$database_component = stripslashes($field["component"]);
-				if ($database_component == "checkbox" || $database_component == "radio") {
-					$group = $database_component;
-					$role_title = strtolower(str_replace(" ", "_", $title));
-				}
-				$is_role = $database_component == "[role]";
-				$is_group = $database_component == "checkbox" || $database_component == "radio";
-				$is_header = $database_component == "[header]";
-				$is_tab = $database_component == "[tab]";
-				if ($is_tab) {
-				} else if ($is_header || $is_group) {
-					echo '<h2>'.$title.'</h2>';
-				} else if ($is_role && $group == "radio") {
-					?>
-					<div>
-						<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>								
-						<input id="<?php echo $identifier; ?>" type="radio" name="<?php echo "role_group_".$role_title; ?>" value="<?php echo $title; ?>" style="width: auto; margin-right: 10px;" <?php if (get_user_meta($current_user->ID, "role_group_".$role_title, true) == $title) { echo "checked"; } ?>/>
-					</div>
-					<?php
-				} else if ($is_role && $group == "checkbox") {
-					?>
-					<div>
-						<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>								
-						<input id="<?php echo $identifier; ?>" type="checkbox" name="<?php echo $identifier; ?>" value="<?php echo $title; ?>" style="width: auto; margin-right: 10px;" <?php if(get_user_meta($current_user->ID, $identifier, true) == 1) { echo "checked"; } ?>/>
-					</div>
-					<?php
-				} else {
-							if (($database_component) != "" && strpos($database_component, "name=\"") !== false) {
-								$identifier = preg_replace("/.*name=\"/","",stripslashes($database_component));
-								$identifier = preg_replace("/\".*/","",$identifier);
-								$identifier = strtolower($identifier);
-							}
-							if ($identifier == "user_login") {
-								$component_value = get_userdata($current_user->ID)->user_login;
-							} else if ($identifier == "user_nicename") {
-								$component_value = get_userdata($current_user->ID)->user_nicename;
-							} else if ($identifier == "user_email") {
-								$component_value = get_userdata($current_user->ID)->user_email;
-							} else if ($identifier == "display_name") {
-								$component_value = get_userdata($current_user->ID)->display_name;
-							} else {
-								$component_value = get_user_meta($current_user->ID, $identifier, true);
-							}
-							if (strpos($database_component, 'type="file"') !== false) {
-								?>
-								<div class="mui-textfield">
-									<label><?php echo $title; ?></label>
-									<?php echo $database_component; ?>
-								</div>
-								<?php
-							} else if (substr($database_component, 0, 4) == '<img') {
-								if (($database_component) != "" && strpos($database_component, "src=\"") !== false) {
-									$identifier = preg_replace("/.*src=\"/","",stripslashes($database_component));
-									$identifier = preg_replace("/\".*/","",$identifier);
-									$identifier = strtolower($identifier);
-								}
-								$component = str_replace($identifier, get_user_meta($current_user->ID, $identifier, true), $database_component);
-								?>
-								<div class="mui-textfield">
-									<?php echo $component; ?>
-								</div>
-								<?php
-							} else {
-								$component = explode(">", $database_component)[0];
-								$component .= ' value="'.$component_value.'"';
-								$component .= str_replace(explode(">", $database_component)[0], "", $database_component);
-								?>
-								<div class="mui-textfield mui-textfield--float-label">
-									<label><?php echo $title; ?></label>
-									<?php echo $component; ?>
-								</div>
-								<?php
-							}
-						}
-			}
-			$content .= ob_get_clean();
-		}
-	$content .= profile_page_registrations_table_content();
-	ob_start();
-	?>
-	<button class="mui-btn mui-btn--primary" type="submit" name="submit" id="submit" class="button-primary">Save</button>
-	<input type="hidden" name="what-to-save" value="all"/>
-	</form>
-	<?php
-	$content .= ob_get_clean();
-	return $content;
-}
+include_once "profile-page-content-single-page.php";
+include_once "profile-page-content-non-mui.php";
 
 function mp_ssv_save_members_profile($what_to_save) {
 	global $wpdb;
