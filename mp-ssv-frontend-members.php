@@ -97,11 +97,6 @@ function mp_ssv_unregister_mp_ssv_frontend_members() {
 }
 register_deactivation_hook(__FILE__, 'unregister_mp_ssv_frontend_members');
 
-function mp_ssv_app_output_buffer() {
-	ob_start();
-}
-add_action('init', 'app_output_buffer');
-
 function mp_ssv_frontend_members_avatar($avatar, $id_or_email, $size, $default, $alt) {
     $user = false;
     $id = false;
@@ -128,7 +123,7 @@ function mp_ssv_frontend_members_avatar($avatar, $id_or_email, $size, $default, 
 
     return $avatar;
 }
-add_filter( 'get_avatar', 'frontend_members_avatar' , 1 , 5 );
+add_filter( 'get_avatar', 'mp_ssv_frontend_members_avatar' , 1 , 5 );
 
 function mp_ssv_update_mailchimp_frontend_member($memberId, $listID) {
 	$apiKey = get_option('mp_ssv_mailchimp_api_key');

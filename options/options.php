@@ -40,5 +40,5 @@ function mp_ssv_frontend_members_settings_page() {
 	</div>
 	<?php
 }
-add_action('admin_menu', 'add_mp_ssv_frontend_members_options');
+add_action('admin_menu', 'mp_ssv_add_mp_ssv_frontend_members_options');
 ?>

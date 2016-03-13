@@ -1,7 +1,7 @@
 <?php
 include_once "mailchimp-tab-save.php";
 function mp_ssv_mailchimp_settings_page_frontend_members_tab() {
-	$mailchimp_merge_tags = get_merge_fields(get_option('mailchimp_member_sync_list_id'));
+	$mailchimp_merge_tags = mp_ssv_get_merge_fields(get_option('mailchimp_member_sync_list_id'));
 	
 	global $wpdb;
 	$table_name = $wpdb->prefix."mp_ssv_mailchimp_merge_fields";
@@ -21,12 +21,12 @@ function mp_ssv_mailchimp_settings_page_frontend_members_tab() {
 			</tr>
 			<tr>
 				<td><input type="text" class="regular-text" name="member_first_name" value="first_name" readonly/></td>
-				<td> <?php get_merge_fields_select("first_Name", "FNAME", true, $mailchimp_merge_tags); ?> </td>
+				<td> <?php mp_ssv_get_merge_fields_select("first_Name", "FNAME", true, $mailchimp_merge_tags); ?> </td>
 				<td></td>
 			</tr>
 			<tr>
 				<td><input type="text" class="regular-text" name="member_last_name" value="last_name" readonly/></td>
-				<td> <?php get_merge_fields_select("last_Name", "LNAME", true, $mailchimp_merge_tags); ?> </td>
+				<td> <?php mp_ssv_get_merge_fields_select("last_Name", "LNAME", true, $mailchimp_merge_tags); ?> </td>
 				<td></td>
 			</tr>
 			<?php 
@@ -36,8 +36,8 @@ function mp_ssv_mailchimp_settings_page_frontend_members_tab() {
 				$mailchimp_tag = stripslashes($field["mailchimp_tag"]);
 				?>
 				<tr>
-					<td><?php echo get_member_fields_select($member_tag, false, $fields_in_tab); ?></td>
-					<td> <?php get_merge_fields_select($member_tag, $mailchimp_tag, false, $mailchimp_merge_tags); ?> </td>
+					<td><?php echo mp_ssv_get_member_fields_select($member_tag, false, $fields_in_tab); ?></td>
+					<td> <?php mp_ssv_get_merge_fields_select($member_tag, $mailchimp_tag, false, $mailchimp_merge_tags); ?> </td>
 					<td><input type="hidden" name="submit_option_<?php echo $member_tag; ?>"></td>
 				</tr>
 				<?php
@@ -55,11 +55,11 @@ function mp_ssv_mailchimp_settings_page_frontend_members_tab() {
 		$("#container > tbody:last-child").append(
 			$('<tr id="' + id + '">').append(
 				$('<td>').append(
-					'<?php echo get_member_fields_select_for_javascript(false, $fields_in_tab); ?>'
+					'<?php echo mp_ssv_get_member_fields_select_for_javascript(false, $fields_in_tab); ?>'
 				)
 			).append(
 				$('<td>').append(
-					'<?php echo get_merge_fields_select_for_javascript(false, $mailchimp_merge_tags); ?>'
+					'<?php echo mp_ssv_get_merge_fields_select_for_javascript(false, $mailchimp_merge_tags); ?>'
 				)
 			).append(
 				$('<td>').append(
@@ -72,7 +72,7 @@ function mp_ssv_mailchimp_settings_page_frontend_members_tab() {
 	<?php
 }
 
-if (!function_exists("get_member_fields_select_for_javascript")) {
+if (!function_exists("mp_ssv_get_member_fields_select_for_javascript")) {
 	function mp_ssv_get_member_fields_select_for_javascript($disabled, $fields_in_tab) {
 		?><select name="member_' + id + '" <?php if ($disabled) { echo "disabled"; } ?>><option></option><?php
 		foreach ($fields_in_tab as $field) {
@@ -89,7 +89,7 @@ if (!function_exists("get_member_fields_select_for_javascript")) {
 	}
 }
 
-if (!function_exists("get_member_fields_select")) {
+if (!function_exists("mp_ssv_get_member_fields_select")) {
 	function mp_ssv_get_member_fields_select($tag_name, $disabled, $fields_in_tab) {
 		if ($tag_name == "") {
 			$s = uniqid('', true);

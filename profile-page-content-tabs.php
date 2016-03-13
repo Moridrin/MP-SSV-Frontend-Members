@@ -19,7 +19,7 @@ function mp_ssv_profile_page_content_single_tab() {
 			if ($i == 0) { $li_class = ' class="mui--is-active"'; }
 			$content .= '<li'.$li_class.'><a class="mui-btn mui-btn--flat" data-mui-toggle="tab" data-mui-controls="pane-'.$identifier.'">'.$title_value.'</a></li>';
 		}
-		if (function_exists('profile_page_registrations_table_content')) {
+		if (function_exists('mp_ssv_profile_page_registrations_table_content')) {
 			$content .= '<li><a class="mui-btn mui-btn--flat" data-mui-toggle="tab" data-mui-controls="pane-registrations">Registrations</a></li>';
 		}
 		$content .= '<li><a class="mui-btn mui-btn--flat mui-btn--danger" href="'.wp_logout_url($url).'">Logout</a></li>';
@@ -51,20 +51,20 @@ function mp_ssv_profile_page_content_single_tab() {
 						$is_image = strpos($database_component, "[image]") !== false;
 						if ($is_tab) {
 						} else if ($is_header) {
-							echo_tab($title);
+							mp_ssv_echo_tab($title);
 						} else if ($is_group) {
-							echo_group($database_component, $identifier, $title, $current_user);
+							mp_ssv_echo_group($database_component, $identifier, $title, $current_user);
 						} else if ($is_role) {
-							echo_role($identifier, $title, $current_user);
+							mp_ssv_echo_role($identifier, $title, $current_user);
 						} else if ($is_image) {
-							echo_image($database_component, $current_user, $identifier, $title);
+							mp_ssv_echo_image($database_component, $current_user, $identifier, $title);
 						} else {
-							$identifier = get_identifier();
-							$component_value = get_component_value();
+							$identifier = mp_ssv_get_identifier($database_component);
+							$component_value = mp_ssv_get_component_value($identifier, $current_user);
 							if (strpos($database_component, 'type="file"') !== false) {
-								echo_file($database_component, $title);
+								mp_ssv_echo_file($database_component, $title);
 							} else {
-								echo_default($database_component, $component_value, $title);
+								mp_ssv_echo_default($database_component, $component_value, $title);
 							}
 						}
 					}
@@ -84,7 +84,11 @@ function mp_ssv_profile_page_content_single_tab() {
 		ob_start(); ?>
 	<div class="mui-tabs__pane" id="pane-registrations">
 		<form name="members_profile_form" id="member_<?php echo $tab_title; ?>_form" action="/profile" method="post">
-			<?php echo profile_page_registrations_table_content(); ?>
+			<?php
+			if (function_exists('mp_ssv_profile_page_registrations_table_content')) {
+				echo mp_ssv_profile_page_registrations_table_content();
+			}
+			?>
 			<button class="mui-btn mui-btn--primary" type="submit" name="submit" id="submit" class="button-primary">Save</button>
 			<input type="hidden" name="what-to-save" value="<?php echo $tab_title; ?>"/>
 		</form>
@@ -100,6 +104,7 @@ function mp_ssv_echo_tab($title) {
 }
 
 function mp_ssv_echo_group($database_component, $identifier, $title, $current_user) {
+	global $wpdb;
 	$group_items_table_name = $wpdb->prefix."mp_ssv_frontend_members_fields_group_options";
 	$group_options = $wpdb->get_results( 
 		"SELECT *

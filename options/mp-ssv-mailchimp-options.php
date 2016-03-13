@@ -1,5 +1,5 @@
 <?php
-if (!function_exists("add_mp_ssv_mailchimp_menu")) {
+if (!function_exists("mp_ssv_add_mp_ssv_mailchimp_menu")) {
 	function mp_ssv_add_mp_ssv_mailchimp_menu() {
 		add_submenu_page( 'mp_ssv_settings', 'MailChimp Options', 'MailChimp', 'manage_options', "mp-ssv-mailchimp-options", 'mp_ssv_mailchimp_settings_page' );
 	}
@@ -42,7 +42,7 @@ if (!function_exists("add_mp_ssv_mailchimp_menu")) {
 			echo "tmp";
 		}
 	}
-	add_action('admin_menu', 'add_mp_ssv_mailchimp_menu');
+	add_action('admin_menu', 'mp_ssv_add_mp_ssv_mailchimp_menu');
 	
 	
 	function mp_ssv_mailchimp_settings_page_general() {
@@ -66,7 +66,7 @@ if (!function_exists("add_mp_ssv_mailchimp_menu")) {
 	}
 }
 
-if (!function_exists("get_merge_fields_select")) {
+if (!function_exists("mp_ssv_get_merge_fields_select")) {
 	function mp_ssv_get_merge_fields_select($id, $tag_name, $disabled, $mailchimp_merge_tags) {
 		if ($id == "") {
 			$s = uniqid('', true);
@@ -82,7 +82,7 @@ if (!function_exists("get_merge_fields_select")) {
 	}
 }
 
-if (!function_exists("get_merge_fields_select_for_javascript")) {
+if (!function_exists("mp_ssv_get_merge_fields_select_for_javascript")) {
 	function mp_ssv_get_merge_fields_select_for_javascript($disabled, $mailchimp_merge_tags) {
 		?><select name="mailchimp_' + id + '" <?php if ($disabled) { echo "disabled"; } ?>><?php
 			foreach ($mailchimp_merge_tags as $tag) {
@@ -93,7 +93,7 @@ if (!function_exists("get_merge_fields_select_for_javascript")) {
 	}
 }
 
-if (!function_exists("get_merge_fields")) {
+if (!function_exists("mp_ssv_get_merge_fields")) {
 	function mp_ssv_get_merge_fields($listID) {
 		$apiKey = get_option('mp_ssv_mailchimp_api_key');
 	

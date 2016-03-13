@@ -1,7 +1,6 @@
 <?php
 function mp_ssv_register_page_setup($content) {
 	global $post;
-	/* Return */
 	if ($post->post_name != 'register') {
 		return $content;
 	} else if (strpos($content, '[mp-ssv-frontend-members-register]') === false) {
@@ -10,10 +9,10 @@ function mp_ssv_register_page_setup($content) {
 	if (isset($_POST['what-to-save'])) {
 		save_member_registration($_POST['what-to-save']);
 	}
-	$content = register_page_content();
+	$content = mp_ssv_register_page_content();
 	return $content;
 }
-add_filter( 'the_content', 'register_page_setup' );
+add_filter( 'the_content', 'mp_ssv_register_page_setup' );
 
 function mp_ssv_register_page_content() {
 	global $wpdb;

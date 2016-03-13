@@ -64,5 +64,5 @@ function mp_ssv_login_page_content($content) {
 	$content = ob_get_clean();
 	return $content;
 }
-add_filter( 'the_content', 'login_page_content' );
+add_filter( 'the_content', 'mp_ssv_login_page_content' );
 ?>
