@@ -3,7 +3,7 @@ include_once "mp-ssv-general-options.php";
 include_once "mp-ssv-mailchimp-options.php";
 include_once "mailchimp-tab.php";
 
-function add_mp_ssv_frontend_members_options() {
+function mp_ssv_add_mp_ssv_frontend_members_options() {
 	add_submenu_page( 'mp_ssv_settings', 'Frontend Members Options', 'Frontend Members', 'manage_options', __FILE__, 'mp_ssv_frontend_members_settings_page' );
 }
 

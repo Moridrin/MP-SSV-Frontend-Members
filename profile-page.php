@@ -1,5 +1,5 @@
 <?php
-function profile_page_setup($content) {
+function mp_ssv_profile_page_setup($content) {
 	global $post;
 	if ($post->post_name != 'profile') {
 		return $content;
@@ -19,7 +19,7 @@ function profile_page_setup($content) {
 }
 add_filter( 'the_content', 'profile_page_setup' );
 
-function profile_page_content() {
+function mp_ssv_profile_page_content() {
 	$content = "";
 	if (current_theme_supports('mui')) {
 		$content .= profile_page_content_single_tab();
@@ -32,7 +32,7 @@ function profile_page_content() {
 	return $content;
 }
 
-function profile_page_content_single_tab() {
+function mp_ssv_profile_page_content_single_tab() {
 	global $wpdb;
 	$current_user = wp_get_current_user();
 	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
@@ -196,7 +196,7 @@ function profile_page_content_single_tab() {
 
 			if (isset($_POST['what-to-save'])) {
 				if ($_POST['what-to-save'] == $tab_title) {
-					$content .= '<script>$(document).ready(function load() { mui.tabs.activate("pane-'.$tab_title.'"); });</script>';
+					$content .= '<script>$(document).ready(function mp_ssv_load() { mui.tabs.activate("pane-'.$tab_title.'"); });</script>';
 				}
 			}
 		}
@@ -214,7 +214,7 @@ function profile_page_content_single_tab() {
 	return $content;
 }
 
-function profile_page_content_all_tabs() {
+function mp_ssv_profile_page_content_all_tabs() {
 	global $wpdb;
 	$current_user = wp_get_current_user();
 	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
@@ -333,7 +333,7 @@ function profile_page_content_all_tabs() {
 	return $content;
 }
 
-function profile_page_content_all_tabs_non_mui() {
+function mp_ssv_profile_page_content_all_tabs_non_mui() {
 	global $wpdb;
 	$current_user = wp_get_current_user();
 	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
@@ -452,7 +452,7 @@ function profile_page_content_all_tabs_non_mui() {
 	return $content;
 }
 
-function save_members_profile($what_to_save) {
+function mp_ssv_save_members_profile($what_to_save) {
 	global $wpdb;
 	$current_user = wp_get_current_user();
 	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";

@@ -178,7 +178,7 @@ $(function() {
 });
 </script>
 <script>
-function add_new_tab() {
+function mp_ssv_add_new_tab() {
 	var id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 	$("#container > tbody:last-child").append(
 		$('<tr id="' + id + '" style="vertical-align: top;">').append(
@@ -204,7 +204,7 @@ function add_new_tab() {
 		)
 	);
 }
-function add_new_header() {
+function mp_ssv_add_new_header() {
 	var id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 	$("#container > tbody:last-child").append(
 		$('<tr id="' + id + '" style="vertical-align: top;">').append(
@@ -230,7 +230,7 @@ function add_new_header() {
 		)
 	);
 }
-function add_new_component() {
+function mp_ssv_add_new_component() {
 	var id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 	$("#container > tbody:last-child").append(
 		$('<tr id="' + id + '" style="vertical-align: top;">').append(
@@ -250,7 +250,7 @@ function add_new_component() {
 		)
 	);
 }
-function add_new_group() {
+function mp_ssv_add_new_group() {
 	var id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 	$("#container > tbody:last-child").append(
 		$('<tr id="' + id + '" style="vertical-align: top;">').append(
@@ -287,7 +287,7 @@ function add_new_group() {
 		)
 	);
 }
-function add_new_image() {
+function mp_ssv_add_new_image() {
 	var id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 	$("#container > tbody:last-child").append(
 		$('<tr id="' + id + '" style="vertical-align: top;">').append(
@@ -319,7 +319,7 @@ function add_new_image() {
 		)
 	);
 }
-function add_new_user_role_checkbox() {
+function mp_ssv_add_new_user_role_checkbox() {
 	var id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 	$("#" + container.id + " > tbody:last-child").append(
 		$('<tr id="' + container.id + "_" + id + '" style="vertical-align: top;">').append(
@@ -349,7 +349,7 @@ function add_new_user_role_checkbox() {
 		)
 	);
 }
-function add_new_option(container) {
+function mp_ssv_add_new_option(container) {
 	var id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 	$("#" + container.id + " > tbody:last-child").append(
 		$('<tr id="' + container.id + "_" + id + '" style="vertical-align: top;">').append(
@@ -363,7 +363,7 @@ function add_new_option(container) {
 		)
 	);
 }
-function add_new_user_role(container) {
+function mp_ssv_add_new_user_role(container) {
 	var id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 	$("#" + container.id + " > tbody:last-child").append(
 		$('<tr id="' + container.id + "_" + id + '" style="vertical-align: top;">').append(

@@ -1,6 +1,6 @@
 <?php
 if (!function_exists("add_mp_ssv_menu")) {
-	function add_mp_ssv_menu() {
+	function mp_ssv_add_mp_ssv_menu() {
 		add_menu_page('MP SSV Options', 'MP-SSV Options', 'manage_options', 'mp_ssv_settings', 'mp_ssv_settings_page');
 		add_submenu_page( 'mp_ssv_settings', 'General', 'General', 'manage_options', 'mp_ssv_settings');
 	}

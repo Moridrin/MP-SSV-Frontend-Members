@@ -20,7 +20,7 @@ include_once "profile-page.php";
 include_once "register-page.php";
 include_once "options/options.php";
 
-function register_mp_ssv_frontend_members() {
+function mp_ssv_register_mp_ssv_frontend_members() {
 	/* Database */
 	global $wpdb;
 	require_once(ABSPATH.'wp-admin/includes/upgrade.php');
@@ -87,7 +87,7 @@ function register_mp_ssv_frontend_members() {
 }
 register_activation_hook(__FILE__, 'register_mp_ssv_frontend_members');
 
-function unregister_mp_ssv_frontend_members() {
+function mp_ssv_unregister_mp_ssv_frontend_members() {
 	$register_page = get_page_by_title('Register');
 	wp_delete_post($register_page->ID, true);
 	$login_page = get_page_by_title('Login');
@@ -97,12 +97,12 @@ function unregister_mp_ssv_frontend_members() {
 }
 register_deactivation_hook(__FILE__, 'unregister_mp_ssv_frontend_members');
 
-function app_output_buffer() {
+function mp_ssv_app_output_buffer() {
 	ob_start();
 }
 add_action('init', 'app_output_buffer');
 
-function frontend_members_avatar($avatar, $id_or_email, $size, $default, $alt) {
+function mp_ssv_frontend_members_avatar($avatar, $id_or_email, $size, $default, $alt) {
     $user = false;
     $id = false;
 
@@ -130,7 +130,7 @@ function frontend_members_avatar($avatar, $id_or_email, $size, $default, $alt) {
 }
 add_filter( 'get_avatar', 'frontend_members_avatar' , 1 , 5 );
 
-function update_mailchimp_frontend_member($memberId, $listID) {
+function mp_ssv_update_mailchimp_frontend_member($memberId, $listID) {
 	$apiKey = get_option('mp_ssv_mailchimp_api_key');
 
 	$memberId = md5(strtolower(get_userdata($memberId)->user_email));

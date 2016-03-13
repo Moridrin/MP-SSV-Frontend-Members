@@ -1,5 +1,5 @@
 <?php
-function register_page_setup($content) {
+function mp_ssv_register_page_setup($content) {
 	global $post;
 	/* Return */
 	if ($post->post_name != 'register') {
@@ -15,7 +15,7 @@ function register_page_setup($content) {
 }
 add_filter( 'the_content', 'register_page_setup' );
 
-function register_page_content() {
+function mp_ssv_register_page_content() {
 	global $wpdb;
 	$user = wp_get_current_user();
 	$content = "";
@@ -135,7 +135,7 @@ function register_page_content() {
 	return $content;
 }
 
-function save_member_registration($what_to_save) {
+function mp_ssv_save_member_registration($what_to_save) {
 	global $wpdb;
 	$username = $_POST["user_login"];
 	$password = $_POST["password"];

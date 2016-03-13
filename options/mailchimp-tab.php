@@ -50,7 +50,7 @@ function mp_ssv_mailchimp_settings_page_frontend_members_tab() {
 	<script src="https://code.jquery.com/jquery-2.2.0.js"></script>
 	<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 	<script>
-	function add_new_field() {
+	function mp_ssv_add_new_field() {
 		var id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 		$("#container > tbody:last-child").append(
 			$('<tr id="' + id + '">').append(
@@ -73,7 +73,7 @@ function mp_ssv_mailchimp_settings_page_frontend_members_tab() {
 }
 
 if (!function_exists("get_member_fields_select_for_javascript")) {
-	function get_member_fields_select_for_javascript($disabled, $fields_in_tab) {
+	function mp_ssv_get_member_fields_select_for_javascript($disabled, $fields_in_tab) {
 		?><select name="member_' + id + '" <?php if ($disabled) { echo "disabled"; } ?>><option></option><?php
 		foreach ($fields_in_tab as $field) {
 			$field = json_decode(json_encode($field),true);
@@ -90,7 +90,7 @@ if (!function_exists("get_member_fields_select_for_javascript")) {
 }
 
 if (!function_exists("get_member_fields_select")) {
-	function get_member_fields_select($tag_name, $disabled, $fields_in_tab) {
+	function mp_ssv_get_member_fields_select($tag_name, $disabled, $fields_in_tab) {
 		if ($tag_name == "") {
 			$s = uniqid('', true);
 			$tag_name = base_convert($s, 16, 36);
