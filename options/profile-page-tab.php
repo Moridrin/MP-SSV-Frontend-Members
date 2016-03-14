@@ -86,7 +86,8 @@
 								$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields_group_options";
 								$group_options = $wpdb->get_results( 
 									"SELECT *
-										FROM $table_name"
+										FROM $table_name
+										WHERE `parent_group` = '$title'"
 								);
 								foreach ($group_options as $group_option) {
 									$group_option = json_decode(json_encode($group_option),true);

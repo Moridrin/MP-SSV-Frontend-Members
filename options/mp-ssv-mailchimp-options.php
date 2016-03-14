@@ -98,7 +98,8 @@ if (!function_exists("mp_ssv_get_merge_fields")) {
 		$apiKey = get_option('mp_ssv_mailchimp_api_key');
 	
 		$memberCenter = substr($apiKey,strpos($apiKey,'-')+1);
-		$url = 'https://' . $memberCenter . '.api.mailchimp.com/3.0/lists/' . $listID . '/merge-fields';
+		$url = 'https://' . $memberCenter . '.api.mailchimp.com/3.0/lists/' . $listID . '/merge-fields?count=12';
+		echo $url;
 		$ch = curl_init($url);
 	
 		curl_setopt($ch, CURLOPT_USERPWD, 'user:' . $apiKey);

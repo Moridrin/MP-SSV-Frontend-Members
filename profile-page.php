@@ -1,6 +1,9 @@
 <?php
 function mp_ssv_profile_page_login_redirect() {
 	global $post;
+	if ($post == null) {
+		return;
+	}
 	$post_name_correct = $post->post_name == 'profile';
   if (!is_user_logged_in() && $post_name_correct) {
 		wp_redirect("/login");
@@ -52,7 +55,8 @@ function mp_ssv_echo_group($database_component, $identifier, $title, $current_us
 	$group_items_table_name = $wpdb->prefix."mp_ssv_frontend_members_fields_group_options";
 	$group_options = $wpdb->get_results( 
 		"SELECT *
-			FROM $group_items_table_name"
+			FROM $group_items_table_name
+			WHERE `parent_group` = '$title'"
 	);
 	if ($database_component == "select") {
 		echo '<div class="mui-select mui-textfield">';
@@ -194,6 +198,8 @@ include_once "profile-page-content-non-mui.php";
 function mp_ssv_save_members_profile($what_to_save) {
 	global $wpdb;
 	$current_user = wp_get_current_user();
+	$table_name = $wpdb->prefix."mp_ssv_mailchimp_merge_fields";
+	$merge_fields_to_sync = $wpdb->get_results("SELECT * FROM $table_name");
 	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
 	$tabs = $wpdb->get_results("SELECT * FROM $table_name WHERE component = '[tab]'");
 	for ($i = 0; $i < count($tabs); $i++) {
@@ -230,6 +236,13 @@ function mp_ssv_save_members_profile($what_to_save) {
 							$group_value = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $group_value)));
 							update_user_meta($current_user->ID, "group_".$group, $group_value);
 						}
+						foreach ($merge_fields_to_sync as $row) {
+							$row = json_decode(json_encode($row),true);
+							if (in_array($group, $row)) {
+								$mailchimp_tag = $row["mailchimp_tag"];
+								$merge_fields[$mailchimp_tag] = $group_value;
+							}
+						}
 					} else if ($is_role) {
 						if (isset($_POST[$identifier])) {
 							update_user_meta($current_user->ID, $identifier, 1);
@@ -237,6 +250,13 @@ function mp_ssv_save_members_profile($what_to_save) {
 						} else {
 							update_user_meta($current_user->ID, $identifier, 0);
 							$current_user->remove_role($identifier);
+						}
+						foreach ($merge_fields_to_sync as $row) {
+							$row = json_decode(json_encode($row),true);
+							if (in_array($identifier, $row)) {
+								$mailchimp_tag = $row["mailchimp_tag"];
+								$merge_fields[$mailchimp_tag] = get_user_meta($current_user->ID, $identifier, true);
+							}
 						}
 					} else if ($is_image) {
 						if ( ! function_exists( 'wp_handle_upload' ) ) {
@@ -264,11 +284,51 @@ function mp_ssv_save_members_profile($what_to_save) {
 							$identifier = strtolower($identifier);
 							update_user_meta($current_user->ID, $identifier, $_POST[$identifier]);	
 						}
+						foreach ($merge_fields_to_sync as $row) {
+							$row = json_decode(json_encode($row),true);
+							if (in_array($identifier, $row)) {
+								$mailchimp_tag = $row["mailchimp_tag"];
+								$merge_fields[$mailchimp_tag] = get_user_meta($current_user->ID, $identifier, true);
+							}
+						}
 					}
 				}
 			}
 		}
 	}
-	//push to mailchimp
+	$member = array();
+	$merge_fields = array('FNAME' => get_user_meta($current_user->ID, "first_name", true), 'LNAME' => get_user_meta($current_user->ID, "last_name", true));
+	$member["email_address"] = $current_user->user_email;
+	$member["status"] = "subscribed";
+	$member["merge_fields"] = $merge_fields;
+	mp_ssv_update_mailchimp_member($member);
+}
+
+if (!function_exists("mp_ssv_update_mailchimp_member")) {
+	function mp_ssv_update_mailchimp_member($member) {
+		$apiKey = get_option('mp_ssv_mailchimp_api_key');
+		$listID = get_option('mailchimp_member_sync_list_id');
+
+    $memberId = md5(strtolower($member['email_address']));
+		$memberCenter = substr($apiKey,strpos($apiKey,'-')+1);
+		$url = 'https://' . $memberCenter . '.api.mailchimp.com/3.0/lists/' . $listID . '/members/' . $memberId;
+		$ch = curl_init($url);
+		
+		$json = json_encode($member);
+		
+		curl_setopt($ch, CURLOPT_USERPWD, 'user:' . $apiKey);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+	
+		$curl_results = json_decode(curl_exec($ch), true);
+		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		curl_close($ch);
+
+		return $httpCode;
+	}
 }
 ?>

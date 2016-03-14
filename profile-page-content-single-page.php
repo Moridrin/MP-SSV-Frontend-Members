@@ -32,6 +32,7 @@ function mp_ssv_profile_page_content_single_page() {
 				$is_header = $database_component == "[header]";
 				$is_tab = $database_component == "[tab]";
 				$is_image = strpos($database_component, "[image]") !== false;
+				$is_events_registrations = $database_component == "[mp-ssv-events-registrations]";
 				if ($is_tab) {
 					mp_ssv_echo_tab_title($title);
 				} else if ($is_header) {
@@ -42,6 +43,8 @@ function mp_ssv_profile_page_content_single_page() {
 					mp_ssv_echo_role($identifier, $title, $current_user);
 				} else if ($is_image) {
 					mp_ssv_echo_image($database_component, $current_user, $identifier, $title);
+				} else if ($is_events_registrations) {
+					echo mp_ssv_profile_page_registrations_table_content();
 				} else {
 					$identifier = mp_ssv_get_identifier($database_component);
 					$component_value = mp_ssv_get_component_value($identifier, $current_user);
@@ -53,7 +56,8 @@ function mp_ssv_profile_page_content_single_page() {
 				}
 			}
 		}
-		if (function_exists('mp_ssv_profile_page_registrations_table_content')) {
+		include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+		if (is_plugin_active('mp-ssv-events/mp-ssv-events.php') && get_option('mp_ssv_show_registrations_in_profile') == 'true') {
 			mp_ssv_echo_tab_title("Registrations");
 			echo mp_ssv_profile_page_registrations_table_content();
 		}

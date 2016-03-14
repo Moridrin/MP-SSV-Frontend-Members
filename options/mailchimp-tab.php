@@ -21,13 +21,13 @@ function mp_ssv_mailchimp_settings_page_frontend_members_tab() {
 				<th scope="row">*|MERGE|* tag</th>
 			</tr>
 			<tr>
-				<td><input type="text" class="regular-text" name="member_first_name" value="first_name" readonly/></td>
+				<td><?php echo mp_ssv_get_member_fields_select("first_name", true, $fields_in_tab); ?></td>
 				<td> <?php mp_ssv_get_merge_fields_select("first_Name", "FNAME", true, $mailchimp_merge_tags); ?> </td>
 				<td></td>
 			</tr>
 			<tr>
-				<td><input type="text" class="regular-text" name="member_last_name" value="last_name" readonly/></td>
-				<td> <?php mp_ssv_get_merge_fields_select("last_Name", "LNAME", true, $mailchimp_merge_tags); ?> </td>
+				<td><?php echo mp_ssv_get_member_fields_select("last_name", true, $fields_in_tab); ?></td>
+				<td><?php mp_ssv_get_merge_fields_select("last_Name", "LNAME", true, $mailchimp_merge_tags); ?></td>
 				<td></td>
 			</tr>
 			<?php 
@@ -38,7 +38,7 @@ function mp_ssv_mailchimp_settings_page_frontend_members_tab() {
 				?>
 				<tr>
 					<td><?php echo mp_ssv_get_member_fields_select($member_tag, false, $fields_in_tab); ?></td>
-					<td> <?php mp_ssv_get_merge_fields_select($member_tag, $mailchimp_tag, false, $mailchimp_merge_tags); ?> </td>
+					<td><?php mp_ssv_get_merge_fields_select($member_tag, $mailchimp_tag, false, $mailchimp_merge_tags); ?></td>
 					<td><input type="hidden" name="submit_option_<?php echo $member_tag; ?>"></td>
 				</tr>
 				<?php
@@ -79,10 +79,14 @@ if (!function_exists("mp_ssv_get_member_fields_select_for_javascript")) {
 		foreach ($fields_in_tab as $field) {
 			$field = json_decode(json_encode($field),true);
 			$database_component = stripslashes($field["component"]);
-			if (($database_component) != "" && strpos($database_component, "name=\"") !== false) {
+			$title = stripslashes($field["title"]);
+			if (strpos($database_component, "name=\"") !== false) {
 				$identifier = preg_replace("/.*name=\"/","",stripslashes($database_component));
 				$identifier = preg_replace("/\".*/","",$identifier);
 				$identifier = strtolower($identifier);
+				echo "<option>".$identifier."</option>";
+			} else if (strpos($database_component, "select") !== false || strpos($database_component, "radio") !== false || strpos($database_component, "role checkbox") !== false) {
+				$identifier = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $title)));
 				echo "<option>".$identifier."</option>";
 			}
 		}
@@ -100,10 +104,18 @@ if (!function_exists("mp_ssv_get_member_fields_select")) {
 		foreach ($fields_in_tab as $field) {
 			$field = json_decode(json_encode($field),true);
 			$database_component = stripslashes($field["component"]);
-			if (($database_component) != "" && strpos($database_component, "name=\"") !== false) {
+			$title = stripslashes($field["title"]);
+			if (strpos($database_component, "name=\"") !== false) {
 				$identifier = preg_replace("/.*name=\"/","",stripslashes($database_component));
 				$identifier = preg_replace("/\".*/","",$identifier);
 				$identifier = strtolower($identifier);
+				if ($identifier == $tag_name) {
+					echo "<option selected>".$identifier."</option>";
+				} else {
+					echo "<option>".$identifier."</option>";
+				}
+			} else if (strpos($database_component, "select") !== false || strpos($database_component, "radio") !== false || strpos($database_component, "role checkbox") !== false) {
+				$identifier = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $title)));
 				if ($identifier == $tag_name) {
 					echo "<option selected>".$identifier."</option>";
 				} else {

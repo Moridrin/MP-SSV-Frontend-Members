@@ -116,80 +116,133 @@ function mp_ssv_save_member_registration($what_to_save) {
 	$email = $_POST["user_email"];
 	$user_id = wp_create_user($username, $password, $email);
 	$current_user = get_user_by('id', $user_id);
+	$member = array();
+	$merge_fields = array('FNAME' => $_POST["first_name"], 'LNAME' => $_POST["last_name"]);
+	$table_name = $wpdb->prefix."mp_ssv_mailchimp_merge_fields";
+	$merge_fields_to_sync = $wpdb->get_results("SELECT * FROM $table_name");
 	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
 	$tabs = $wpdb->get_results("SELECT * FROM $table_name WHERE component = '[tab]'");
 	for ($i = 0; $i < count($tabs); $i++) {
 		$tab = json_decode(json_encode($tabs[$i]),true);
 		$tab_title = stripslashes($tab["title"]);
-		if ($what_to_save == "All") {
-			$group_type = "";
-			$group = "";
-			$fields_in_tab = $wpdb->get_results("SELECT * FROM $table_name WHERE tab = '$tab_title'");
-			foreach ($fields_in_tab as $field) {
-				$field = json_decode(json_encode($field),true);
-				$title = stripslashes($field["title"]);
-				$identifier = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $title)));
-				$title_value = str_replace("_", " ", $title);
-				$database_component = stripslashes($field["component"]);
-				$is_group = $database_component == "select" || $database_component == "radio";
-				$is_role = $database_component == "[role checkbox]";
-				$is_header = $database_component == "[header]";
-				$is_tab = $database_component == "[tab]";
-				$is_image = strpos($database_component, "[image]") !== false;
-				if (!$is_header && !$is_tab) {
-					if ($is_group) {
-						$group_type = $database_component;
-						$group = strtolower(str_replace(" ", "_", $title));
-						$group_value = $_POST["group_".$group];
-						$old_role = str_replace(";[role]", "", get_user_meta($current_user->ID, "group_".$group, true));
-						if (strpos($group_value, ";[role]") !== false) {
-							$group_value = str_replace(";[role]", "", $group_value);
-							$group_value = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $group_value)));
-							$current_user->remove_role($old_role);
-							$current_user->add_role($group_value);
-							update_user_meta($current_user->ID, "group_".$group, $group_value.";[role]");
-						} else {
-							$group_value = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $group_value)));
-							update_user_meta($current_user->ID, "group_".$group, $group_value);
+		$group_type = "";
+		$group = "";
+		$fields_in_tab = $wpdb->get_results("SELECT * FROM $table_name WHERE tab = '$tab_title'");
+		foreach ($fields_in_tab as $field) {
+			$field = json_decode(json_encode($field),true);
+			$title = stripslashes($field["title"]);
+			$identifier = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $title)));
+			$title_value = str_replace("_", " ", $title);
+			$database_component = stripslashes($field["component"]);
+			$is_group = $database_component == "select" || $database_component == "radio";
+			$is_role = $database_component == "[role checkbox]";
+			$is_header = $database_component == "[header]";
+			$is_tab = $database_component == "[tab]";
+			$is_image = strpos($database_component, "[image]") !== false;
+			if (!$is_header && !$is_tab) {
+				if ($is_group) {
+					$group_type = $database_component;
+					$group = strtolower(str_replace(" ", "_", $title));
+					$group_value = $_POST["group_".$group];
+					$old_role = str_replace(";[role]", "", get_user_meta($user_id, "group_".$group, true));
+					if (strpos($group_value, ";[role]") !== false) {
+						$group_value = str_replace(";[role]", "", $group_value);
+						$group_value = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $group_value)));
+						$current_user->remove_role($old_role);
+						$current_user->add_role($group_value);
+						update_user_meta($user_id, "group_".$group, $group_value.";[role]");
+					} else {
+						$group_value = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $group_value)));
+						update_user_meta($user_id, "group_".$group, $group_value);
+					}
+					foreach ($merge_fields_to_sync as $row) {
+						$row = json_decode(json_encode($row),true);
+						if (in_array($group, $row)) {
+							$mailchimp_tag = $row["mailchimp_tag"];
+							$merge_fields[$mailchimp_tag] = $group_value;
 						}
-					} else if ($is_role) {
-						if (isset($_POST[$identifier])) {
-							update_user_meta($current_user->ID, $identifier, 1);
-							$current_user->add_role($identifier);
-						} else {
-							update_user_meta($current_user->ID, $identifier, 0);
-							$current_user->remove_role($identifier);
+					}
+				} else if ($is_role) {
+					if (isset($_POST[$identifier])) {
+						update_user_meta($user_id, $identifier, 1);
+						$current_user->add_role($identifier);
+					} else {
+						update_user_meta($user_id, $identifier, 0);
+						$current_user->remove_role($identifier);
+					}
+					foreach ($merge_fields_to_sync as $row) {
+						$row = json_decode(json_encode($row),true);
+						if (in_array($identifier, $row)) {
+							$mailchimp_tag = $row["mailchimp_tag"];
+							$merge_fields[$mailchimp_tag] = get_user_meta($user_id, $identifier, true);
 						}
-					} else if ($is_image) {
+					}
+				} else if ($is_image) {
+					if ( ! function_exists( 'wp_handle_upload' ) ) {
+						require_once( ABSPATH . 'wp-admin/includes/file.php' );
+					}
+					$file_location = wp_handle_upload($_FILES[$identifier], array('test_form' => FALSE));
+					if ($file_location && !isset($file_location['error'])) {
+						update_user_meta($user_id, $identifier, $file_location["url"]);	
+						update_user_meta($user_id, $identifier."_path", $file_location["file"]);	
+					}
+				} else if (($database_component) != "" && strpos($database_component, "name=\"") !== false && strpos($database_component, "readonly") == false) {
+					if (strpos($database_component, 'type="file"') !== false) {
 						if ( ! function_exists( 'wp_handle_upload' ) ) {
 							require_once( ABSPATH . 'wp-admin/includes/file.php' );
 						}
 						$file_location = wp_handle_upload($_FILES[$identifier], array('test_form' => FALSE));
 						if ($file_location && !isset($file_location['error'])) {
-							update_user_meta($current_user->ID, $identifier, $file_location["url"]);	
-							update_user_meta($current_user->ID, $identifier."_path", $file_location["file"]);	
+							update_user_meta($user_id, $identifier, $file_location["url"]);	
+							update_user_meta($user_id, $identifier."_path", $file_location["file"]);	
 						}
-					} else if (($database_component) != "" && strpos($database_component, "name=\"") !== false && strpos($database_component, "readonly") == false) {
-						if (strpos($database_component, 'type="file"') !== false) {
-							if ( ! function_exists( 'wp_handle_upload' ) ) {
-								require_once( ABSPATH . 'wp-admin/includes/file.php' );
-							}
-							$file_location = wp_handle_upload($_FILES[$identifier], array('test_form' => FALSE));
-							if ($file_location && !isset($file_location['error'])) {
-								update_user_meta($current_user->ID, $identifier, $file_location["url"]);	
-								update_user_meta($current_user->ID, $identifier."_path", $file_location["file"]);	
-							}
-						} else {
-							$identifier = preg_replace("/.*name=\"/","",stripslashes($database_component));
-							$identifier = preg_replace("/\".*/","",$identifier);
-							$identifier = strtolower($identifier);
-							update_user_meta($current_user->ID, $identifier, $_POST[$identifier]);	
+					} else {
+						$identifier = preg_replace("/.*name=\"/","",stripslashes($database_component));
+						$identifier = preg_replace("/\".*/","",$identifier);
+						$identifier = strtolower($identifier);
+						update_user_meta($user_id, $identifier, $_POST[$identifier]);	
+					}
+					foreach ($merge_fields_to_sync as $row) {
+						$row = json_decode(json_encode($row),true);
+						if (in_array($identifier, $row)) {
+							$mailchimp_tag = $row["mailchimp_tag"];
+							$merge_fields[$mailchimp_tag] = get_user_meta($user_id, $identifier, true);
 						}
 					}
 				}
 			}
 		}
 	}
-	//Register at MailChimp
+	$member["email_address"] = $email;
+	$member["status"] = "subscribed";
+	$member["merge_fields"] = $merge_fields;
+	mp_ssv_register_mailchimp_member($member);
+}
+
+if (!function_exists("mp_ssv_subscribe_mailchimp_member")) {
+	function mp_ssv_subscribe_mailchimp_member($member) {
+		$apiKey = get_option('mp_ssv_mailchimp_api_key');
+		$listID = get_option('mailchimp_member_sync_list_id');
+		
+		$memberId = md5(strtolower($member['email_address']));
+		$memberCenter = substr($apiKey,strpos($apiKey,'-')+1);
+		$url = 'https://' . $memberCenter . '.api.mailchimp.com/3.0/lists/' . $listID . '/members/' . $memberId;
+		$ch = curl_init($url);
+		$json = json_encode($member);
+		
+		curl_setopt($ch, CURLOPT_USERPWD, 'user:' . $apiKey);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+		
+		$curl_results = json_decode(curl_exec($ch), true);
+		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		curl_close($ch);
+		
+		return $httpCode;
+	}
 }
 ?>
