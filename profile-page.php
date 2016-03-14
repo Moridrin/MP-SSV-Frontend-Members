@@ -297,7 +297,8 @@ function mp_ssv_save_members_profile($what_to_save) {
 		}
 	}
 	$member = array();
-	$merge_fields = array('FNAME' => get_user_meta($current_user->ID, "first_name", true), 'LNAME' => get_user_meta($current_user->ID, "last_name", true));
+	$merge_fields['FNAME'] = get_user_meta($current_user->ID, "first_name", true);
+	$merge_fields['LNAME'] = get_user_meta($current_user->ID, "last_name", true);
 	$member["email_address"] = $current_user->user_email;
 	$member["status"] = "subscribed";
 	$member["merge_fields"] = $merge_fields;
