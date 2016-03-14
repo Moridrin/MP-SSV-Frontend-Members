@@ -38,25 +38,25 @@
 					</td>
 					<?php if ($is_tab) { ?>
 						<td>
-							<input type="text" id="<?php echo $identifier."_title"; ?>" name="title_option_<?php echo $identifier; ?>" value="<?php echo $title_value; ?>"/>
+							<input type="text" id="tab_<?php echo $identifier; ?>_title" name="tab_title_option_<?php echo $identifier; ?>" value="<?php echo $title_value; ?>"/>
 						</td>
 						<td>
 							<input type="text" value="[tab]" disabled>
-							<input type="hidden" name="component_option_<?php echo $identifier; ?>" value="[tab]">
-							<input type="hidden" name="submit_option_<?php echo $identifier; ?>">
+							<input type="hidden" name="tab_component_option_<?php echo $identifier; ?>" value="[tab]">
+							<input type="hidden" name="tab_submit_option_<?php echo $identifier; ?>">
 						</td>
 					<?php } else if ($is_header) { ?>
 						<td>
-							<input type="text" id="<?php echo $identifier."_title"; ?>" name="title_option_<?php echo $identifier; ?>" value="<?php echo $title_value; ?>"/>
+							<input type="text" id="header_<?php echo $identifier; ?>_title" name="header_title_option_<?php echo $identifier; ?>" value="<?php echo $title_value; ?>"/>
 						</td>
 						<td>
 							<input type="text" value="[header]" disabled>
-							<input type="hidden" name="component_option_<?php echo $identifier; ?>" value="[header]">
-							<input type="hidden" name="submit_option_<?php echo $identifier; ?>">
+							<input type="hidden" name="header_component_option_<?php echo $identifier; ?>" value="[header]">
+							<input type="hidden" name="header_submit_option_<?php echo $identifier; ?>">
 						</td>
 					<?php } else if ($is_role) { ?>
 						<td>
-							<select id="<?php echo $identifier."_title"; ?>" name="title_option_<?php echo $identifier; ?>">
+							<select id="role_<?php echo $identifier; ?>_title" name="role_title_option_<?php echo $identifier; ?>">
 								<option></option>
 								<?php
 								$roles = get_editable_roles();
@@ -67,18 +67,17 @@
 						</td>
 						<td>
 							<input type="text" value="[role checkbox]" disabled>
-							<input type="hidden" name="component_option_<?php echo $identifier; ?>" value="[role checkbox]">
-							<input type="hidden" name="submit_option_<?php echo $identifier; ?>">
+							<input type="hidden" name="role_component_option_<?php echo $identifier; ?>" value="[role checkbox]">
+							<input type="hidden" name="role_submit_option_<?php echo $identifier; ?>">
 						</td>
 					<?php } else if ($is_group) { ?>
 						<td>
-							<input type="text" id="<?php echo $identifier."_title"; ?>" name="title_option_<?php echo $identifier; ?>" value="<?php echo $title_value; ?>"/>
+							<input type="text" id="group_<?php echo $identifier; ?>_title" name="group_title_option_<?php echo $identifier; ?>" value="<?php echo $title_value; ?>"/>
 						</td>
 						<td>
-							<select id="<?php echo $identifier."_title"; ?>" name="component_option_<?php echo $identifier; ?>">
+							<select id="group_<?php echo $identifier; ?>_title" name="group_component_option_<?php echo $identifier; ?>">
 								<option value=""></option>
 								<option value="radio" <?php if($component == "radio") { echo "selected"; } ?>>Radio</option>
-								<option value="checkbox" <?php if($component == "checkbox") { echo "selected"; } ?>>Checkbox</option>
 								<option value="select" <?php if($component == "select") { echo "selected"; } ?>>Select</option>
 							</select>
 							<table id="container_<?php echo $identifier; ?>" style="width: 100%; border-spacing: 10px 0; margin-bottom: 20px; margin-top: 20px;">
@@ -99,7 +98,7 @@
 										?>
 										<tr>
 											<td>
-												<select id="<?php echo $group_option_identifier."_title"; ?>" name="group_option_item_<?php echo $group_option_identifier; ?>">
+												<select id="group_option_<?php echo $group_option_identifier; ?>_title" name="group_option_item_<?php echo $group_option_identifier; ?>">
 													<option></option>
 													<?php
 													$roles = get_editable_roles();
@@ -117,7 +116,7 @@
 										?>
 										<tr>
 											<td>
-												<input id="<?php echo $group_option_identifier."_title"; ?>" name="group_option_item_<?php echo $group_option_identifier; ?>" value="<?php echo $group_option; ?>">
+												<input id="groep_option_<?php echo $group_option_identifier; ?>_title" name="group_option_item_<?php echo $group_option_identifier; ?>" value="<?php echo $group_option; ?>">
 											</td>
 											<td><input type="hidden" name="<?php echo "submit_group_option_".$group_option_identifier ?>"></td>
 										</tr>
@@ -126,22 +125,22 @@
 								}
 								?>
 							</table>
-							<button type="button" id="add_option_button" onclick="add_new_option(container_<?php echo $identifier; ?>)">Add Component</button>
+							<button type="button" id="add_option_button" onclick="mp_ssv_add_new_option(container_<?php echo $identifier; ?>)">Add Component</button>
 							<?php if (esc_attr(stripslashes(get_option('mp_ssv_frontend_members_guest_custom_roles_enabled'))) == 'true') { ?>
-								<button type="button" id="add_user_role_button" onclick="add_new_user_role(container_<?php echo $identifier; ?>)">Add User Role</button>
+								<button type="button" id="add_user_role_button" onclick="mp_ssv_add_new_user_role(container_<?php echo $identifier; ?>)">Add User Role</button>
 							<?php } ?>
-							<input type="hidden" name="submit_option_<?php echo $identifier; ?>">
+							<input type="hidden" name="group_submit_option_<?php echo $identifier; ?>">
 						</td>
 					<?php } else if ($is_image) { ?>
 						<td>
-							<input type="text" id="<?php echo $identifier."_title"; ?>" name="title_option_<?php echo $identifier; ?>" value="<?php echo $title_value; ?>"/>
+							<input type="text" id="image_<?php echo $identifier; ?>_title" name="image_title_option_<?php echo $identifier; ?>" value="<?php echo $title_value; ?>"/>
 						</td>
 						<td>
 							<input type="text" value="[image]" disabled><br/>
-							<input type="hidden" name="component_option_<?php echo $identifier; ?>" value="[image]">
+							<input type="hidden" name="image_component_option_<?php echo $identifier; ?>" value="[image]">
 							<input type="checkbox" name="is_required_option_<?php echo $identifier; ?>" <?php if (strpos($component, "required")) { echo "checked"; } ?> style="margin: 0 10px;" value="on">Required<br/>
 							<input type="checkbox" name="show_preview_option_<?php echo $identifier; ?>" <?php if (strpos($component, "show_preview")) { echo "checked"; } ?> style="margin: 0 10px;" value="on">Show Preview<br/>
-							<input type="hidden" name="submit_option_<?php echo $identifier; ?>">
+							<input type="hidden" name="image_submit_option_<?php echo $identifier; ?>">
 						</td>
 					<?php } else { ?>
 						<td>
@@ -157,14 +156,14 @@
 		</tbody>
 	</table>
 	<?php if (get_theme_support('mui')) { ?>
-		<button type="button" id="add_tab_button" onclick="add_new_tab()">Add Tab</button>
+		<button type="button" id="add_tab_button" onclick="mp_ssv_add_new_tab()">Add Tab</button>
 	<?php } ?>
-	<button type="button" id="add_header_button" onclick="add_new_header()">Add Header</button>
-	<button type="button" id="add_component_button" onclick="add_new_component()">Add Component</button>
-	<button type="button" id="add_group_button" onclick="add_new_group()">Add Group</button>
-	<button type="button" id="add_image_button" onclick="add_new_image()">Add Image</button>
+	<button type="button" id="add_header_button" onclick="mp_ssv_add_new_header()">Add Header</button>
+	<button type="button" id="add_component_button" onclick="mp_ssv_add_new_component()">Add Component</button>
+	<button type="button" id="add_group_button" onclick="mp_ssv_add_new_group()">Add Group</button>
+	<button type="button" id="add_image_button" onclick="mp_ssv_add_new_image()">Add Image</button>
 	<?php if (esc_attr(stripslashes(get_option('mp_ssv_frontend_members_guest_custom_roles_enabled'))) == 'true') { ?>
-		<button type="button" id="add_user_role_button" onclick="add_new_user_role_checkbox()">Add User Role</button>
+		<button type="button" id="add_user_role_button" onclick="mp_ssv_add_new_user_role_checkbox()">Add User Role</button>
 	<?php }
 	submit_button();
 	?>
@@ -272,9 +271,9 @@ function mp_ssv_add_new_group() {
 					'<tbody>'
 				)
 			).append(
-				'<button type="button" id="add_option_button" onclick="add_new_option(container_' + id + ')">Add Component</button>'
+				'<button type="button" id="add_option_button" onclick="mp_ssv_add_new_option(container_' + id + ')">Add Component</button>'
 			).append(
-				<?php if (esc_attr(stripslashes(get_option('mp_ssv_frontend_members_guest_custom_roles_enabled'))) == 'true') { ?>'<button type="button" id="add_user_role_button" onclick="add_new_user_role(container_' + id + ')">Add User Role</button>'<?php } ?>
+				<?php if (esc_attr(stripslashes(get_option('mp_ssv_frontend_members_guest_custom_roles_enabled'))) == 'true') { ?>'<button type="button" id="add_user_role_button" onclick="mp_ssv_add_new_user_role(container_' + id + ')">Add User Role</button>'<?php } ?>
 			)
 		).append(
 			'<td>'

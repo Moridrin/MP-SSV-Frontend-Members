@@ -55,6 +55,7 @@ function mp_ssv_profile_page_content_non_mui() {
 		}
 		?>
 		<button type="submit" name="submit" id="submit" class="button-primary">Save</button>
+		<input type="hidden" name="what-to-save" value="All"/>
 	</form>
 	<?php
 	$content .= ob_get_clean();

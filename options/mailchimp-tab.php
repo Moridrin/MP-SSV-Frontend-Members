@@ -9,6 +9,7 @@ function mp_ssv_mailchimp_settings_page_frontend_members_tab() {
 	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
 	$fields_in_tab = $wpdb->get_results("SELECT * FROM $table_name");
 	?>
+	<br/>Add & Synchronize members to this MailChimp List.
 	<form method="post" action="#">
 		<table id="container" class="form-table">
 			<tr>
@@ -44,7 +45,7 @@ function mp_ssv_mailchimp_settings_page_frontend_members_tab() {
 			}
 			?>
 		</table>
-		<button type="button" id="add_field_button" onclick="add_new_field()">Add Field</button>
+		<button type="button" id="add_field_button" onclick="mp_ssv_add_new_field()">Add Field</button>
 		<?php submit_button(); ?>
 	</form>
 	<script src="https://code.jquery.com/jquery-2.2.0.js"></script>

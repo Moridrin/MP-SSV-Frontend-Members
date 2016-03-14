@@ -59,12 +59,10 @@ function mp_ssv_profile_page_content_single_page() {
 		}
 		?>
 		<button class="mui-btn mui-btn--primary" type="submit" name="submit" id="submit" class="button-primary">Save</button>
+		<input type="hidden" name="what-to-save" value="All"/>
 	</form>
 	<?php
 	$content .= ob_get_clean();
 	return $content;
 }
-
-function mp_ssv_echo_tab_title($title) {
-	echo '<H1>'.$title.'</H1>';
-}
+?>
