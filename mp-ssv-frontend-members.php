@@ -186,4 +186,46 @@ if (!function_exists("mp_ssv_unsubscribe_mailchimp_member")) {
 	}
 }
 add_action('delete_user', 'mp_ssv_unsubscribe_mailchimp_member');
+
+if (!function_exists("mp_ssv_add_google_member")) {
+	function mp_ssv_add_google_member() {
+		include_once "google-api-php-client/src/Google/autoload.php";
+		ob_start();
+		$base = '/var/www/html/wp-content/plugins/mp-ssv-frontend-members/';
+		$private_key_file = $base.'Frontend-Members-3eeb9f190c21.json';
+		$private_key = file_get_contents($private_key_file);
+		$client_email = 'wordpress@frontend-members.iam.gserviceaccount.com';
+		$private_key = file_get_contents($base.'Frontend-Members-43c8edc1a2d9.p12');
+		$scopes = array('https://www.googleapis.com/auth/admin.directory.group', 'https://www.googleapis.com/auth/admin.directory.group.member', 'https://www.googleapis.com/auth/admin.directory.user');
+		$credentials = new Google_Auth_AssertionCredentials(
+			$client_email,
+			$scopes,
+			$private_key
+		);
+		$credentials->sub = "j.berkvens@allterrain.nl";
+		$client = new Google_Client();
+		$client->setAssertionCredentials($credentials);
+		if ($client->getAuth()->isAccessTokenExpired()) {
+			$client->getAuth()->refreshTokenWithAssertion();
+		}
+		$service = new Google_Service_Directory($client);
+		$optParams = array(
+		);
+		$results = $service->members->listMembers('members@allterrain.nl', $optParams)->getMembers();
+		foreach ($results as $result) {
+			print_r($result->email);			
+			echo "<br/>";
+		}
+		return ob_get_clean();
+	}
+}
+
+if (!function_exists("mp_ssv_redirect")) {
+	function mp_ssv_redirect($location) {
+		$redirect_script = '<script type="text/javascript">';
+		$redirect_script .= 'window.location = "' . $location . '"';
+		$redirect_script .= '</script>';
+		echo $redirect_script;
+	}
+}
 ?>

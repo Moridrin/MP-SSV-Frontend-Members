@@ -40,6 +40,7 @@ function mp_ssv_login_page_content($content) {
 			<button class="mui-btn mui-btn--primary" type="submit" name="wp-submit" id="wp-submit" class="button-primary">Login</button>
 			<input type="hidden" name="redirect_to" value="http://allterrain.nl/profile">
 		</form>
+		Don't have an account? <a href="register">Click Here</a> to register.
 		<?php
 	} else {
 		?>
@@ -59,6 +60,8 @@ function mp_ssv_login_page_content($content) {
 			<button class="mui-btn mui-btn--primary" type="submit" name="wp-submit" id="wp-submit" class="button-primary">Login</button>
 			<input type="hidden" name="redirect_to" value="http://allterrain.nl/profile">
 		</form>
+		<br/>
+		Don't have an account? <a href="register">Click Here</a> to register.
 		<?php
 	}
 	$content = ob_get_clean();

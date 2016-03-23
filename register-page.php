@@ -8,12 +8,14 @@ function mp_ssv_register_page_setup($content) {
 	}
 	if (isset($_POST['what-to-save'])) {
 		mp_ssv_save_member_registration($_POST['what-to-save']);
+		$url = "login";
+		mp_ssv_redirect("login?register=success");
+	} else {
+		$content = mp_ssv_register_page_content();
 	}
-	$content = mp_ssv_register_page_content();
 	return $content;
 }
 add_filter( 'the_content', 'mp_ssv_register_page_setup' );
-
 
 function mp_ssv_register_page_content() {
 	global $wpdb;
@@ -47,6 +49,7 @@ function mp_ssv_register_page_content() {
 				$is_header = $database_component == "[header]";
 				$is_tab = $database_component == "[tab]";
 				$is_image = strpos($database_component, "[image]") !== false;
+				$is_events_registrations = $database_component == "[mp-ssv-events-registrations]";
 				if ($is_tab) {
 					mp_ssv_echo_tab_title($title);
 				} else if ($is_header) {
@@ -56,14 +59,18 @@ function mp_ssv_register_page_content() {
 				} else if ($is_role) {
 					mp_ssv_echo_role($identifier, $title, null);
 				} else if ($is_image) {
-					mp_ssv_echo_image($database_component, null, $identifier, $title);
-				} else {
-					$identifier = mp_ssv_get_identifier($database_component);
-					$component_value = mp_ssv_get_component_value($identifier, null);
-					if (strpos($database_component, 'type="file"') !== false) {
-						mp_ssv_echo_file($database_component, $title);
-					} else {
-						mp_ssv_echo_default($database_component, $component_value, $title);
+					if (strpos($database_component, "required") !== false || get_option('mp_ssv_frontend_members_register_page') == "same_as_profile_page") {
+						mp_ssv_echo_image($database_component, null, $identifier, $title);
+					}
+				} else if (!$is_events_registrations) {
+					if (strpos($database_component, "required") !== false || strpos($database_component, "readonly") !== false || get_option('mp_ssv_frontend_members_register_page') == "same_as_profile_page") {
+						$identifier = mp_ssv_get_identifier($database_component);
+						$component_value = mp_ssv_get_component_value($identifier, null);
+						if (strpos($database_component, 'type="file"') !== false) {
+							mp_ssv_echo_file($database_component, $title);
+						} else {
+							mp_ssv_echo_default($database_component, $component_value, $title);
+						}
 					}
 				}
 			}
@@ -110,18 +117,22 @@ function mp_ssv_register_page_content() {
 }
 
 function mp_ssv_save_member_registration($what_to_save) {
+	if (!isset($_POST['what-to-save'])) {
+		return;
+	}
 	global $wpdb;
-	$username = $_POST["user_login"];
-	$password = $_POST["password"];
-	$email = $_POST["user_email"];
-	$user_id = wp_create_user($username, $password, $email);
-	$current_user = get_user_by('id', $user_id);
 	$member = array();
 	$merge_fields = array('FNAME' => $_POST["first_name"], 'LNAME' => $_POST["last_name"]);
 	$table_name = $wpdb->prefix."mp_ssv_mailchimp_merge_fields";
 	$merge_fields_to_sync = $wpdb->get_results("SELECT * FROM $table_name");
 	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
 	$tabs = $wpdb->get_results("SELECT * FROM $table_name WHERE component = '[tab]'");
+	
+	$username = $_POST["user_login"];
+	$password = $_POST["password"];
+	$email = $_POST["user_email"];
+	$user_id = wp_create_user($username, $password, $email);
+	$current_user = get_user_by('id', $user_id);
 	for ($i = 0; $i < count($tabs); $i++) {
 		$tab = json_decode(json_encode($tabs[$i]),true);
 		$tab_title = stripslashes($tab["title"]);
@@ -213,10 +224,15 @@ function mp_ssv_save_member_registration($what_to_save) {
 			}
 		}
 	}
+	if (get_option("mp_ssv_frontend_members_show_admin_bar_front") == "true") {
+		update_user_meta($user_id, "show_admin_bar_front", "true");
+	} else {
+		update_user_meta($user_id, "show_admin_bar_front", "false");
+	}
 	$member["email_address"] = $email;
 	$member["status"] = "subscribed";
 	$member["merge_fields"] = $merge_fields;
-	mp_ssv_register_mailchimp_member($member);
+	mp_ssv_subscribe_mailchimp_member($member);
 }
 
 if (!function_exists("mp_ssv_subscribe_mailchimp_member")) {
