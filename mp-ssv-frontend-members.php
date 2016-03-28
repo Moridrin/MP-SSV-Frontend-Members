@@ -85,17 +85,21 @@ function mp_ssv_register_mp_ssv_frontend_members() {
 	);
 	wp_insert_post($profile_post);
 }
-register_activation_hook(__FILE__, 'register_mp_ssv_frontend_members');
+register_activation_hook(__FILE__, 'mp_ssv_register_mp_ssv_frontend_members');
 
 function mp_ssv_unregister_mp_ssv_frontend_members() {
-	$register_page = get_page_by_title('Register');
+	if (is_plugin_active('mp-ssv-google-apps/mp-ssv-google-apps.php')) {
+		wp_die('Sorry, but this plugin is required by SSV Frontend Members. Deactivate SSV Frontend Members before deactivating this plugin. <br><a href="' . admin_url( 'plugins.php' ) . '">&laquo; Return to Plugins</a>');
+	}
 	wp_delete_post($register_page->ID, true);
 	$login_page = get_page_by_title('Login');
 	wp_delete_post($login_page->ID, true);
+	$profile_page = get_page_by_title('Register');
+	wp_delete_post($profile_page->ID, true);
 	$profile_page = get_page_by_title('My Profile');
 	wp_delete_post($profile_page->ID, true);
 }
-register_deactivation_hook(__FILE__, 'unregister_mp_ssv_frontend_members');
+register_deactivation_hook(__FILE__, 'mp_ssv_unregister_mp_ssv_frontend_members');
 
 function mp_ssv_frontend_members_avatar($avatar, $id_or_email, $size, $default, $alt) {
     $user = false;
@@ -187,39 +191,6 @@ if (!function_exists("mp_ssv_unsubscribe_mailchimp_member")) {
 }
 add_action('delete_user', 'mp_ssv_unsubscribe_mailchimp_member');
 
-if (!function_exists("mp_ssv_add_google_member")) {
-	function mp_ssv_add_google_member() {
-		include_once "google-api-php-client/src/Google/autoload.php";
-		ob_start();
-		$base = '/var/www/html/wp-content/plugins/mp-ssv-frontend-members/';
-		$private_key_file = $base.'Frontend-Members-3eeb9f190c21.json';
-		$private_key = file_get_contents($private_key_file);
-		$client_email = 'wordpress@frontend-members.iam.gserviceaccount.com';
-		$private_key = file_get_contents($base.'Frontend-Members-43c8edc1a2d9.p12');
-		$scopes = array('https://www.googleapis.com/auth/admin.directory.group', 'https://www.googleapis.com/auth/admin.directory.group.member', 'https://www.googleapis.com/auth/admin.directory.user');
-		$credentials = new Google_Auth_AssertionCredentials(
-			$client_email,
-			$scopes,
-			$private_key
-		);
-		$credentials->sub = "j.berkvens@allterrain.nl";
-		$client = new Google_Client();
-		$client->setAssertionCredentials($credentials);
-		if ($client->getAuth()->isAccessTokenExpired()) {
-			$client->getAuth()->refreshTokenWithAssertion();
-		}
-		$service = new Google_Service_Directory($client);
-		$optParams = array(
-		);
-		$results = $service->members->listMembers('members@allterrain.nl', $optParams)->getMembers();
-		foreach ($results as $result) {
-			print_r($result->email);			
-			echo "<br/>";
-		}
-		return ob_get_clean();
-	}
-}
-
 if (!function_exists("mp_ssv_redirect")) {
 	function mp_ssv_redirect($location) {
 		$redirect_script = '<script type="text/javascript">';
@@ -228,4 +199,10 @@ if (!function_exists("mp_ssv_redirect")) {
 		echo $redirect_script;
 	}
 }
+
+function mp_ssv_frontend_members_register_errors($errors, $sanitized_user_login, $user_email) {
+	$errors->add( 'spam_error', __( '<strong>ERROR</strong>: This is not registered in the frontend registration.', 'mpssv' ) );		
+	return $errors;
+}
+add_filter('registration_errors', 'mp_ssv_frontend_members_register_errors', 10, 3);
 ?>

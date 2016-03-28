@@ -19,11 +19,10 @@ function mp_ssv_profile_page_setup($content) {
 	} else if (strpos($content, '[mp-ssv-frontend-members-profile]') === false) {
 		return $content;
 	}
-	$content = mp_ssv_add_google_member();
-	//if (isset($_POST['what-to-save'])) {
-	//	mp_ssv_save_members_profile($_POST['what-to-save']);
-	//}
-	//$content = mp_ssv_profile_page_content();
+	if (isset($_POST['what-to-save'])) {
+		mp_ssv_save_members_profile($_POST['what-to-save']);
+	}
+	$content = mp_ssv_profile_page_content();
 	return $content;
 }
 add_filter( 'the_content', 'mp_ssv_profile_page_setup' );

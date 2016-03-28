@@ -224,10 +224,12 @@ function mp_ssv_save_member_registration($what_to_save) {
 			}
 		}
 	}
-	if (get_option("mp_ssv_frontend_members_show_admin_bar_front") == "true") {
-		update_user_meta($user_id, "show_admin_bar_front", "true");
-	} else {
-		update_user_meta($user_id, "show_admin_bar_front", "false");
+	if (!is_plugin_active('user-role-editor/user-role-editor.php')) {
+		if (get_option("mp_ssv_frontend_members_show_admin_bar_front") == "true") {
+			update_user_meta($user_id, "show_admin_bar_front", "true");
+		} else {
+			update_user_meta($user_id, "show_admin_bar_front", "false");
+		}
 	}
 	$member["email_address"] = $email;
 	$member["status"] = "subscribed";

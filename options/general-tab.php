@@ -13,8 +13,14 @@
 		<tr>
 			<th scope="row">Show Admin Bar</th>
 			<td>
-				<input type="checkbox" name="mp_ssv_frontend_members_show_admin_bar_front" value="true" <?php if (get_option('mp_ssv_frontend_members_show_admin_bar_front') == 'true') { echo "checked"; } ?>/>
-				Show the wordpress admin bar for new members.
+				<?php
+				if (is_plugin_active('user-role-editor/user-role-editor.php')) { ?>
+					<input type="checkbox" name="mp_ssv_frontend_members_show_admin_bar_front" value="true" checked disabled/>
+					Show the wordpress admin bar for new members. Specify this in <a href="http://allterrain.nl/wp-admin/users.php?page=users-user-role-editor.php">User Role Editor</a>
+				<?php } else { ?>
+					<input type="checkbox" name="mp_ssv_frontend_members_show_admin_bar_front" value="true" <?php if (get_option('mp_ssv_frontend_members_show_admin_bar_front') == 'true') { echo "checked"; } ?>/>
+					Show the wordpress admin bar for new members.
+				<?php } ?>
 			</td>
 		</tr>
 	</table>
