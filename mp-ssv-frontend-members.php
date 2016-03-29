@@ -21,6 +21,9 @@ include_once "register-page.php";
 include_once "options/options.php";
 
 function mp_ssv_register_mp_ssv_frontend_members() {
+	if (!is_plugin_active('MP-SSV-General/mp-ssv-google-apps.php')) {
+		wp_die('Sorry, but this plugin requires <a href="http://studentensurvival.com/plugins/mp-ssv-general">SSV Gemeral</a> to be installed and active. <br><a href="' . admin_url( 'plugins.php' ) . '">&laquo; Return to Plugins</a>');
+	}
 	/* Database */
 	global $wpdb;
 	require_once(ABSPATH.'wp-admin/includes/upgrade.php');
@@ -88,7 +91,7 @@ function mp_ssv_register_mp_ssv_frontend_members() {
 register_activation_hook(__FILE__, 'mp_ssv_register_mp_ssv_frontend_members');
 
 function mp_ssv_unregister_mp_ssv_frontend_members() {
-	if (is_plugin_active('mp-ssv-google-apps/mp-ssv-google-apps.php')) {
+	if (is_plugin_active('MP-SSV-Google-Apps/mp-ssv-google-apps.php')) {
 		wp_die('Sorry, but this plugin is required by SSV Frontend Members. Deactivate SSV Frontend Members before deactivating this plugin. <br><a href="' . admin_url( 'plugins.php' ) . '">&laquo; Return to Plugins</a>');
 	}
 	wp_delete_post($register_page->ID, true);
