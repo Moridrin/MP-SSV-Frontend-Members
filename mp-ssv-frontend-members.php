@@ -31,23 +31,24 @@ function mp_ssv_register_mp_ssv_frontend_members() {
 	require_once(ABSPATH.'wp-admin/includes/upgrade.php');
 	$charset_collate = $wpdb->get_charset_collate();
 	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
-	$sql = "
-		CREATE TABLE $table_name (
-			id bigint(20) NOT NULL AUTO_INCREMENT,
+	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
+			id bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 			title varchar(30) NOT NULL,
 			component varchar(255) NOT NULL,
-			is_mandatory tinyint(1) NOT NULL DEFAULT 0,
-			is_deletable tinyint(1) NOT NULL DEFAULT 1,
-			UNIQUE KEY id (id)
+			is_deletable tinyint(1) NOT NULL DEFAULT '1',
+			tab varchar(20) NOT NULL,
+			is_mandatory tinyint(1) NOT NULL DEFAULT '0'
 		) $charset_collate;";
 	dbDelta($sql);
 	$wpdb->insert(
 		$table_name,
 		array(
 			'title' => "First Name",
-			'component' => '<input type="text" name="first_name"/>'
+			'component' => '<input type=\"text\" name=\"first_name\"/>',
+			'tab' => 'General'
 		),
 		array(
+			'%s',
 			'%s',
 			'%s'
 		)
@@ -56,9 +57,11 @@ function mp_ssv_register_mp_ssv_frontend_members() {
 		$table_name,
 		array(
 			'title' => "Last Name",
-			'component' => '<input type="text" name="first_name"/>'
+			'component' => '<input type=\"text\" name=\"last_name\" required>',
+			'tab' => 'General'
 		),
 		array(
+			'%s',
 			'%s',
 			'%s'
 		)
@@ -96,13 +99,18 @@ function mp_ssv_unregister_mp_ssv_frontend_members() {
 	if (is_plugin_active('MP-SSV-Google-Apps/mp-ssv-google-apps.php')) {
 		wp_die('Sorry, but this plugin is required by SSV Frontend Members. Deactivate SSV Frontend Members before deactivating this plugin. <br><a href="' . admin_url( 'plugins.php' ) . '">&laquo; Return to Plugins</a>');
 	}
+	$register_page = get_page_by_title('Register');
 	wp_delete_post($register_page->ID, true);
 	$login_page = get_page_by_title('Login');
 	wp_delete_post($login_page->ID, true);
-	$profile_page = get_page_by_title('Register');
-	wp_delete_post($profile_page->ID, true);
 	$profile_page = get_page_by_title('My Profile');
 	wp_delete_post($profile_page->ID, true);
+	global $wpdb;
+	require_once(ABSPATH.'wp-admin/includes/upgrade.php');
+	$charset_collate = $wpdb->get_charset_collate();
+	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
+	$sql = "DROP TABLE $table_name;";
+	$wpdb->query($sql);
 }
 register_deactivation_hook(__FILE__, 'mp_ssv_unregister_mp_ssv_frontend_members');
 
