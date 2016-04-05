@@ -44,7 +44,7 @@ function mp_ssv_register_mp_ssv_frontend_members() {
 		$table_name,
 		array(
 			'title' => "First Name",
-			'component' => '<input type=\"text\" name=\"first_name\"/>',
+			'component' => '<input type=\"text\" name=\"first_name\" required>',
 			'tab' => 'General'
 		),
 		array(
@@ -66,6 +66,14 @@ function mp_ssv_register_mp_ssv_frontend_members() {
 			'%s'
 		)
 	);
+	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields_group_options";
+	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
+			id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+			parent_group varchar(30) NOT NULL,
+			option_text varchar(30) NOT NULL,
+			is_deletable tinyint(1) NOT NULL DEFAULT '1'
+		) $charset_collate;";
+	dbDelta($sql);
 
 	/* Pages */
 	$login_post = array(
@@ -109,6 +117,9 @@ function mp_ssv_unregister_mp_ssv_frontend_members() {
 	require_once(ABSPATH.'wp-admin/includes/upgrade.php');
 	$charset_collate = $wpdb->get_charset_collate();
 	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
+	$sql = "DROP TABLE $table_name;";
+	$wpdb->query($sql);
+	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields_group_options";
 	$sql = "DROP TABLE $table_name;";
 	$wpdb->query($sql);
 }
