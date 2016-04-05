@@ -22,6 +22,11 @@ include_once "options/options.php";
 require_once 'filter_content.php';
 add_filter( 'the_content', 'mp_ssv_filter_frontend_members_content', 100);
 
+function mp_ssv_use_recaptcha() {
+	echo '<script src="https://www.google.com/recaptcha/api.js"></script>';
+}
+add_action('wp_head', 'mp_ssv_use_recaptcha');
+
 function mp_ssv_register_mp_ssv_frontend_members() {
 	if (!is_plugin_active('mp-ssv-general/mp-ssv-general.php')) {
 		wp_die('Sorry, but this plugin requires <a href="http://studentensurvival.com/plugins/mp-ssv-general">SSV General</a> to be installed and active. <br><a href="' . admin_url( 'plugins.php' ) . '">&laquo; Return to Plugins</a>');
