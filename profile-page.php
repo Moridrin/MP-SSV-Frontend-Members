@@ -50,7 +50,7 @@ function mp_ssv_echo_header($title) {
 	echo '<legend>'.$title.'</legend>';
 }
 
-function mp_ssv_echo_group($database_component, $identifier, $title, $current_user) {
+function mp_ssv_echo_group($database_component, $identifier, $title, $current_user, $can_edit) {
 	global $wpdb;
 	$group_items_table_name = $wpdb->prefix."mp_ssv_frontend_members_fields_group_options";
 	$group_options = $wpdb->get_results( 
@@ -60,7 +60,11 @@ function mp_ssv_echo_group($database_component, $identifier, $title, $current_us
 	);
 	if ($database_component == "select") {
 		echo '<div class="mui-select mui-textfield">';
-		echo '<select id="'.$identifier.'" name="group_'.$identifier.'">';
+		if ($can_edit) {
+			echo '<select id="'.$identifier.'" name="group_'.$identifier.'">';
+		} else {
+			echo '<select id="'.$identifier.'" name="group_'.$identifier.'" disabled>';
+		}
 	} else {
 
 	}
@@ -104,16 +108,16 @@ function mp_ssv_echo_group_option($group_option, $group_option_label, $current_u
 	echo $option;
 }
 
-function mp_ssv_echo_role($identifier, $title, $current_user) {
+function mp_ssv_echo_role($identifier, $title, $current_user, $can_edit) {
 	?>
 	<div>
-		<input id="<?php echo $identifier; ?>" type="checkbox" name="<?php echo $identifier; ?>" value="<?php echo $title; ?>" style="width: auto; margin-right: 10px;" <?php if($current_user != null && get_user_meta($current_user->ID, $identifier, true) == 1) { echo "checked"; } ?>/>
+		<input id="<?php echo $identifier; ?>" type="checkbox" name="<?php echo $identifier; ?>" value="<?php echo $title; ?>" style="width: auto; margin-right: 10px;" <?php if($current_user != null && get_user_meta($current_user->ID, $identifier, true) == 1) { echo "checked"; } ?> <?php if (!$can_edit) { echo "disabled"; } ?>/>
 		<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>
 	</div>
 	<?php
 }
 
-function mp_ssv_echo_image($database_component, $current_user, $identifier, $title) {
+function mp_ssv_echo_image($database_component, $current_user, $identifier, $title, $can_edit) {
 	$required;
 	if (strpos($database_component, "required") !== false) {
 		if ($current_user == null) {
@@ -126,12 +130,14 @@ function mp_ssv_echo_image($database_component, $current_user, $identifier, $tit
 	} else {
 		$required = false;
 	}
-	?>
-	<div class="mui-textfield">
-		<input id="<?php echo $identifier; ?>" type="file" name="<?php echo $identifier; ?>" accept="image/*" <?php if($required) { echo "required"; } ?>/>
-		<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>
-	</div>
-	<?php
+	if ($can_edit) {
+		?>
+		<div class="mui-textfield">
+			<input id="<?php echo $identifier; ?>" type="file" name="<?php echo $identifier; ?>" accept="image/*" <?php if($required) { echo "required"; } ?>/>
+			<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>
+		</div>
+		<?php
+	}
 	if (strpos($database_component, "show_preview") !== false) {
 		if(!($current_user == null || strlen(get_user_meta($current_user->ID, $identifier, true)) < 1)) {
 			?>
@@ -150,13 +156,18 @@ function mp_ssv_echo_file($database_component, $title) {
 	<?php
 }
 
-function mp_ssv_echo_default($database_component, $component_value, $title) {
+function mp_ssv_echo_default($database_component, $component_value, $title, $can_edit) {
 	$component = explode(">", $database_component)[0];
 	$component .= ' value="'.$component_value.'"';
 	$component .= str_replace(explode(">", $database_component)[0], "", $database_component);
 	?>
 	<div class="mui-textfield <?php if (strpos($component, 'type="date"') == false) { echo "mui-textfield--float-label"; } ?>">
-		<?php echo $component; ?>
+		<?php
+			if (strpos($component, "readonly") == false && strpos($component, "disabled") == false && $can_edit == false) {
+				$component = str_replace(">", "disabled >", $component);
+			}
+			echo $component;
+		?>
 		<label><?php echo $title; ?></label>
 	</div>
 	<?php

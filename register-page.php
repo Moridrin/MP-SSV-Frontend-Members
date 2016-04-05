@@ -55,12 +55,12 @@ function mp_ssv_register_page_content() {
 				} else if ($is_header) {
 					mp_ssv_echo_header($title);
 				} else if ($is_group) {
-					mp_ssv_echo_group($database_component, $identifier, $title, null);
+					mp_ssv_echo_group($database_component, $identifier, $title, null, true);
 				} else if ($is_role) {
-					mp_ssv_echo_role($identifier, $title, null);
+					mp_ssv_echo_role($identifier, $title, null, true);
 				} else if ($is_image) {
 					if (strpos($database_component, "required") !== false || get_option('mp_ssv_frontend_members_register_page') == "same_as_profile_page") {
-						mp_ssv_echo_image($database_component, null, $identifier, $title);
+						mp_ssv_echo_image($database_component, null, $identifier, $title, true);
 					}
 				} else if (!$is_events_registrations) {
 					if (strpos($database_component, "required") !== false || strpos($database_component, "readonly") !== false || get_option('mp_ssv_frontend_members_register_page') == "same_as_profile_page") {
@@ -69,7 +69,7 @@ function mp_ssv_register_page_content() {
 						if (strpos($database_component, 'type="file"') !== false) {
 							mp_ssv_echo_file($database_component, $title);
 						} else {
-							mp_ssv_echo_default($database_component, $component_value, $title);
+							mp_ssv_echo_default($database_component, $component_value, $title, true);
 						}
 					}
 				}
@@ -231,10 +231,22 @@ function mp_ssv_save_member_registration($what_to_save) {
 			update_user_meta($user_id, "show_admin_bar_front", "false");
 		}
 	}
+	update_user_meta($user_id, 'display_name', get_user_meta($user_id, "first_name", true)." ".get_user_meta($user_id, "last_name", true));
 	$member["email_address"] = $email;
 	$member["status"] = "subscribed";
 	$member["merge_fields"] = $merge_fields;
 	mp_ssv_subscribe_mailchimp_member($member);
+	$to = $current_user->user_email;
+	$subject = "Registration All Terrain";
+	$message = "Dear ".$current_user->display_name.",\nWe're happy you've registered at our site. We also use the site to manage subscriptions to our mailing lists so if you would like to subscribe or unsubscribe, you can do so on your profile page.";
+	wp_mail($to, $subject, $message);
+	$to = "webmaster@moridrin.com";
+	$subject = "New User Registration";
+	$message = "Hello,\nA new user has registered on the site:";
+	ob_start();
+	print_r($member);
+	$message .= ob_get_clean();
+	wp_mail($to, $subject, $message);
 }
 
 if (!function_exists("mp_ssv_subscribe_mailchimp_member")) {

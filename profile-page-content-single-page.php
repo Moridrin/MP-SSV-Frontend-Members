@@ -1,7 +1,16 @@
 <?php
 function mp_ssv_profile_page_content_single_page() {
 	global $wpdb;
-	$current_user = wp_get_current_user();
+	$can_edit = true;
+	$current_user = null;
+	if (isset($_GET['user_id'])) {
+		$current_user = get_user_by('id', $_GET['user_id']);
+	} else {
+		$current_user = wp_get_current_user();	
+	}
+	if ($current_user != wp_get_current_user() && !current_user_can('edit_user')) {
+		$can_edit = false;
+	}
 	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
 	$group = "";
 	
@@ -38,11 +47,11 @@ function mp_ssv_profile_page_content_single_page() {
 				} else if ($is_header) {
 					mp_ssv_echo_header($title);
 				} else if ($is_group) {
-					mp_ssv_echo_group($database_component, $identifier, $title, $current_user);
+					mp_ssv_echo_group($database_component, $identifier, $title, $current_user, $can_edit);
 				} else if ($is_role) {
-					mp_ssv_echo_role($identifier, $title, $current_user);
+					mp_ssv_echo_role($identifier, $title, $current_user, $can_edit);
 				} else if ($is_image) {
-					mp_ssv_echo_image($database_component, $current_user, $identifier, $title);
+					mp_ssv_echo_image($database_component, $current_user, $identifier, $title, $can_edit);
 				} else if ($is_events_registrations) {
 					echo mp_ssv_profile_page_registrations_table_content();
 				} else {
@@ -51,7 +60,7 @@ function mp_ssv_profile_page_content_single_page() {
 					if (strpos($database_component, 'type="file"') !== false) {
 						mp_ssv_echo_file($database_component, $title);
 					} else {
-						mp_ssv_echo_default($database_component, $component_value, $title);
+						mp_ssv_echo_default($database_component, $component_value, $title, $can_edit);
 					}
 				}
 			}
@@ -61,8 +70,10 @@ function mp_ssv_profile_page_content_single_page() {
 			mp_ssv_echo_tab_title("Registrations");
 			echo mp_ssv_profile_page_registrations_table_content();
 		}
+		if ($can_edit) {
+			?><button class="mui-btn mui-btn--primary" type="submit" name="submit" id="submit" class="button-primary">Save</button><?php
+		}
 		?>
-		<button class="mui-btn mui-btn--primary" type="submit" name="submit" id="submit" class="button-primary">Save</button>
 		<input type="hidden" name="what-to-save" value="All"/>
 	</form>
 	<?php

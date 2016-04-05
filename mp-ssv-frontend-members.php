@@ -19,6 +19,8 @@ include_once "login-page.php";
 include_once "profile-page.php";
 include_once "register-page.php";
 include_once "options/options.php";
+require_once 'filter_content.php';
+add_filter( 'the_content', 'mp_ssv_filter_frontend_members_content', 100);
 
 function mp_ssv_register_mp_ssv_frontend_members() {
 	if (!is_plugin_active('MP-SSV-General/mp-ssv-general.php')) {
@@ -194,18 +196,44 @@ if (!function_exists("mp_ssv_unsubscribe_mailchimp_member")) {
 }
 add_action('delete_user', 'mp_ssv_unsubscribe_mailchimp_member');
 
-if (!function_exists("mp_ssv_redirect")) {
-	function mp_ssv_redirect($location) {
-		$redirect_script = '<script type="text/javascript">';
-		$redirect_script .= 'window.location = "' . $location . '"';
-		$redirect_script .= '</script>';
-		echo $redirect_script;
-	}
-}
-
 function mp_ssv_frontend_members_register_errors($errors, $sanitized_user_login, $user_email) {
 	$errors->add( 'spam_error', __( '<strong>ERROR</strong>: This is not registered in the frontend registration.', 'mpssv' ) );		
 	return $errors;
 }
 add_filter('registration_errors', 'mp_ssv_frontend_members_register_errors', 10, 3);
+
+function mp_ssv_authenticate($user, $email, $password){
+	if(empty($email) || empty ($password)){
+		$error = new WP_Error();
+		if(empty($email)){ //No email
+			$error->add('empty_username', __('<strong>ERROR</strong>: Email field is empty.'));
+		}
+		else if(!filter_var($email, FILTER_VALIDATE_EMAIL)){ //Invalid Email
+			$error->add('invalid_username', __('<strong>ERROR</strong>: Email is invalid.'));
+		}
+
+		if(empty($password)){ //No password
+			$error->add('empty_password', __('<strong>ERROR</strong>: Password field is empty.'));
+		}
+
+		return $error;
+	}
+	$user = get_user_by('email', $email);
+	if(!$user){
+		$error = new WP_Error();
+		$error->add('invalid', __('<strong>ERROR</strong>: Either the email or password you entered is invalid.'));
+		return $error;
+	}
+	else{ //check password
+		if(!wp_check_password($password, $user->user_pass, $user->ID)){ //bad password
+			$error = new WP_Error();
+			$error->add('invalid', __('<strong>ERROR</strong>: Either the email or password you entered is invalid.'));
+			return $error;
+		} else {
+			return $user; //passed
+		}
+	}
+}
+add_filter('authenticate', 'mp_ssv_authenticate', 20, 3);
+remove_filter('authenticate', 'wp_authenticate_username_password', 20);
 ?>

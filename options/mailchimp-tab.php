@@ -73,57 +73,34 @@ function mp_ssv_mailchimp_settings_page_frontend_members_tab() {
 	<?php
 }
 
-if (!function_exists("mp_ssv_get_member_fields_select_for_javascript")) {
-	function mp_ssv_get_member_fields_select_for_javascript($disabled, $fields_in_tab) {
-		?><select name="member_' + id + '" <?php if ($disabled) { echo "disabled"; } ?>><option></option><?php
-		foreach ($fields_in_tab as $field) {
-			$field = json_decode(json_encode($field),true);
-			$database_component = stripslashes($field["component"]);
-			$title = stripslashes($field["title"]);
-			if (strpos($database_component, "name=\"") !== false) {
-				$identifier = preg_replace("/.*name=\"/","",stripslashes($database_component));
-				$identifier = preg_replace("/\".*/","",$identifier);
-				$identifier = strtolower($identifier);
+function mp_ssv_get_member_fields_select($tag_name, $disabled, $fields_in_tab) {
+	if ($tag_name == "") {
+		$s = uniqid('', true);
+		$tag_name = base_convert($s, 16, 36);
+	}
+	?><select name="member_<?php echo $tag_name; ?>" <?php if ($disabled) { echo "disabled"; } ?>><option></option><?php
+	foreach ($fields_in_tab as $field) {
+		$field = json_decode(json_encode($field),true);
+		$database_component = stripslashes($field["component"]);
+		$title = stripslashes($field["title"]);
+		if (strpos($database_component, "name=\"") !== false) {
+			$identifier = preg_replace("/.*name=\"/","",stripslashes($database_component));
+			$identifier = preg_replace("/\".*/","",$identifier);
+			$identifier = strtolower($identifier);
+			if ($identifier == $tag_name) {
+				echo "<option selected>".$identifier."</option>";
+			} else {
 				echo "<option>".$identifier."</option>";
-			} else if (strpos($database_component, "select") !== false || strpos($database_component, "radio") !== false || strpos($database_component, "role checkbox") !== false) {
-				$identifier = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $title)));
+			}
+		} else if (strpos($database_component, "select") !== false || strpos($database_component, "radio") !== false || strpos($database_component, "role checkbox") !== false) {
+			$identifier = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $title)));
+			if ($identifier == $tag_name) {
+				echo "<option selected>".$identifier."</option>";
+			} else {
 				echo "<option>".$identifier."</option>";
 			}
 		}
-		?></select><?php
 	}
-}
-
-if (!function_exists("mp_ssv_get_member_fields_select")) {
-	function mp_ssv_get_member_fields_select($tag_name, $disabled, $fields_in_tab) {
-		if ($tag_name == "") {
-			$s = uniqid('', true);
-			$tag_name = base_convert($s, 16, 36);
-		}
-		?><select name="member_<?php echo $tag_name; ?>" <?php if ($disabled) { echo "disabled"; } ?>><option></option><?php
-		foreach ($fields_in_tab as $field) {
-			$field = json_decode(json_encode($field),true);
-			$database_component = stripslashes($field["component"]);
-			$title = stripslashes($field["title"]);
-			if (strpos($database_component, "name=\"") !== false) {
-				$identifier = preg_replace("/.*name=\"/","",stripslashes($database_component));
-				$identifier = preg_replace("/\".*/","",$identifier);
-				$identifier = strtolower($identifier);
-				if ($identifier == $tag_name) {
-					echo "<option selected>".$identifier."</option>";
-				} else {
-					echo "<option>".$identifier."</option>";
-				}
-			} else if (strpos($database_component, "select") !== false || strpos($database_component, "radio") !== false || strpos($database_component, "role checkbox") !== false) {
-				$identifier = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '_', str_replace(" ", "_", $title)));
-				if ($identifier == $tag_name) {
-					echo "<option selected>".$identifier."</option>";
-				} else {
-					echo "<option>".$identifier."</option>";
-				}
-			}
-		}
-		?></select><?php
-	}
+	?></select><?php
 }
 ?>

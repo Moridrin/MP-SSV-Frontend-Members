@@ -1,7 +1,16 @@
 <?php
 function mp_ssv_profile_page_content_non_mui() {
 	global $wpdb;
-	$current_user = wp_get_current_user();
+	$can_edit = true;
+	$current_user = null;
+	if (isset($_GET['user_id'])) {
+		$current_user = get_user_by('id', $_GET['user_id']);
+	} else {
+		$current_user = wp_get_current_user();	
+	}
+	if ($current_user != wp_get_current_user() && !current_user_can('edit_user')) {
+		$can_edit = false;
+	}
 	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
 	$group = "";
 	
@@ -38,17 +47,17 @@ function mp_ssv_profile_page_content_non_mui() {
 				} else if ($is_header) {
 					mp_ssv_echo_non_mui_header($title);
 				} else if ($is_group) {
-					mp_ssv_echo_non_mui_group($database_component, $identifier, $title, $current_user);
+					mp_ssv_echo_non_mui_group($database_component, $identifier, $title, $current_user, $can_edit);
 				} else if ($is_role) {
-					mp_ssv_echo_non_mui_role($identifier, $title, $current_user);
+					mp_ssv_echo_non_mui_role($identifier, $title, $current_user, $can_edit);
 				} else if ($is_image) {
-					mp_ssv_echo_non_mui_image($database_component, $current_user, $identifier, $title);
+					mp_ssv_echo_non_mui_image($database_component, $current_user, $identifier, $title, $can_edit);
 				} else if ($is_events_registrations) {
 					echo mp_ssv_profile_page_registrations_table_content();
 				} else {
 					$identifier = mp_ssv_get_identifier($database_component);
 					$component_value = mp_ssv_get_component_value($identifier, $current_user);
-					mp_ssv_echo_non_mui_default($database_component, $component_value, $title);
+					mp_ssv_echo_non_mui_default($database_component, $component_value, $title, $can_edit);
 				}
 			}
 		}
@@ -57,8 +66,10 @@ function mp_ssv_profile_page_content_non_mui() {
 			mp_ssv_echo_non_mui_tab_title("Registrations");
 			echo mp_ssv_profile_page_registrations_table_content();
 		}
+		if ($can_edit) {
+			?><button class="mui-btn mui-btn--primary" type="submit" name="submit" id="submit" class="button-primary">Save</button><?php
+		}
 		?>
-		<button type="submit" name="submit" id="submit" class="button-primary">Save</button>
 		<input type="hidden" name="what-to-save" value="All"/>
 	</form>
 	<?php
@@ -74,7 +85,7 @@ function mp_ssv_echo_non_mui_header($title) {
 	echo '<H3>'.$title.'</H3>';
 }
 
-function mp_ssv_echo_non_mui_group($database_component, $identifier, $title, $current_user) {
+function mp_ssv_echo_non_mui_group($database_component, $identifier, $title, $current_user, $can_edit) {
 	global $wpdb;
 	$group_items_table_name = $wpdb->prefix."mp_ssv_frontend_members_fields_group_options";
 	$group_options = $wpdb->get_results( 
@@ -84,7 +95,11 @@ function mp_ssv_echo_non_mui_group($database_component, $identifier, $title, $cu
 	if ($database_component == "select") {
 		echo '<div>';
 		echo '<label for="group_'.$identifier.'">'.$title.'</label>';
-		echo '<select id="'.$identifier.'" name="group_'.$identifier.'">';
+		if ($can_edit) {
+			echo '<select id="'.$identifier.'" name="group_'.$identifier.'">';
+		} else {
+			echo '<select id="'.$identifier.'" name="group_'.$identifier.'" disabled>';
+		}
 	} else {
 
 	}
@@ -127,23 +142,25 @@ function mp_ssv_echo_non_mui_group_option($group_option, $group_option_label, $c
 	echo $option;
 }
 
-function mp_ssv_echo_non_mui_role($identifier, $title, $current_user) {
+function mp_ssv_echo_non_mui_role($identifier, $title, $current_user, $can_edit) {
 	?>
 	<div>
-		<input id="<?php echo $identifier; ?>" type="checkbox" name="<?php echo $identifier; ?>" value="<?php echo $title; ?>" style="width: auto; margin-right: 10px;" <?php if(get_user_meta($current_user->ID, $identifier, true) == 1) { echo "checked"; } ?>/>
+		<input id="<?php echo $identifier; ?>" type="checkbox" name="<?php echo $identifier; ?>" value="<?php echo $title; ?>" style="width: auto; margin-right: 10px;" <?php if(get_user_meta($current_user->ID, $identifier, true) == 1) { echo "checked"; } ?> <?php if (!$can_edit) { echo "disabled"; } ?>/>
 		<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>
 	</div>
 	<?php
 }
 
-function mp_ssv_echo_non_mui_image($database_component, $current_user, $identifier, $title) {
+function mp_ssv_echo_non_mui_image($database_component, $current_user, $identifier, $title, $can_edit) {
 	$required = strpos($database_component, "required") !== false && strlen(get_user_meta($current_user->ID, $identifier, true)) < 1;
-	?>
-	<div>
-		<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>
-		<input id="<?php echo $identifier; ?>" type="file" name="<?php echo $identifier; ?>" accept="image/*" <?php if($required) { echo "required"; } ?>/>
-	</div>
-	<?php
+	if ($can_edit) {
+		?>
+		<div>
+			<label for="<?php echo $identifier; ?>"><?php echo $title; ?></label>
+			<input id="<?php echo $identifier; ?>" type="file" name="<?php echo $identifier; ?>" accept="image/*" <?php if($required) { echo "required"; } ?>/>
+		</div>
+		<?php
+	}
 	if (strpos($database_component, "show_preview") !== false) {
 		?>
 		<img class="image-preview" src="<?php echo get_user_meta($current_user->ID, $identifier, true); ?>"/><br/>
@@ -151,14 +168,19 @@ function mp_ssv_echo_non_mui_image($database_component, $current_user, $identifi
 	}
 }
 
-function mp_ssv_echo_non_mui_default($database_component, $component_value, $title) {
+function mp_ssv_echo_non_mui_default($database_component, $component_value, $title, $can_edit) {
 	$component = explode(">", $database_component)[0];
 	$component .= ' value="'.$component_value.'"';
 	$component .= str_replace(explode(">", $database_component)[0], "", $database_component);
 	?>
 	<div>
 		<label><?php echo $title; ?></label>
-		<?php echo $component; ?>
+		<?php
+		if (strpos($component, "readonly") == false && strpos($component, "disabled") == false && $can_edit == false) {
+			$component = str_replace(">", "disabled >", $component);
+		}
+		echo $component;
+		?>
 	</div>
 	<?php
 }
