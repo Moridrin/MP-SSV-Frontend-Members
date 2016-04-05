@@ -1,4 +1,5 @@
 <?php
+include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 if (is_plugin_active('mp-ssv-mailchimp/mp-ssv-mailchimp.php')) {
 	include_once "mailchimp-tab.php";
 }
