@@ -16,7 +16,7 @@ function mp_ssv_register_page_setup($content) {
 		} else {
 			$url = 'https://www.google.com/recaptcha/api/siteverify';
 			$fields = array(
-				'secret' => '6LfEqhwTAAAAAFHvzq8v6JBJs8Zm9lSZw_bTfN-f',
+				'secret' => get_option('mp_ssv_recaptcha_secret_key'),
 				'response' => $_POST['g-recaptcha-response']
 			);
 			$fields_string = "";
@@ -130,7 +130,7 @@ function mp_ssv_register_page_content() {
 		}
 		ob_start();
 		?>
-		<div class="g-recaptcha" data-sitekey="6LfEqhwTAAAAAFRdK9eDpaof1DEDGMFNWYmIbNEr"></div>
+		<div class="g-recaptcha" data-sitekey="<?php echo get_option('mp_ssv_recaptcha_site_key'); ?>"></div>
 		<button class="mui-btn mui-btn--primary" type="submit" name="submit" id="submit" class="button-primary">Register</button>
 		<input type="hidden" name="what-to-save" value="All"/>
 	</form>

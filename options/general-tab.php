@@ -23,6 +23,18 @@
 				<?php } ?>
 			</td>
 		</tr>
+		<tr>
+			<th scope="row">reCAPTCHA Site Key</th>
+			<td>
+				<input type="text" name="mp_ssv_recaptcha_site_key" value="<?php echo get_option('mp_ssv_recaptcha_site_key'); ?>">
+			</td>
+		</tr>
+		<tr>
+			<th scope="row">reCAPTCHA Secret Key</th>
+			<td>
+				<input type="text" name="mp_ssv_recaptcha_secret_key" value="<?php echo get_option('mp_ssv_recaptcha_secret_key'); ?>">
+			</td>
+		</tr>
 	</table>
 	<?php submit_button(); ?>
 </form>
