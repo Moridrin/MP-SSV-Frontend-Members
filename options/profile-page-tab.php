@@ -127,9 +127,7 @@
 								?>
 							</table>
 							<button type="button" id="add_option_button" onclick="mp_ssv_add_new_option(container_<?php echo $identifier; ?>)">Add Component</button>
-							<?php if (esc_attr(stripslashes(get_option('mp_ssv_frontend_members_guest_custom_roles_enabled'))) == 'true') { ?>
-								<button type="button" id="add_user_role_button" onclick="mp_ssv_add_new_user_role(container_<?php echo $identifier; ?>)">Add User Role</button>
-							<?php } ?>
+							<button type="button" id="add_user_role_button" onclick="mp_ssv_add_new_user_role(container_<?php echo $identifier; ?>)">Add User Role</button>
 							<input type="hidden" name="group_submit_option_<?php echo $identifier; ?>">
 						</td>
 					<?php } else if ($is_image) { ?>
@@ -163,9 +161,8 @@
 	<button type="button" id="add_component_button" onclick="mp_ssv_add_new_component()">Add Component</button>
 	<button type="button" id="add_group_button" onclick="mp_ssv_add_new_group()">Add Group</button>
 	<button type="button" id="add_image_button" onclick="mp_ssv_add_new_image()">Add Image</button>
-	<?php if (esc_attr(stripslashes(get_option('mp_ssv_frontend_members_guest_custom_roles_enabled'))) == 'true') { ?>
-		<button type="button" id="add_user_role_button" onclick="mp_ssv_add_new_user_role_checkbox()">Add User Role</button>
-	<?php }
+	<button type="button" id="add_user_role_button" onclick="mp_ssv_add_new_user_role_checkbox()">Add User Role</button>
+	<?php
 	submit_button();
 	?>
 </form>

@@ -245,7 +245,7 @@ function mp_ssv_authenticate($user, $email, $password){
 	$user = get_user_by('email', $email);
 	if(!$user){
 		$error = new WP_Error();
-		$error->add('invalid', __('<strong>ERROR</strong>: Either the email or password you entered is invalid.'));
+		$error->add('invalid', __('<strong>ERROR</strong>: Either the email or password you entered is invalid. The email you entered was: '.$email));
 		return $error;
 	}
 	else{ //check password
@@ -259,5 +259,5 @@ function mp_ssv_authenticate($user, $email, $password){
 	}
 }
 add_filter('authenticate', 'mp_ssv_authenticate', 20, 3);
-remove_filter('authenticate', 'wp_authenticate_username_password', 20);
+//remove_filter('authenticate', 'wp_authenticate_username_password', 20);
 ?>
