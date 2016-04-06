@@ -7,40 +7,45 @@ function mp_ssv_register_page_setup($content) {
 		return $content;
 	}
 	if (isset($_POST['what-to-save'])) {
-		if ($_POST['g-recaptcha-response'] == "") {
-			$content = "";
-			?>
-			My computer is thinking that you are a computer. If his isn't so please contact the webmaster.
-			This ofthen happens when the recaptcha is not filled in correctly. Make sure that you do before submitting.
-			<?php
-		} else {
-			$url = 'https://www.google.com/recaptcha/api/siteverify';
-			$fields = array(
-				'secret' => get_option('mp_ssv_recaptcha_secret_key'),
-				'response' => $_POST['g-recaptcha-response']
-			);
-			$fields_string = "";
-			foreach($fields as $key=>$value) {
-				$fields_string .= $key.'='.$value.'&';
-			}
-			rtrim($fields_string, '&');
-			$ch = curl_init();
-			curl_setopt($ch,CURLOPT_URL, $url);
-			curl_setopt($ch,CURLOPT_POST, count($fields));
-			curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
-			curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
-			$result = curl_exec($ch);
-			curl_close($ch);
-			if (strpos($result, '"success": true') !== false) {
-				mp_ssv_save_member_registration($_POST['what-to-save']);
-				mp_ssv_redirect("login?register=success");
-			} else {
+		if (strlen(get_option('mp_ssv_recaptcha_site_key')) > 1) {
+			if ($_POST['g-recaptcha-response'] == "") {
 				$content = "";
 				?>
 				My computer is thinking that you are a computer. If his isn't so please contact the webmaster.
 				This ofthen happens when the recaptcha is not filled in correctly. Make sure that you do before submitting.
 				<?php
+			} else {
+				$url = 'https://www.google.com/recaptcha/api/siteverify';
+				$fields = array(
+					'secret' => get_option('mp_ssv_recaptcha_secret_key'),
+					'response' => $_POST['g-recaptcha-response']
+				);
+				$fields_string = "";
+				foreach($fields as $key=>$value) {
+					$fields_string .= $key.'='.$value.'&';
+				}
+				rtrim($fields_string, '&');
+				$ch = curl_init();
+				curl_setopt($ch,CURLOPT_URL, $url);
+				curl_setopt($ch,CURLOPT_POST, count($fields));
+				curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
+				curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
+				$result = curl_exec($ch);
+				curl_close($ch);
+				if (strpos($result, '"success": true') !== false) {
+					mp_ssv_save_member_registration($_POST['what-to-save']);
+					mp_ssv_redirect("login?register=success");
+				} else {
+					$content = "";
+					?>
+					My computer is thinking that you are a computer. If his isn't so please contact the webmaster.
+					This ofthen happens when the recaptcha is not filled in correctly. Make sure that you do before submitting.
+					<?php
+				}
 			}
+		} else {
+			mp_ssv_save_member_registration($_POST['what-to-save']);
+			mp_ssv_redirect("login?register=success");
 		}
 	} else {
 		$content = mp_ssv_register_page_content();
@@ -129,8 +134,10 @@ function mp_ssv_register_page_content() {
 			$content .= ob_get_clean();
 		}
 		ob_start();
+		if (strlen(get_option('mp_ssv_recaptcha_site_key')) > 1) {
+			?><div class="g-recaptcha" data-sitekey="<?php echo get_option('mp_ssv_recaptcha_site_key'); ?>"></div><?php
+		}
 		?>
-		<div class="g-recaptcha" data-sitekey="<?php echo get_option('mp_ssv_recaptcha_site_key'); ?>"></div>
 		<button class="mui-btn mui-btn--primary" type="submit" name="submit" id="submit" class="button-primary">Register</button>
 		<input type="hidden" name="what-to-save" value="All"/>
 	</form>
