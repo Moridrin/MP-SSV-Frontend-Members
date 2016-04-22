@@ -36,49 +36,36 @@ function mp_ssv_register_mp_ssv_frontend_members() {
 	require_once(ABSPATH.'wp-admin/includes/upgrade.php');
 	$charset_collate = $wpdb->get_charset_collate();
 	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
+	$wpdb->show_errors();
 	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
 			id bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-			title varchar(30) NOT NULL,
-			component varchar(255) NOT NULL,
-			is_deletable tinyint(1) NOT NULL DEFAULT '1',
-			tab varchar(20) NOT NULL,
-			is_mandatory tinyint(1) NOT NULL DEFAULT '0'
+			field_index bigint(20) NOT NULL,
+			field_type varchar(30) NOT NULL,
+			field_title varchar(30)
 		) $charset_collate;";
 	dbDelta($sql);
-	$wpdb->insert(
-		$table_name,
-		array(
-			'title' => "First Name",
-			'component' => '<input type=\"text\" name=\"first_name\" required>',
-			'tab' => 'General'
-		),
-		array(
-			'%s',
-			'%s',
-			'%s'
-		)
-	);
-	$wpdb->insert(
-		$table_name,
-		array(
-			'title' => "Last Name",
-			'component' => '<input type=\"text\" name=\"last_name\" required>',
-			'tab' => 'General'
-		),
-		array(
-			'%s',
-			'%s',
-			'%s'
-		)
-	);
-	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields_group_options";
+	$table_name = $wpdb->prefix."mp_ssv_frontend_members_field_meta";
 	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
-			id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-			parent_group varchar(30) NOT NULL,
-			option_text varchar(30) NOT NULL,
-			is_deletable tinyint(1) NOT NULL DEFAULT '1'
+			id bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+			field_id bigint(20) NOT NULL,
+			meta_key varchar(255) NOT NULL,
+			meta_value varchar(255) NOT NULL
 		) $charset_collate;";
 	dbDelta($sql);
+
+	$first_name_id = add_field(0, "input", "First Name");
+	add_field_meta($first_name_id, "input_type", "text");
+	add_field_meta($first_name_id, "name", "first_name");
+	add_field_meta($first_name_id, "placeholder", "");
+	add_field_meta($first_name_id, "required", "true");
+	add_field_meta($first_name_id, "display", "normal");
+	
+	$last_name_id = add_field(1, "input", "Last Name");
+	add_field_meta($last_name_id, "input_type", "text");
+	add_field_meta($last_name_id, "name", "last_name");
+	add_field_meta($last_name_id, "placeholder", "");
+	add_field_meta($last_name_id, "required", "true");
+	add_field_meta($last_name_id, "display", "normal");
 
 	/* Pages */
 	$login_post = array(
@@ -124,7 +111,7 @@ function mp_ssv_unregister_mp_ssv_frontend_members() {
 	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
 	$sql = "DROP TABLE $table_name;";
 	$wpdb->query($sql);
-	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields_group_options";
+	$table_name = $wpdb->prefix."mp_ssv_frontend_members_field_meta";
 	$sql = "DROP TABLE $table_name;";
 	$wpdb->query($sql);
 }
@@ -226,38 +213,165 @@ function mp_ssv_frontend_members_register_errors($errors, $sanitized_user_login,
 }
 add_filter('registration_errors', 'mp_ssv_frontend_members_register_errors', 10, 3);
 
-function mp_ssv_authenticate($user, $email, $password){
-	if(empty($email) || empty ($password)){
+function mp_ssv_authenticate($user, $login, $password){
+	if (empty($login) || empty ($password)) {
 		$error = new WP_Error();
-		if(empty($email)){ //No email
-			$error->add('empty_username', __('<strong>ERROR</strong>: Email field is empty.'));
+		if (empty($login)) {
+			$error->add('empty_username', __('<strong>ERROR</strong>: Email/Username field is empty.'));
 		}
-		else if(!filter_var($email, FILTER_VALIDATE_EMAIL)){ //Invalid Email
-			$error->add('invalid_username', __('<strong>ERROR</strong>: Email is invalid.'));
-		}
-
-		if(empty($password)){ //No password
+		if (empty($password)) {
 			$error->add('empty_password', __('<strong>ERROR</strong>: Password field is empty.'));
 		}
+		return $error;
+	}
 
-		return $error;
+	$user = get_user_by('email', $login);
+	if (!$user) {
+		$user = get_user_by('login', $login);
 	}
-	$user = get_user_by('email', $email);
-	if(!$user){
+	if (!$user) {
 		$error = new WP_Error();
-		$error->add('invalid', __('<strong>ERROR</strong>: Either the email or password you entered is invalid. The email you entered was: '.$email));
+		$error->add('invalid', __('<strong>ERROR</strong>: Either the email/username or password you entered is invalid. The email you entered was: '.$login));
 		return $error;
-	}
-	else{ //check password
-		if(!wp_check_password($password, $user->user_pass, $user->ID)){ //bad password
+	} else {
+		if (!wp_check_password($password, $user->user_pass, $user->ID)){
 			$error = new WP_Error();
-			$error->add('invalid', __('<strong>ERROR</strong>: Either the email or password you entered is invalid.'));
+			$error->add('invalid', __('<strong>ERROR</strong>: The password you entered is invalid.'));
 			return $error;
 		} else {
-			return $user; //passed
+			return $user;
 		}
 	}
 }
 add_filter('authenticate', 'mp_ssv_authenticate', 20, 3);
-//remove_filter('authenticate', 'wp_authenticate_username_password', 20);
+
+function add_field($tab_index, $type, $title) {
+	global $wpdb;
+	require_once(ABSPATH.'wp-admin/includes/upgrade.php');
+	$charset_collate = $wpdb->get_charset_collate();
+	$table = $wpdb->prefix."mp_ssv_frontend_members_fields";
+	$wpdb->insert(
+		$table,
+		array(
+			'field_index' => $tab_index,
+			'field_type' => $type,
+			'field_title' => $title
+		),
+		array(
+			'%d',
+			'%s',
+			'%s'
+		)
+	);
+	return $wpdb->get_var("SELECT id FROM $table ORDER BY id DESC LIMIT 0 , 1" );
+}
+
+function add_field_meta($field_id, $key, $value) {
+	global $wpdb;
+	require_once(ABSPATH.'wp-admin/includes/upgrade.php');
+	$charset_collate = $wpdb->get_charset_collate();
+	$table = $wpdb->prefix."mp_ssv_frontend_members_field_meta";
+	$wpdb->insert(
+		$table,
+		array(
+			'field_id' => $field_id,
+			'meta_key' => $key,
+			'meta_value' => $value
+		),
+		array(
+			'%d',
+			'%s',
+			'%s'
+		)
+	);
+	return $wpdb->get_var("SELECT id FROM $table ORDER BY id DESC LIMIT 0 , 1" )[0];
+}
+
+function mp_ssv_get_field_meta($id, $key) {
+	global $wpdb;
+	$table_name = $wpdb->prefix."mp_ssv_frontend_members_field_meta";
+	return json_decode(json_encode($wpdb->get_var( 
+		"SELECT meta_value
+			FROM $table_name
+			WHERE field_id = '$id'
+			AND meta_key = '$key';"
+	)), true);
+}
+
+function mp_ssv_get_group_fields($id) {
+	global $wpdb;
+	$table_name = $wpdb->prefix."mp_ssv_frontend_members_field_meta";
+	$options = json_decode(json_encode($wpdb->get_results( 
+		"SELECT field_id
+			FROM $table_name
+			WHERE meta_key = 'parent_id'
+			AND meta_value = '$id';"
+	)), true);
+	
+	$table_name = $wpdb->prefix."mp_ssv_frontend_members_fields";
+	$sql = "SELECT * FROM $table_name WHERE field_type = 'group_option' AND (";
+	for ($i = 0; $i < count($options); $i++) {
+		if ($i != 0) {
+			$sql .= " OR ";
+		}
+		$sql .= "id = ".$options[$i]["field_id"];
+	}
+	$sql .= ") ORDER BY field_index ASC;";
+	$group_fields = json_decode(json_encode($wpdb->get_results($sql)), true);
+	$table_name = $wpdb->prefix."mp_ssv_frontend_members_field_meta";
+	for ($i = 0; $i < count($group_fields); $i++) {
+		$group_field_meta = json_decode(json_encode($wpdb->get_results( 
+			"SELECT meta_key, meta_value
+				FROM $table_name
+				WHERE field_id = ".$group_fields[$i]["id"].";"
+		)), true);
+		foreach ($group_field_meta as $meta_item) {
+			$group_fields[$i][$meta_item["meta_key"]] = $meta_item["meta_value"];
+		}
+	}
+	return $group_fields;
+}
+
+function mp_ssv_get_user_meta($user_id, $meta_key, $single = true) {
+	if ($meta_key == "email" || $meta_key == "email_address" || $meta_key == "user_email" || $meta_key == "member_email") {
+		return get_user_by("ID", $user_id)->user_email;
+	} else if ($meta_key == "name" || $meta_key == "display_name") {
+		return get_user_by("ID", $user_id)->display_name;
+	} else if ($meta_key == "login" || $meta_key == "username" || $meta_key == "user_name" || $meta_key == "user_login") {
+		return get_user_by("ID", $user_id)->user_login;
+	} else if (strpos($meta_key, "_role") !== false) {
+		return in_array(str_replace("_role", "", $meta_key), get_user_by("ID", $user_id)->roles);
+	} else {
+		return get_user_meta($user_id, $meta_key, $single);
+	}
+}
+
+function mp_ssv_update_user_meta($user_id, $meta_key, $value) {
+	if ($meta_key == "email" || $meta_key == "email_address" || $meta_key == "user_email" || $meta_key == "member_email") {
+		wp_update_user(array('ID' => $user_id, 'user_email' => $value));
+		return true;
+	} else if ($meta_key == "name" || $meta_key == "display_name") {
+		wp_update_user(array('ID' => $user_id, 'display_name' => $value));
+		return true;
+	} else if ($meta_key == "login" || $meta_key == "username" || $meta_key == "user_name" || $meta_key == "user_login") {
+		return false; //cannot change user_login
+	} else if (strpos($meta_key, "_role_select") !== false) {
+		$user = get_user_by("ID", $user_id);
+		$old_role = mp_ssv_get_user_meta($user_id, str_replace("_role_select", "", $meta_key));
+		$user->remove_role($old_role);
+		$user->add_role($value);
+	} else if (strpos($meta_key, "_role") !== false) {
+		$user = get_user_by("ID", $user_id);
+		$role = str_replace("_role", "", $meta_key);
+		if ($value == "yes") {
+			$user->add_role($role);
+		} else {
+			$user->remove_role($role);
+		}
+		return true;
+	} else {
+		update_user_meta($user_id, $meta_key, $value);
+		return true;
+	}
+}
 ?>
