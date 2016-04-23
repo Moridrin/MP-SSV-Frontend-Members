@@ -12,7 +12,7 @@ function mp_ssv_frontend_members_settings_page() {
 	if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		if ($active_tab == "general") {
 			include_once "general-tab-save.php";
-		} else if ($active_tab == "profile_page") {
+		} else if ($active_tab == "frontend-pages") {
 			include_once "profile-page-tab-save.php";
 		}
 	}
@@ -21,7 +21,7 @@ function mp_ssv_frontend_members_settings_page() {
 		<h1>Frontend Members Options</h1>
 		<h2 class="nav-tab-wrapper">
 			<a href="?page=<?php echo __FILE__; ?>&tab=general" class="nav-tab <?php if ($active_tab == "general") { echo "nav-tab-active"; } ?>">General</a>
-			<a href="?page=<?php echo __FILE__; ?>&tab=profile_page" class="nav-tab <?php if ($active_tab == "profile_page") { echo "nav-tab-active"; } ?>">Profile Page</a>
+			<a href="?page=<?php echo __FILE__; ?>&tab=profile_page" class="nav-tab <?php if ($active_tab == "frontend-pages") { echo "nav-tab-active"; } ?>">Profile Page</a>
 			<a href="http://studentensurvival.com/mp-ssv/mp-ssv-frontend-members/" target="_blank" class="nav-tab">Help <img src="<?php echo plugin_dir_url('mp-ssv-general/images/link-new-tab.png'); ?>link-new-tab.png" width="14px" style="vertical-align:middle"></a>
 		</h2>
 		<?php

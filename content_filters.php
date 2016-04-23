@@ -1,5 +1,5 @@
 <?php
-function mp_ssv_filter_frontend_members_content($content) {
+function mp_ssv_frontend_members_content_filters($content) {
 	if (strpos($content, '[mp_ssv_loop_committees]') !== false) {
 		$index = 0;
 		$counter = 0;

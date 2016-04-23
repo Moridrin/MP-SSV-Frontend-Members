@@ -230,7 +230,7 @@ function mp_ssv_save_member_registration($what_to_save) {
 					}
 				} else if ($is_image) {
 					if ( ! function_exists( 'wp_handle_upload' ) ) {
-						require_once( ABSPATH . 'wp-admin/includes/file.php' );
+						require_once(ABSPATH . 'wp-admin/includes/file.php');
 					}
 					$file_location = wp_handle_upload($_FILES[$identifier], array('test_form' => FALSE));
 					if ($file_location && !isset($file_location['error'])) {
@@ -240,7 +240,7 @@ function mp_ssv_save_member_registration($what_to_save) {
 				} else if (($database_component) != "" && strpos($database_component, "name=\"") !== false && strpos($database_component, "readonly") == false) {
 					if (strpos($database_component, 'type="file"') !== false) {
 						if ( ! function_exists( 'wp_handle_upload' ) ) {
-							require_once( ABSPATH . 'wp-admin/includes/file.php' );
+							require_once(ABSPATH . 'wp-admin/includes/file.php');
 						}
 						$file_location = wp_handle_upload($_FILES[$identifier], array('test_form' => FALSE));
 						if ($file_location && !isset($file_location['error'])) {
