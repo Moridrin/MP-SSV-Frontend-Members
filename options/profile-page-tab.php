@@ -15,8 +15,8 @@
 	submit_button();
 	?>
 </form>
-<script src="https://code.jquery.com/jquery-2.2.0.js"></script>
-<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script src="<?php echo plugins_url("/mp-ssv-frontend-members/include/jquery-2.2.0.js"); ?>"></script>
+<script src="<?php echo plugins_url("/mp-ssv-frontend-members/include/jquery-ui.js"); ?>"></script>
 <script>
 	$(function () {
 		$(".sortable").sortable();
@@ -191,7 +191,7 @@
 				break;
 			case "custom":
 				$(input_type_custom).append(
-					'<div><input type="text" id="' + sender_id + '_input_type_custom" name="' + sender_id + '_input_type_custom" value="<?php echo mp_ssv_get_field_meta('\' + sender_id + \'', "input_type_custom"); ?>"/></div>'
+					'<div><input type="text" id="' + sender_id + '_input_type_custom" name="' + sender_id + '_input_type_custom"/></div>'
 				);
 				$(tr).append(
 					'<?php echo mp_ssv_td(mp_ssv_text_input("Name", '\' + sender_id + \'', "")); ?>'
@@ -231,14 +231,14 @@ function mp_ssv_td($content)
 	ob_start();
 	?>
 	<td style="vertical-align: middle; cursor: move;"><?php echo $content; ?></td><?php
-	return ob_get_clean();
+	return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
 function mp_ssv_draggable_icon()
 {
 	ob_start();
 	?><img style="padding-right: 15px; margin: 10px 0;" src="<?php echo plugins_url('../images/icon-menu.svg', __FILE__); ?>"/><?php
-	return ob_get_clean();
+	return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
 function mp_ssv_text_input($title, $id, $value, $type = "text", $args = array())
@@ -248,7 +248,7 @@ function mp_ssv_text_input($title, $id, $value, $type = "text", $args = array())
 	echo $title; ?><br/><input type="<?php echo $type; ?>" id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" value="<?php echo $value; ?>" <?php foreach ($args as $arg) {
 	echo $arg;
 } ?>/><?php
-	return ob_get_clean();
+	return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
 function mp_ssv_select($title, $id, $selected, $options, $args = array(), $allow_custom = false, $input_type_custom = null)
@@ -261,14 +261,20 @@ function mp_ssv_select($title, $id, $selected, $options, $args = array(), $allow
 	$object_custom_name = $id . "_" . strtolower(str_replace(" ", "_", $title)) . "_custom";
 	echo $title; ?>
 	<br/>
-	<select id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" <?php foreach ($args as $arg) { echo $arg; } ?>>
+	<select id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" <?php foreach ($args as $arg) {
+		echo $arg;
+	} ?>>
 		<?php foreach ($options as $option) { ?>
-			<option value="<?php echo strtolower(str_replace(" ", "_", $option)); ?>" <?php if ($selected == strtolower(str_replace(" ", "_", $option))) { echo "selected"; } ?>><?php echo $option; ?></option>
+			<option value="<?php echo strtolower(str_replace(" ", "_", $option)); ?>" <?php if ($selected == strtolower(str_replace(" ", "_", $option))) {
+				echo "selected";
+			} ?>><?php echo $option; ?></option>
 		<?php } ?>
-	</select><?php if ($allow_custom && $selected == "custom") { ?>
-	<div><input type="text" id="<?php echo $object_custom_name; ?>" name="<?php echo $object_custom_name; ?>" value="<?php echo $input_type_custom; ?>"/></div><?php }
+	</select>
+	<?php if ($allow_custom && $selected == "custom") { ?>
+	<div><input type="text" id="<?php echo $object_custom_name; ?>" name="<?php echo $object_custom_name; ?>" value="<?php echo $input_type_custom; ?>"/></div>
+<?php }
 
-	return ob_get_clean();
+	return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
 function mp_ssv_checkbox($title, $id, $value, $args = array())
@@ -281,20 +287,20 @@ function mp_ssv_checkbox($title, $id, $value, $args = array())
 	echo $arg;
 } ?>/> <?php echo $title;
 
-	return ob_get_clean();
+	return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
 function mp_ssv_options($parent_id, $options, $type, $args = array())
 {
 	ob_start();
 	?>
-	<ul id="<?php echo $parent_id; ?>_options" style="margin: 0;">Options<br/><?php foreach ($options as $option) {
+<ul id="<?php echo $parent_id; ?>_options" style="margin: 0;">Options<br/><?php foreach ($options as $option) {
 		echo mp_ssv_option($parent_id, $option, $args);
 	} ?>
 	<li>
 		<button type="button" id="<?php echo $parent_id; ?>_add_option" onclick="add_<?php echo $type; ?>_option(<?php echo $parent_id; ?>)">Add Option</button>
 	</li></ul><?php
-	return ob_get_clean();
+	return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
 function mp_ssv_option($parent_id, $option, $args = array())
@@ -310,7 +316,7 @@ function mp_ssv_option($parent_id, $option, $args = array())
 			} ?>/></li> <?php
 	}
 
-	return ob_get_clean();
+	return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
 function mp_ssv_hidden($id, $name, $value)
@@ -318,7 +324,7 @@ function mp_ssv_hidden($id, $name, $value)
 	ob_start();
 	$object_name = $id . "_" . $name;
 	?><input type="hidden" id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" value="<?php echo $value; ?>"<?php
-	return ob_get_clean();
+	return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
 function mp_ssv_role_select($id, $title, $value, $with_title = true, $args = array())
@@ -326,7 +332,7 @@ function mp_ssv_role_select($id, $title, $value, $with_title = true, $args = arr
 	$object_name = $id . "_" . strtolower(str_replace(" ", "_", $title));
 	ob_start();
 	wp_dropdown_roles($value);
-	$roles_options = ob_get_clean();
+	$roles_options = trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 	$roles_options = trim(preg_replace('/\s\s+/', ' ', $roles_options));
 	$roles_options = str_replace("'", '"', $roles_options);
 	ob_start();
@@ -337,7 +343,7 @@ function mp_ssv_role_select($id, $title, $value, $with_title = true, $args = arr
 	echo $arg;
 } ?>>
 	<option value=""></option><?php echo $roles_options; ?></select> <?php
-	return ob_get_clean();
+	return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
 ?>

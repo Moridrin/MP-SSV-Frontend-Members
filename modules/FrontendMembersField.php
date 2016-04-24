@@ -275,4 +275,8 @@ class FrontendMembersField
 		<?php
 		return ob_get_clean();
 	}
+	
+	protected function saveOptionRow(){
+		
+	}
 }
