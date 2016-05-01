@@ -187,7 +187,7 @@ class FrontendMembersField
 						$field = new FrontendMembersFieldInputRoleCheckbox($field, $field->getMeta('role'), $field->getMeta('display'));
 						break;
 					case "role_select":
-						$field = new FrontendMembersFieldInputRoleSelect($field, $field->getOptions(), $field->getMeta('display'));
+						$field = new FrontendMembersFieldInputRoleSelect($field, $field->getMeta('display'));
 						break;
 					case "text":
 						$field = new FrontendMembersFieldInputText($field, $field->getMeta('required'), $field->getMeta('display'), $field->getMeta('placeholder'));
@@ -196,7 +196,8 @@ class FrontendMembersField
 						$field = new FrontendMembersFieldInputTextCheckbox($field, $field->getMeta('help_text'), $field->getMeta('display'));
 						break;
 					case "text_select":
-						$field = new FrontendMembersFieldInputTextSelect($field, $field->getOptions(), $field->getMeta('display'));
+						$field = new FrontendMembersFieldInputTextSelect($field, $field->getMeta('display'));
+						$field->options = $field->getOptions();
 						break;
 				}
 				break;
@@ -227,12 +228,12 @@ class FrontendMembersField
 		$sql = "SELECT id FROM $table";
 		foreach ($filters as $filter => $value) {
 			if (substr($value, 0, 1) == "!") {
-				$sql .= " WHERE " . $filter . " != '" . $value . "'";
+				$sql .= " WHERE " . $filter . " != '" . str_replace("!", "", $value) . "'";
 			} else {
 				$sql .= " WHERE " . $filter . " = '" . $value . "'";
 			}
 		}
-		$sql .= " ORDER BY id ASC;";
+		$sql .= " ORDER BY field_index ASC;";
 
 		$database_fields = json_decode(json_encode($wpdb->get_results($sql)), true);
 		$fields = array();
@@ -285,51 +286,11 @@ class FrontendMembersField
 		foreach ($_POST as $name => $val) {
 			if (strpos($name, "_field_title") !== false) {
 				$id++;
-				$_POST[str_replace("_field_title", "", $name) . "_field_index"] = $id;
+				$_POST[str_replace("_field_title", "", $name) . "_field_index"] = $id; //Set field_index
 				$field = self::fromPOST(str_replace("_field_title", "", $name));
 				$field->save();
 			}
 		}
-	}
-
-	/**
-	 * This function returns all the group options for this field.
-	 * @return array|null with all options linked to this FrontendMembersField or null if this is not a group field.
-	 */
-	public function getOptions()
-	{
-		global $wpdb;
-		$table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
-		$options = json_decode(json_encode($wpdb->get_results(
-			"SELECT id
-			FROM $table
-			WHERE meta_key = 'parent_id'
-			AND meta_value = '$this->id';"
-		)), true);
-
-		$table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
-		$sql = "SELECT * FROM $table WHERE field_type = 'group_option' AND (";
-		for ($i = 0; $i < count($options); $i++) {
-			if ($i != 0) {
-				$sql .= " OR ";
-			}
-			$sql .= "id = " . $options[$i]["id"];
-		}
-		$sql .= ") ORDER BY id ASC;";
-		$group_fields = json_decode(json_encode($wpdb->get_results($sql)), true);
-		$table_name = $wpdb->prefix . "mp_ssv_frontend_members_field_meta";
-		for ($i = 0; $i < count($group_fields); $i++) {
-			$group_field_meta = json_decode(json_encode($wpdb->get_results(
-				"SELECT meta_key, meta_value
-				FROM $table_name
-				WHERE id = " . $group_fields[$i]["id"] . ";"
-			)), true);
-			foreach ($group_field_meta as $meta_item) {
-				$group_fields[$i][$meta_item["meta_key"]] = $meta_item["meta_value"];
-			}
-		}
-
-		return $group_fields;
 	}
 
 	/**
@@ -405,7 +366,8 @@ class FrontendMembersField
 						$field = new FrontendMembersFieldInputTextCheckbox($field, $field->getMetaFromPOST('help_text'), $field->getMetaFromPOST('display'));
 						break;
 					case "text_select":
-						$field = new FrontendMembersFieldInputTextSelect($field, $field->getOptions(), $field->getMetaFromPOST('display'));
+						$field = new FrontendMembersFieldInputTextSelect($field, $field->getMetaFromPOST('display'));
+						$field->options  = $field->getOptionsFromPOST($variables);
 						break;
 				}
 				break;
@@ -414,16 +376,25 @@ class FrontendMembersField
 		return $field;
 	}
 
-	protected function save()
+	protected function save($remove = false)
 	{
 		global $wpdb;
+		if (strlen($this->title) <= 0) {
+			$remove = true;
+		}
 		$table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
 		$update = $wpdb->get_results(
 			"SELECT id
 					FROM $table
 					WHERE id = $this->id;"
 		);
-		if (count($update) > 0) {
+		if ($remove) {
+			$wpdb->delete(
+				$table,
+				array("id" => $this->id),
+				array('%d')
+			);
+		} else if (count($update) > 0) {
 			$wpdb->update(
 				$table,
 				array("field_index" => $this->index, "field_type" => $this->type, "field_title" => $this->title),
@@ -438,5 +409,6 @@ class FrontendMembersField
 				array('%d', '%d', '%s', '%s')
 			);
 		}
+		return $remove;
 	}
 }

@@ -72,9 +72,9 @@ class FrontendMembersFieldInputText extends FrontendMembersFieldInput
 		return ob_get_clean();
 	}
 
-	public function save()
+	public function save($remove = false)
 	{
-		parent::save();
+		parent::save($remove);
 		global $wpdb;
 		$table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
 		$wpdb->replace($table, array("field_id" => $this->id, "meta_key" => "required", "meta_value" => $this->required), array('%d', '%s', '%s'));

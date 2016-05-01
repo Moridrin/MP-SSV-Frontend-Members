@@ -50,8 +50,8 @@ class FrontendMembersFieldHeader extends FrontendMembersField
 		return "<h1>$this->title</h1>";
 	}
 
-	public function save()
+	public function save($remove = false)
 	{
-		parent::save();
+		parent::save($remove);
 	}
 }

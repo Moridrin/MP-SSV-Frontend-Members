@@ -52,9 +52,9 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
 		return parent::getOptionRowInput($content);
 	}
 
-	public function save()
+	public function save($remove = false)
 	{
-		parent::save();
+		parent::save($remove);
 		global $wpdb;
 		$table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
 		$wpdb->replace(

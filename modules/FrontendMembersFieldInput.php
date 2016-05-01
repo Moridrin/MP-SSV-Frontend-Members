@@ -62,20 +62,29 @@ class FrontendMembersFieldInput extends FrontendMembersField
 		return parent::getOptionRowField($content);
 	}
 
-	protected function save()
+	protected function save($remove = false)
 	{
-		parent::save();
+		$remove = parent::save($remove);
 		global $wpdb;
 		$table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
-		$wpdb->replace(
-			$table,
-			array("field_id" => $this->id, "meta_key" => "input_type", "meta_value" => $this->input_type),
-			array('%d', '%s', '%s')
-		);
-		$wpdb->replace(
-			$table,
-			array("field_id" => $this->id, "meta_key" => "name", "meta_value" => $this->name),
-			array('%d', '%s', '%s')
-		);
+		if ($remove) {
+			$wpdb->delete(
+				$table,
+				array("field_id" => $this->id),
+				array('%d')
+			);
+		} else {
+			$wpdb->replace(
+				$table,
+				array("field_id" => $this->id, "meta_key" => "input_type", "meta_value" => $this->input_type),
+				array('%d', '%s', '%s')
+			);
+			$wpdb->replace(
+				$table,
+				array("field_id" => $this->id, "meta_key" => "name", "meta_value" => $this->name),
+				array('%d', '%s', '%s')
+			);
+		}
+		return $remove;
 	}
 }

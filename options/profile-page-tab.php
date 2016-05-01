@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	}
 	$new_field_content = mp_ssv_get_td(mp_ssv_get_draggable_icon());
 	$new_field_content .= mp_ssv_get_td(mp_ssv_get_text_input("Field Title", '\' + id + \'', "", "text", array("required")));
-	$new_field_content .= mp_ssv_get_td(mp_ssv_get_select("Field Type", '\' + id + \'', "input", array("Tab", "Header", "Input")));
+	$new_field_content .= mp_ssv_get_td(mp_ssv_get_select("Field Type", '\' + id + \'', "input", array("Tab", "Header", "Input"), array("onchange=\"mp_ssv_type_changed(' + id + ')\"")));
 	$new_field_content .= mp_ssv_get_td(mp_ssv_get_select("Input Type", '\' + id + \'', "text", array("Text", "Text Select", "Role Select", "Text Checkbox", "Role Checkbox", "Image"), array("onchange=\"mp_ssv_input_type_changed(' + id + ')\""), true));
 	$new_field_content .= mp_ssv_get_td(mp_ssv_get_text_input("Name", '\' + id + \'', "", "text", array("required")));
 	$new_field_content .= mp_ssv_get_td(mp_ssv_get_checkbox("Required", '\' + id + \'', "no"));
@@ -201,15 +201,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		}
 	}
 </script>
+<!-- Add Text Option. -->
 <script>
 	function add_text_option(sender_id) {
-		var li = document.getElementById(sender_id + "_add_option").parentElement;
 		id++;
+		var li = document.getElementById(sender_id + "_add_option").parentElement;
 		$(li).before(
-			'<li><?php echo mp_ssv_get_text_input("", '\' + sender_id + \'', ""); ?></li>'
+			'<li><?php echo mp_ssv_get_option('\' + sender_id + \'', array('id' => '\' + id + \'', 'type' => 'text', 'value' => "")); ?></li>'
 		);
 	}
 </script>
+<!-- Add Role Option. -->
 <script>
 	function add_role_option(sender_id) {
 		var li = document.getElementById(sender_id + "_add_option").parentElement;

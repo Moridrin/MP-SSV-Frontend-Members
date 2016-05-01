@@ -73,8 +73,8 @@ class FrontendMembersFieldTab extends FrontendMembersField
 		}
 	}
 
-	public function save()
+	public function save($remove = false)
 	{
-		parent::save();
+		parent::save($remove);
 	}
 }
