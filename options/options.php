@@ -10,13 +10,6 @@ function mp_ssv_frontend_members_settings_page()
 	if (isset($_GET['tab'])) {
 		$active_tab = $_GET['tab'];
 	}
-	if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-		if ($active_tab == "general") {
-			include_once "general-tab-save.php";
-		} else if ($active_tab == "profile_page") {
-			include_once "profile-page-tab-save.php";
-		}
-	}
 	?>
 	<div class="wrap">
 		<h1>Frontend Members Options</h1>
@@ -32,9 +25,9 @@ function mp_ssv_frontend_members_settings_page()
 		</h2>
 		<?php
 		if ($active_tab == "general") {
-			include_once "general-tab.php";
+			require_once "general-tab.php";
 		} else if ($active_tab == "profile_page") {
-			include_once "profile-page-tab.php";
+			require_once "profile-page-tab.php";
 		}
 		?>
 	</div>

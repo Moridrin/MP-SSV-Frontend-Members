@@ -1,10 +1,10 @@
 <?php
+
 /**
  * Created by: Jeroen Berkvens
  * Date: 23-4-2016
  * Time: 16:08
  */
-
 class FrontendMembersFieldInputText extends FrontendMembersFieldInput
 {
 
@@ -49,11 +49,36 @@ class FrontendMembersFieldInputText extends FrontendMembersFieldInput
 	public function getOptionRow()
 	{
 		ob_start();
-		echo mp_ssv_td(mp_ssv_text_input("Name", $this->id, $this->name));
-		echo mp_ssv_td(mp_ssv_checkbox("Required", $this->id, $this->required));
-		echo mp_ssv_td(mp_ssv_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
-		echo mp_ssv_td(mp_ssv_text_input("Placeholder", $this->id, $this->placeholder));
+		echo mp_ssv_get_td(mp_ssv_get_text_input("Name", $this->id, $this->name, "text", array("required")));
+		echo mp_ssv_get_td(mp_ssv_get_checkbox("Required", $this->id, $this->required));
+		echo mp_ssv_get_td(mp_ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
+		echo mp_ssv_get_td(mp_ssv_get_text_input("Placeholder", $this->id, $this->placeholder));
 		$content = ob_get_clean();
+
 		return parent::getOptionRowInput($content);
+	}
+
+	public function getHTML($frontend_member)
+	{
+		ob_start();
+		$value = $frontend_member->getMeta($this->name);
+		?>
+		<div class="mui-textfield <?php if ($this->placeholder == "") echo "mui-textfield--float-label"; ?>">
+			<input type="text" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="<?php echo $value; ?>" <?php echo $this->display; ?>
+			       placeholder="<?php echo $this->placeholder; ?>" <?php if ($this->required == "yes") echo "required"; ?>/>
+			<label><?php echo $this->title; ?></label>
+		</div>
+		<?php
+		return ob_get_clean();
+	}
+
+	public function save()
+	{
+		parent::save();
+		global $wpdb;
+		$table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
+		$wpdb->replace($table, array("field_id" => $this->id, "meta_key" => "required", "meta_value" => $this->required), array('%d', '%s', '%s'));
+		$wpdb->replace($table, array("field_id" => $this->id, "meta_key" => "display", "meta_value" => $this->display), array('%d', '%s', '%s'));
+		$wpdb->replace($table, array("field_id" => $this->id, "meta_key" => "placeholder", "meta_value" => $this->placeholder), array('%d', '%s', '%s'));
 	}
 }

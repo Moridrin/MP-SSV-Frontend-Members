@@ -5,8 +5,6 @@
  * Time: 14:48
  */
 
-namespace modules;
-
 
 class FrontendMember extends \WP_User
 {
@@ -18,6 +16,17 @@ class FrontendMember extends \WP_User
 	function __construct($user)
 	{
 		parent::__construct($user);
+	}
+
+	/**
+	 * @return bool returns true if this is the current user.
+	 */
+	public function isCurrentUser() {
+		if ($this->ID == wp_get_current_user()->ID) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -34,7 +43,7 @@ class FrontendMember extends \WP_User
 	 *
 	 * @return string the value associated with the key.
 	 */
-	function get_meta($meta_key, $single = true)
+	function getMeta($meta_key, $single = true)
 	{
 		if ($meta_key == "email" || $meta_key == "email_address" || $meta_key == "user_email" || $meta_key == "member_email") {
 			return $this->user_email;
@@ -45,7 +54,7 @@ class FrontendMember extends \WP_User
 		} else if (strpos($meta_key, "_role") !== false) {
 			return in_array(str_replace("_role", "", $meta_key), $this->roles);
 		} else {
-			return $this->get_meta($meta_key, $single);
+			return get_user_meta($this->ID, $meta_key, $single);
 		}
 	}
 
@@ -62,33 +71,33 @@ class FrontendMember extends \WP_User
 	 *
 	 * @return bool is only false if the key is user_login (or an alias).
 	 */
-	function update_meta($meta_key, $value)
+	function updateMeta($meta_key, $value)
 	{
 		if ($meta_key == "email" || $meta_key == "email_address" || $meta_key == "user_email" || $meta_key == "member_email") {
-			$this->update_meta('user_email', $value);
-
+			update_user_meta($this->ID, 'user_email', $value);
 			return true;
 		} else if ($meta_key == "name" || $meta_key == "display_name") {
-			$this->update_meta('display_name', $value);
+			update_user_meta($this->ID, 'display_name', $value);
 
 			return true;
 		} else if ($meta_key == "login" || $meta_key == "username" || $meta_key == "user_name" || $meta_key == "user_login") {
 			return false; //cannot change user_login
 		} else if (strpos($meta_key, "_role_select") !== false) {
-			$old_role = $this->get_meta(str_replace("_role_select", "", $meta_key), true);
-			$this->remove_role($old_role);
-			$this->add_role($value);
+			$old_role = $this->getMeta(str_replace("_role_select", "", $meta_key), true);
+			parent::remove_role($old_role);
+			parent::add_role($value);
+			return true;
 		} else if (strpos($meta_key, "_role") !== false) {
 			$role = str_replace("_role", "", $meta_key);
 			if ($value == "yes") {
-				$this->add_role($role);
+				parent::add_role($role);
 			} else {
-				$this->remove_role($role);
+				parent::remove_role($role);
 			}
 
 			return true;
 		} else {
-			$this->update_meta($meta_key, $value);
+			update_user_meta($this->ID, $meta_key, $value);
 
 			return true;
 		}

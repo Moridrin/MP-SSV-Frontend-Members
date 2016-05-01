@@ -63,6 +63,7 @@ function mp_ssv_register_page_content() {
 	$tabs = $wpdb->get_results("SELECT title FROM $table_name WHERE component = '[tab]'");
 	$content = "";
 	ob_start(); ?>
+	<!--suppress HtmlUnknownTarget -->
 	<form name="members_profile_form" id="member_<?php echo $tab_title; ?>_form" action="/register" method="post" enctype="multipart/form-data">
 		<?php
 		for ($i = 0; $i < count($tabs); $i++) {

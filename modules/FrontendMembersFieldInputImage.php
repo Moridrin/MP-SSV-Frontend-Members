@@ -44,11 +44,43 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
 	public function getOptionRow()
 	{
 		ob_start();
-		echo mp_ssv_td(mp_ssv_text_input("Name", $this->id, $this->name));
-		echo mp_ssv_td(mp_ssv_checkbox("Required", $this->id, $this->required));
-		echo mp_ssv_td(mp_ssv_checkbox("Preview", $this->id, $this->preview));
-		echo mp_ssv_td('<div class="' . $this->id . '_empty"></div>');
+		echo mp_ssv_get_td(mp_ssv_get_text_input("Name", $this->id, $this->name));
+		echo mp_ssv_get_td(mp_ssv_get_checkbox("Required", $this->id, $this->required));
+		echo mp_ssv_get_td(mp_ssv_get_checkbox("Preview", $this->id, $this->preview));
+		echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
 		$content = ob_get_clean();
 		return parent::getOptionRowInput($content);
+	}
+
+	public function getHTML($size = 150)
+	{
+		ob_start();
+		$location = mp_ssv_get_user_meta($this->name);
+		if ($this->required == "yes" && $location != "") {
+			echo '<input type="file" id="' . $this->id . '" name="' . $this->name . '" required/>';
+		} else {
+			echo '<input type="file" id="' . $this->id . '" name="' . $this->name . '" />';
+		}
+		if ($this->preview == "yes") {
+			echo '<img src="'.$location.'" height="'.$size.' width="'.$size.'">';
+		}
+		return ob_get_clean();
+	}
+
+	public function save()
+	{
+		parent::save();
+		global $wpdb;
+		$table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
+		$wpdb->replace(
+			$table,
+			array("field_id" => $this->id, "meta_key" => "required", "meta_value" => $this->required),
+			array('%d', '%s', '%s')
+		);
+		$wpdb->replace(
+			$table,
+			array("field_id" => $this->id, "meta_key" => "preview", "meta_value" => $this->preview),
+			array('%d', '%s', '%s')
+		);
 	}
 }

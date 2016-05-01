@@ -1,10 +1,10 @@
 <?php
+
 /**
  * Created by: Jeroen Berkvens
  * Date: 23-4-2016
  * Time: 16:08
  */
-
 class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
 {
 
@@ -50,11 +50,43 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
 	public function getOptionRow()
 	{
 		ob_start();
-		echo mp_ssv_td(mp_ssv_text_input("Name", $this->id, $this->name));
-		echo mp_ssv_td(mp_ssv_checkbox("Required", $this->id, $this->required));
-		echo mp_ssv_td(mp_ssv_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled"), array(), true, $this->getMeta('input_type_custom')));
-		echo mp_ssv_td(mp_ssv_text_input("Placeholder", $this->id, $this->placeholder));
+		echo mp_ssv_get_td(mp_ssv_get_text_input("Name", $this->id, $this->name));
+		echo mp_ssv_get_td(mp_ssv_get_checkbox("Required", $this->id, $this->required));
+		echo mp_ssv_get_td(mp_ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled"), array(), true, $this->getMeta('input_type_custom')));
+		echo mp_ssv_get_td(mp_ssv_get_text_input("Placeholder", $this->id, $this->placeholder));
 		$content = ob_get_clean();
+
 		return parent::getOptionRowInput($content);
+	}
+
+	public function getHTML()
+	{
+		if ($this->required == "yes") {
+			return '<input type="' . $this->input_type . '" id="' . $this->id . '" name="' . $this->name . '" value="' . mp_ssv_get_user_meta($this->name) . '" placeholder="'.$this->placeholder.'" display="' . $this->display . '" required/>';
+		} else {
+			return '<input type="' . $this->input_type . '" id="' . $this->id . '" name="' . $this->name . '" value="' . mp_ssv_get_user_meta($this->name) . '" placeholder="'.$this->placeholder.'" display="' . $this->display . '" />';
+		}
+	}
+
+	public function save()
+	{
+		parent::save();
+		global $wpdb;
+		$table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
+		$wpdb->replace(
+			$table,
+			array("field_id" => $this->id, "meta_key" => "required", "meta_value" => $this->required),
+			array('%d', '%s', '%s')
+		);
+		$wpdb->replace(
+			$table,
+			array("field_id" => $this->id, "meta_key" => "display", "meta_value" => $this->display),
+			array('%d', '%s', '%s')
+		);
+		$wpdb->replace(
+			$table,
+			array("field_id" => $this->id, "meta_key" => "placeholder", "meta_value" => $this->placeholder),
+			array('%d', '%s', '%s')
+		);
 	}
 }

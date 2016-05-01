@@ -44,11 +44,28 @@ class FrontendMembersFieldInputTextCheckbox extends FrontendMembersFieldInput
 	public function getOptionRow()
 	{
 		ob_start();
-		echo mp_ssv_td(mp_ssv_text_input("Name", $this->id, $this->name));
-		echo mp_ssv_td(mp_ssv_checkbox("Required", $this->id, $this->help_text));
-		echo mp_ssv_td(mp_ssv_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
-		echo mp_ssv_td('<div class="' . $this->id . '_empty"></div>');
+		echo mp_ssv_get_td(mp_ssv_get_text_input("Name", $this->id, $this->name));
+		echo mp_ssv_get_td(mp_ssv_get_checkbox("Required", $this->id, $this->help_text));
+		echo mp_ssv_get_td(mp_ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
+		echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
 		$content = ob_get_clean();
 		return parent::getOptionRowInput($content);
+	}
+
+	public function save()
+	{
+		parent::save();
+		global $wpdb;
+		$table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
+		$wpdb->replace(
+			$table,
+			array("field_id" => $this->id, "meta_key" => "help_text", "meta_value" => $this->help_text),
+			array('%d', '%s', '%s')
+		);
+		$wpdb->replace(
+			$table,
+			array("field_id" => $this->id, "meta_key" => "display", "meta_value" => $this->display),
+			array('%d', '%s', '%s')
+		);
 	}
 }

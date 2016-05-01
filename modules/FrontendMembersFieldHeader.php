@@ -1,10 +1,10 @@
 <?php
+
 /**
  * Created by: Jeroen Berkvens
  * Date: 23-4-2016
  * Time: 16:01
  */
-
 class FrontendMembersFieldHeader extends FrontendMembersField
 {
 
@@ -26,7 +26,7 @@ class FrontendMembersFieldHeader extends FrontendMembersField
 	 */
 	public static function create($index, $title)
 	{
-		return new FrontendMembersFieldHeader(parent::createField($index, 'header', $title));
+		return new FrontendMembersFieldHeader(parent::createField($index, $title, 'header'));
 	}
 
 	/**
@@ -35,12 +35,23 @@ class FrontendMembersFieldHeader extends FrontendMembersField
 	public function getOptionRow()
 	{
 		ob_start();
-		echo mp_ssv_td('<div class="' . $this->id . '_empty"></div>');
-		echo mp_ssv_td('<div class="' . $this->id . '_empty"></div>');
-		echo mp_ssv_td('<div class="' . $this->id . '_empty"></div>');
-		echo mp_ssv_td('<div class="' . $this->id . '_empty"></div>');
-		echo mp_ssv_td('<div class="' . $this->id . '_empty"></div>');
+		echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+		echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+		echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+		echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+		echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
 		$content = ob_get_clean();
+
 		return parent::getOptionRowField($content);
+	}
+
+	public function getHTML()
+	{
+		return "<h1>$this->title</h1>";
+	}
+
+	public function save()
+	{
+		parent::save();
 	}
 }

@@ -44,11 +44,28 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
 	public function getOptionRow()
 	{
 		ob_start();
-		echo mp_ssv_td('<div class="' . $this->id . '_empty"></div>');
-		echo mp_ssv_td('<div class="' . $this->id . '_empty"></div>');
-		echo mp_ssv_td(mp_ssv_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
-		echo mp_ssv_td(mp_ssv_role_select($this->id, "Role", $this->role));
+		echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+		echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+		echo mp_ssv_get_td(mp_ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
+		echo mp_ssv_get_td(mp_ssv_get_role_select($this->id, "Role", $this->role));
 		$content = ob_get_clean();
 		return parent::getOptionRowInput($content);
+	}
+
+	public function save()
+	{
+		parent::save();
+		global $wpdb;
+		$table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
+		$wpdb->replace(
+			$table,
+			array("field_id" => $this->id, "meta_key" => "role", "meta_value" => $this->role),
+			array('%d', '%s', '%s')
+		);
+		$wpdb->replace(
+			$table,
+			array("field_id" => $this->id, "meta_key" => "display", "meta_value" => $this->display),
+			array('%d', '%s', '%s')
+		);
 	}
 }
