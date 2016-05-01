@@ -33,8 +33,8 @@ function mp_ssv_profile_page_setup($content)
 	} else if (strpos($content, '[mp-ssv-frontend-members-profile]') === false) { //Not the Profile Page Tag
 		return $content;
 	}
-	if (isset($_POST['what-to-save'])) {
-		mp_ssv_save_members_profile($_POST['what-to-save']); //TODO Check if this works.
+	if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+		mp_ssv_save_members_profile();
 	}
 	$content = mp_ssv_profile_page_content();
 
@@ -101,7 +101,6 @@ function mp_ssv_profile_page_content_tabs()
 					echo $item->getHTML($member);
 				}
 				?>
-				<input type="hidden" name="what-to-save" value="<?php echo $tab->title; ?>">
 				<?php
 				if ($can_edit) {
 					?>
@@ -146,23 +145,22 @@ function mp_ssv_get_profile_page_tab_select($member)
 	return ob_get_clean();
 }
 
-function mp_ssv_save_members_profile($what_to_save)
+function mp_ssv_save_members_profile()
 {
 	if (isset($_GET['user_id'])) {
 		$user = get_user_by('id', $_GET['user_id']);
 	} else {
 		$user = wp_get_current_user();
 	}
+	$user = new FrontendMember($user);
 	foreach ($_POST as $name => $val) {
 		if (strpos($name, "_reset") !== false) {
 			$name = str_replace("_reset", "", $name);
 		}
-		if (!mp_ssv_update_user_meta($user->ID, $name, $val)) {
+		$update_success = $user->updateMeta($name, $val);
+		if (!$update_success) {
 			echo "Cannot change the user-login. Please concider setting the field display to 'read-only' or 'disabled'";
 		}
-	}
-	if (!function_exists("mp_ssv_update_mailchimp_member")) {
-		mp_ssv_update_mailchimp_member($user);
 	}
 }
 
