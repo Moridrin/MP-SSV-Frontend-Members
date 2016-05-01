@@ -79,28 +79,41 @@ function mp_ssv_profile_page_content_tabs()
 	} else {
 		$member = wp_get_current_user();
 	}
-	if ($member != wp_get_current_user() && !current_user_can('edit_user')) {
-		$can_edit = false;
+	if ($member == wp_get_current_user() || current_user_can('edit_user')) {
+		$can_edit = true;
 	}
 	$member = new FrontendMember($member);
 	ob_start();
 	echo mp_ssv_get_profile_page_tab_select($member);
-	$fields = FrontendMembersField::getAll();
-	for ($i = 0; $i < count($fields); $i++) {
-		$field = $fields[$i];
-		if ($field instanceof FrontendMembersFieldTab) {
-			if ($i == 0) {
-				echo $field->getDivHeader(true); //Open the first (active) Tab-panel
-			} else {
-				echo "</div>"; //Close the previous Tab-panel
-				echo $field->getDivHeader(); //Open the Tab-panel
-			}
+	$tabs = FrontendMembersField::getTabs();
+	foreach ($tabs as $tab) {
+		if ($tabs[0] == $tab) {
+			$active_class = "mui--is-active";
 		} else {
-			echo $field->getHTML($member);
+			$active_class = "";
 		}
+		?>
+		<div class="mui-tabs__pane <?php echo $active_class; ?>" id="pane-<?php echo $tab->id; ?>">
+			<form name="members_<?php echo $tab->title; ?>_form" id="member_<?php echo $tab->title; ?>_form" action="/profile" method="post" enctype="multipart/form-data">
+				<?php
+				$items_in_tab = FrontendMembersField::getItemsInTab($tab);
+				foreach ($items_in_tab as $item) {
+					echo $item->getHTML($member);
+				}
+				?>
+				<input type="hidden" name="what-to-save" value="<?php echo $tab->title; ?>">
+				<?php
+				if ($can_edit) {
+					?>
+					<button class="mui-btn mui-btn--primary" type="submit" name="submit" id="submit" class="button-primary">Save</button>
+					<?php
+				}
+				?>
+			</form>
+		</div>
+		<?php
 	}
-	echo "</div>"; //Close the last Tab-panel
-	//TODO echo save button.
+
 	return ob_get_clean();
 }
 

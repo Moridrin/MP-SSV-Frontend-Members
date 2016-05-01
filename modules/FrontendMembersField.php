@@ -11,7 +11,7 @@ require_once "FrontendMembersFieldInput.php";
 
 class FrontendMembersField
 {
-	protected $id;
+	public $id;
 	protected $index;
 	public $type;
 	public $title;
@@ -85,6 +85,33 @@ class FrontendMembersField
 		}
 
 		return $tabs;
+	}
+
+	/**
+	 * This function returns all the items in the given Tab.
+	 *
+	 * @param FrontendMembersFieldTab $tab is the tab where you want the fields from.
+	 *
+	 * @return array
+	 */
+	public static function getItemsInTab($tab)
+	{
+		$all_fields = self::getAll();
+		$is_in_tab = false;
+		$fields_in_tab = array();
+		foreach ($all_fields as $field) {
+			if ($field instanceof FrontendMembersFieldTab) {
+				if ($field == $tab) {
+					$is_in_tab = true;
+				} else {
+					$is_in_tab = false;
+				}
+			} else if ($is_in_tab) {
+				$fields_in_tab[] = $field;
+			}
+		}
+
+		return $fields_in_tab;
 	}
 
 	/**
@@ -332,7 +359,7 @@ class FrontendMembersField
 						break;
 					case "text_select":
 						$field = new FrontendMembersFieldInputTextSelect($field, $field->getMetaFromPOST('display'));
-						$field->options  = $field->getOptionsFromPOST($variables);
+						$field->options = $field->getOptionsFromPOST($variables);
 						break;
 				}
 				break;
@@ -374,6 +401,7 @@ class FrontendMembersField
 				array('%d', '%d', '%s', '%s')
 			);
 		}
+
 		return $remove;
 	}
 }

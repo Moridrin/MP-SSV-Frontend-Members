@@ -67,9 +67,9 @@ class FrontendMembersFieldTab extends FrontendMembersField
 	public function getDivHeader($active = false)
 	{
 		if ($active) {
-			return '<div class="mui-tabs__pane mui--is-active" id="' . $this->id . '">';
+			return '<div class="mui-tabs__pane mui--is-active" id="pane-' . $this->id . '">';
 		} else {
-			return '<div class="mui-tabs__pane" id="' . $this->id . '">';
+			return '<div class="mui-tabs__pane" id="pane-' . $this->id . '">';
 		}
 	}
 
