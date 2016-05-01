@@ -52,6 +52,22 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
 		return parent::getOptionRowInput($content);
 	}
 
+	public function getHTML($frontend_member)
+	{
+		ob_start();
+		$value = $frontend_member->getMeta($this->name);
+		global $wp_roles;
+		?>
+		<div class="mui-checkbox">
+			<label for="<?php echo $this->id; ?>">
+				<input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->role; ?>" <?php if ($value == "yes") : echo "checked"; endif; ?>>
+				<?php echo translate_user_role( $wp_roles->roles[ $this->role ]['name']); ?>
+			</label>
+		</div>
+		<?php
+		return ob_get_clean();
+	}
+
 	public function save($remove = false)
 	{
 		parent::save($remove);

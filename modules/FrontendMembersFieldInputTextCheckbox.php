@@ -1,26 +1,27 @@
 <?php
+
 /**
  * Created by: Jeroen Berkvens
  * Date: 23-4-2016
  * Time: 16:10
  */
-
 class FrontendMembersFieldInputTextCheckbox extends FrontendMembersFieldInput
 {
-	public $help_text;
+	public $required;
 	public $display;
 
 	/**
 	 * FrontendMembersFieldInputRoleCheckbox constructor.
+
 	 *
-	 * @param FrontendMembersFieldInput $field     is the parent field.
-	 * @param string                    $help_text is the name of the role or the role itself associated with this checkbox.
-	 * @param string                    $display   is the way the input field is displayed (readonly, disabled or normal) default is normal.
+*@param FrontendMembersFieldInput $field    is the parent field.
+	 * @param string              $required is the name of the role or the role itself associated with this checkbox.
+	 * @param string              $display  is the way the input field is displayed (readonly, disabled or normal) default is normal.
 	 */
-	protected function __construct($field, $help_text, $display)
+	protected function __construct($field, $required, $display)
 	{
 		parent::__construct($field, $field->input_type, $field->name);
-		$this->help_text = $help_text;
+		$this->required = $required;
 		$this->display = $display;
 	}
 
@@ -45,11 +46,27 @@ class FrontendMembersFieldInputTextCheckbox extends FrontendMembersFieldInput
 	{
 		ob_start();
 		echo mp_ssv_get_td(mp_ssv_get_text_input("Name", $this->id, $this->name, "text", array("required")));
-		echo mp_ssv_get_td(mp_ssv_get_checkbox("Required", $this->id, $this->help_text));
+		echo mp_ssv_get_td(mp_ssv_get_checkbox("Required", $this->id, $this->required));
 		echo mp_ssv_get_td(mp_ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
 		echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
 		$content = ob_get_clean();
+
 		return parent::getOptionRowInput($content);
+	}
+
+	public function getHTML($frontend_member)
+	{
+		ob_start();
+		$value = $frontend_member->getMeta($this->name);
+		?>
+		<div class="mui-checkbox">
+			<label for="<?php echo $this->id; ?>">
+				<input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" <?php if ($value == "yes") : echo "checked"; endif; ?>>
+				<?php echo $this->title; ?>
+			</label>
+		</div>
+		<?php
+		return ob_get_clean();
 	}
 
 	public function save($remove = false)
@@ -59,7 +76,7 @@ class FrontendMembersFieldInputTextCheckbox extends FrontendMembersFieldInput
 		$table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
 		$wpdb->replace(
 			$table,
-			array("field_id" => $this->id, "meta_key" => "help_text", "meta_value" => $this->help_text),
+			array("field_id" => $this->id, "meta_key" => "help_text", "meta_value" => $this->required),
 			array('%d', '%s', '%s')
 		);
 		$wpdb->replace(
