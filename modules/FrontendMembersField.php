@@ -245,41 +245,6 @@ class FrontendMembersField
 		return $fields;
 	}
 
-	public static function getAllAsHTML($frontend_member, $can_edit, $is_current_user)
-	{
-		ob_start();
-		$fields = self::getAll();
-		echo '<ul id="profile-menu" class="mui-tabs__bar mui-tabs__bar--justified">';
-		for ($i = 0; $i < count($fields); $i++) {
-			$field = $fields[$i];
-			if ($field instanceof FrontendMembersFieldTab) {
-				if ($i == 0) {
-					echo $field->getTabButton(true);
-				} else {
-					echo $field->getTabButton();
-				}
-			}
-		}
-		$url = (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '?logout=success';
-		echo '<li><a class="mui-btn mui-btn--flat mui-btn--danger" href="' . wp_logout_url($url) . '">Logout</a></li>';
-		echo '</ul>';
-		for ($i = 0; $i < count($fields); $i++) {
-			$field = $fields[$i];
-			if ($field instanceof FrontendMembersFieldTab) {
-				if ($i == 0) {
-					echo $field->getDivHeader(true);
-				} else {
-					echo "</div>"; //Close the previous Tab
-					echo $field->getDivHeader();
-				}
-			} else {
-				echo $field->getHTML($frontend_member, $can_edit);
-			}
-		}
-
-		return ob_get_clean();
-	}
-
 	public static function saveAllFromPost()
 	{
 		$id = 0;
@@ -343,8 +308,8 @@ class FrontendMembersField
 				break;
 			case "input":
 				$input_type = $field->getMetaFromPOST("input_type");
-
 				$name = $field->getMetaFromPOST("name");
+				mp_ssv_print($input_type);
 				$field = new FrontendMembersFieldInput($field, $input_type, $name);
 				switch ($input_type) {
 					case "custom":
@@ -357,7 +322,8 @@ class FrontendMembersField
 						$field = new FrontendMembersFieldInputRoleCheckbox($field, $field->getMetaFromPOST('role'), $field->getMetaFromPOST('display'));
 						break;
 					case "role_select":
-						$field = new FrontendMembersFieldInputRoleSelect($field, $field->getOptions(), $field->getMetaFromPOST('display'));
+						$field = new FrontendMembersFieldInputRoleSelect($field, $field->getMetaFromPOST('display'));
+						$field->options = $field->getOptionsFromPOST($variables);
 						break;
 					case "text":
 						$field = new FrontendMembersFieldInputText($field, $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('placeholder'));

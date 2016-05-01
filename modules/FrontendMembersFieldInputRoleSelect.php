@@ -5,6 +5,8 @@
  * Time: 16:08
  */
 
+require_once 'FrontendMembersFieldInputRoleSelectOption.php';
+
 class FrontendMembersFieldInputRoleSelect extends FrontendMembersFieldInput
 {
 	public $options;
@@ -53,6 +55,7 @@ class FrontendMembersFieldInputRoleSelect extends FrontendMembersFieldInput
 			WHERE meta_key = 'parent_id'
 			AND meta_value = '$this->id';"
 		);
+		$option_ids = json_decode(json_encode($option_ids), true);
 
 		//Get Option Fields
 		$table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
@@ -61,7 +64,7 @@ class FrontendMembersFieldInputRoleSelect extends FrontendMembersFieldInput
 			if ($i != 0) {
 				$sql .= " OR ";
 			}
-			$sql .= "id = " . $option_ids[$i]["id"];
+			$sql .= "id = " . $option_ids[$i]["field_id"];
 		}
 		$sql .= ") ORDER BY id ASC;";
 		$option_fields = $wpdb->get_results($sql);
@@ -69,17 +72,33 @@ class FrontendMembersFieldInputRoleSelect extends FrontendMembersFieldInput
 		//Create Options and Get Value
 		$options = array();
 		$table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
-		foreach ($option_fields as $group_field) {
-			$option = new FrontendMembersFieldInputTextSelectOption($group_field['id'], $group_field['field_index']);
-			$option->value = $wpdb->get_var(
-				"SELECT id
+		foreach ($option_fields as $option_field) {
+			$option_field = json_decode(json_encode($option_field), true);
+			$option = new FrontendMembersFieldInputRoleSelectOption($option_field['id'], $option_field['field_index'], $this->id);
+			$value = $wpdb->get_var(
+				"SELECT meta_value
 			FROM $table
-			WHERE meta_key = 'field_id'
-			AND meta_value = '$option->id';"
+			WHERE field_id = '$option->id'
+			AND meta_key = 'value';"
 			);
+			$option->value = $value;
 			$options[] = $option;
 		}
-		mp_ssv_print($options);
+
+		return $options;
+	}
+
+	public function getOptionsFromPOST($variables)
+	{
+		$options = array();
+		$index = 0;
+		foreach ($variables as $name => $value) {
+			if (strpos($name, "_option") !== false) {
+				$id = str_replace("option", "", str_replace("_", "", $name));
+				$options[] = new FrontendMembersFieldInputRoleSelectOption($id, $index, $this->id, $value);
+				$index++;
+			}
+		}
 
 		return $options;
 	}
@@ -91,23 +110,62 @@ class FrontendMembersFieldInputRoleSelect extends FrontendMembersFieldInput
 	{
 		ob_start();
 		echo mp_ssv_get_td(mp_ssv_get_text_input("Name", $this->id, $this->name, "text", array("required")));
-		echo mp_ssv_get_td('<div class="'.$this->id.'_empty"></div>');
+		echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
 		echo mp_ssv_get_td(mp_ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
-		echo mp_ssv_get_td(mp_ssv_get_options($this->id, $this->options, "role"));
+		echo mp_ssv_get_td(mp_ssv_get_options($this->id, self::getOptionsAsArray(), "role"));
 		$content = ob_get_clean();
+
 		return parent::getOptionRowInput($content);
+	}
+
+	private function getOptionsAsArray($names_only = false)
+	{
+		$array = array();
+		if (count($this->options) > 0) {
+			foreach ($this->options as $option) {
+				if ($names_only) {
+					$array[] = $option->value;
+				} else {
+					$array[] = array('id' => $option->id, 'type' => 'role', 'value' => $option->value);
+				}
+			}
+		}
+
+		return $array;
+	}
+
+	public function getHTML($frontend_member)
+	{
+		ob_start();
+		$value = $frontend_member->getMeta($this->name);
+		?>
+		<div class="mui-select mui-textfield">
+			<label for="<?php echo $this->id; ?>"><?php echo $this->title; ?></label>
+			<select id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>">
+				<?php foreach ($this->options as $option) {
+					echo $option->getHTML($value);
+				}
+				?>
+			</select>
+		</div>
+		<?php
+		return ob_get_clean();
 	}
 
 	public function save($remove = false)
 	{
-		parent::save($remove);
+		$remove = parent::save($remove);
 		global $wpdb;
 		$table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
+		mp_ssv_print($remove);
 		$wpdb->replace(
 			$table,
 			array("field_id" => $this->id, "meta_key" => "display", "meta_value" => $this->display),
 			array('%d', '%s', '%s')
 		);
-		//TODO Save options
+		foreach ($this->options as $option) {
+			$option->save($remove);
+		}
+		return $remove;
 	}
 }
