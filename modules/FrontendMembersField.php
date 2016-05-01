@@ -178,7 +178,7 @@ class FrontendMembersField
 				$field = new FrontendMembersFieldInput($field, $input_type, $name);
 				switch ($input_type) {
 					case "custom":
-						$field = new FrontendMembersFieldInputCustom($field, $field->getMeta('required'), $field->getMeta('display'), $field->getMeta('placeholder'));
+						$field = new FrontendMembersFieldInputCustom($field, $field->getMeta('input_type_custom'), $field->getMeta('required'), $field->getMeta('display'), $field->getMeta('placeholder'));
 						break;
 					case "image":
 						$field = new FrontendMembersFieldInputImage($field, $field->getMeta('required'), $field->getMeta('preview'));
@@ -309,11 +309,10 @@ class FrontendMembersField
 			case "input":
 				$input_type = $field->getMetaFromPOST("input_type");
 				$name = $field->getMetaFromPOST("name");
-				mp_ssv_print($input_type);
 				$field = new FrontendMembersFieldInput($field, $input_type, $name);
 				switch ($input_type) {
 					case "custom":
-						$field = new FrontendMembersFieldInputCustom($field, $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('placeholder'));
+						$field = new FrontendMembersFieldInputCustom($field, $field->getMetaFromPOST('input_type_custom'), $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('placeholder'));
 						break;
 					case "image":
 						$field = new FrontendMembersFieldInputImage($field, $field->getMetaFromPOST('required'), $field->getMetaFromPOST('preview'));

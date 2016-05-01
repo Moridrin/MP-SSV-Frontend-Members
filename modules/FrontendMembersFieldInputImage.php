@@ -1,10 +1,10 @@
 <?php
+
 /**
  * Created by: Jeroen Berkvens
  * Date: 23-4-2016
  * Time: 16:10
  */
-
 class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
 {
 	public $required;
@@ -49,21 +49,25 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
 		echo mp_ssv_get_td(mp_ssv_get_checkbox("Preview", $this->id, $this->preview));
 		echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
 		$content = ob_get_clean();
+
 		return parent::getOptionRowInput($content);
 	}
 
-	public function getHTML($size = 150)
+	public function getHTML($frontend_member, $size = 150)
 	{
 		ob_start();
-		$location = mp_ssv_get_user_meta($this->name);
-		if ($this->required == "yes" && $location != "") {
+		$location = $frontend_member->getMeta($this->name);
+		echo '<div class="mui-textfield">';
+		if ($this->required == "yes" && $location == "") {
 			echo '<input type="file" id="' . $this->id . '" name="' . $this->name . '" required/>';
 		} else {
 			echo '<input type="file" id="' . $this->id . '" name="' . $this->name . '" />';
 		}
 		if ($this->preview == "yes") {
-			echo '<img src="'.$location.'" height="'.$size.' width="'.$size.'">';
+			echo '<img src="' . $location . '" style="padding-top: 10px;" height="' . $size . '" width="' . $size . '">';
 		}
+		echo '</div>';
+
 		return ob_get_clean();
 	}
 

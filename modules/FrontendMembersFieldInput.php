@@ -49,13 +49,14 @@ class FrontendMembersFieldInput extends FrontendMembersField
 
 	/**
 	 * @param string $content is a string of all input columns.
+	 * @param string $input_type_custom
 	 *
 	 * @return string row that can be added to the profile page options table.
 	 */
-	protected function getOptionRowInput($content)
+	protected function getOptionRowInput($content, $input_type_custom = "")
 	{
 		ob_start();
-		echo mp_ssv_get_td(mp_ssv_get_select("Input Type", $this->id, $this->input_type, array("Text", "Text Select", "Role Select", "Text Checkbox", "Role Checkbox", "Image"), array('onchange="mp_ssv_input_type_changed(\'' . $this->id . '\')"'), true));
+		echo mp_ssv_get_td(mp_ssv_get_select("Input Type", $this->id, $this->input_type, array("Text", "Text Select", "Role Select", "Text Checkbox", "Role Checkbox", "Image"), array('onchange="mp_ssv_input_type_changed(\'' . $this->id . '\')"'), true, $input_type_custom));
 		echo $content;
 		$content = ob_get_clean();
 

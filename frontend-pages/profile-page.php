@@ -96,11 +96,11 @@ function mp_ssv_profile_page_content_tabs()
 				echo $field->getDivHeader(); //Open the Tab-panel
 			}
 		} else {
-			echo $field->getHTML($member, $can_edit);
+			echo $field->getHTML($member);
 		}
 	}
 	echo "</div>"; //Close the last Tab-panel
-
+	//TODO echo save button.
 	return ob_get_clean();
 }
 

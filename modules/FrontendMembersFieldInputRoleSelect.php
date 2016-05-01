@@ -157,7 +157,6 @@ class FrontendMembersFieldInputRoleSelect extends FrontendMembersFieldInput
 		$remove = parent::save($remove);
 		global $wpdb;
 		$table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
-		mp_ssv_print($remove);
 		$wpdb->replace(
 			$table,
 			array("field_id" => $this->id, "meta_key" => "display", "meta_value" => $this->display),
