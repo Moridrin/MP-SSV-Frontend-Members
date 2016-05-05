@@ -57,7 +57,9 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
 	{
 		ob_start();
 		$location = $frontend_member->getMeta($this->name);
-		echo '<div class="mui-textfield">';
+		if (current_theme_supports('mui')) {
+			echo '<div class="mui-textfield">';
+		}
 		if ($this->required == "yes" && $location == "") {
 			echo '<input type="file" id="' . $this->id . '" name="' . $this->name . '" required/>';
 		} else {
@@ -66,7 +68,11 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
 		if ($this->preview == "yes") {
 			echo '<img src="' . $location . '" style="padding-top: 10px;" height="' . $size . '" width="' . $size . '">';
 		}
-		echo '</div>';
+		if (current_theme_supports('mui')) {
+			echo '</div>';
+		} else {
+			echo '<br/>';
+		}
 
 		return ob_get_clean();
 	}

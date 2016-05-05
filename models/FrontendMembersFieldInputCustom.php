@@ -71,13 +71,23 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
 	{
 		ob_start();
 		$value = $frontend_member->getMeta($this->name);
-		?>
-		<div class="mui-textfield">
+		if (current_theme_supports('mui')) {
+			?>
+			<div class="mui-textfield">
+				<input type="<?php echo $this->input_type_custom; ?>" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="<?php echo $value; ?>" <?php echo $this->display; ?>
+				       placeholder="<?php echo $this->placeholder; ?>" <?php if ($this->required == "yes") echo "required"; ?>/>
+				<label><?php echo $this->title; ?></label>
+			</div>
+			<?php
+		} else {
+			?>
+			<label><?php echo $this->title; ?></label>
 			<input type="<?php echo $this->input_type_custom; ?>" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="<?php echo $value; ?>" <?php echo $this->display; ?>
 			       placeholder="<?php echo $this->placeholder; ?>" <?php if ($this->required == "yes") echo "required"; ?>/>
-			<label><?php echo $this->title; ?></label>
-		</div>
-		<?php
+			<br/>
+			<?php
+		}
+
 		return ob_get_clean();
 	}
 

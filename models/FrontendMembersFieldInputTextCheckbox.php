@@ -12,11 +12,10 @@ class FrontendMembersFieldInputTextCheckbox extends FrontendMembersFieldInput
 
 	/**
 	 * FrontendMembersFieldInputRoleCheckbox constructor.
-
 	 *
-*@param FrontendMembersFieldInput $field    is the parent field.
-	 * @param string              $required is the name of the role or the role itself associated with this checkbox.
-	 * @param string              $display  is the way the input field is displayed (readonly, disabled or normal) default is normal.
+	 * @param FrontendMembersFieldInput $field    is the parent field.
+	 * @param string                    $required is the name of the role or the role itself associated with this checkbox.
+	 * @param string                    $display  is the way the input field is displayed (readonly, disabled or normal) default is normal.
 	 */
 	protected function __construct($field, $required, $display)
 	{
@@ -58,15 +57,27 @@ class FrontendMembersFieldInputTextCheckbox extends FrontendMembersFieldInput
 	{
 		ob_start();
 		$value = $frontend_member->getMeta($this->name);
-		?>
-		<input type="hidden" name="<?php echo $this->name; ?>" value="no"/>
-		<div class="mui-checkbox">
-			<label for="<?php echo $this->id; ?>">
+		if (current_theme_supports('mui')) {
+			?>
+			<input type="hidden" name="<?php echo $this->name; ?>" value="no"/>
+			<div class="mui-checkbox">
+				<label>
+					<input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="yes" <?php if ($value == "yes") : echo "checked"; endif; ?>>
+					<?php echo $this->title; ?>
+				</label>
+			</div>
+			<?php
+		} else {
+			?>
+			<input type="hidden" name="<?php echo $this->name; ?>" value="no"/>
+			<label>
 				<input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="yes" <?php if ($value == "yes") : echo "checked"; endif; ?>>
 				<?php echo $this->title; ?>
 			</label>
-		</div>
-		<?php
+			<br/>
+			<?php
+		}
+
 		return ob_get_clean();
 	}
 

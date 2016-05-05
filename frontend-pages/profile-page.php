@@ -46,26 +46,20 @@ function mp_ssv_profile_page_setup($content)
  */
 function mp_ssv_profile_page_content()
 {
+	$tabs = FrontendMembersField::getTabs();
 	if (current_theme_supports('mui')) {
-		global $wpdb;
-		$table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
-		$tabs = $wpdb->get_row(
-			"SELECT *
-					FROM $table
-					WHERE field_type = 'tab';"
-		);
 		if (count($tabs) > 0) {
 			$content = '<div class="mui--hidden-xs">';
 			$content .= mp_ssv_profile_page_content_tabs();
 			$content .= '</div>';
 			$content .= '<div class="mui--visible-xs-block">';
-//			$content .= mp_ssv_profile_page_content_single_page();
+			$content .= mp_ssv_profile_page_content_single_page();
 			$content .= '</div>';
 		} else {
-//			$content = mp_ssv_profile_page_content_single_page();
+			$content = mp_ssv_profile_page_content_single_page();
 		}
 	} else {
-//		$content = mp_ssv_profile_page_content_non_mui();
+		$content = mp_ssv_profile_page_content_single_page();
 	}
 
 	return $content;
@@ -111,6 +105,42 @@ function mp_ssv_profile_page_content_tabs()
 			</form>
 		</div>
 		<?php
+	}
+
+	return ob_get_clean();
+}
+
+function mp_ssv_profile_page_content_single_page()
+{
+	$can_edit = false;
+	if (isset($_GET['user_id'])) {
+		$member = get_user_by('id', $_GET['user_id']);
+	} else {
+		$member = wp_get_current_user();
+	}
+	if ($member == wp_get_current_user() || current_user_can('edit_user')) {
+		$can_edit = true;
+	}
+	$member = new FrontendMember($member);
+	ob_start();
+	$items = FrontendMembersField::getAll();
+	?>
+	<form name="members_form" id="members_form" action="/profile" method="post" enctype="multipart/form-data">
+		<?php
+		foreach ($items as $item) {
+			if (!$item instanceof FrontendMembersFieldTab) {
+				echo $item->getHTML($member);
+			}
+		}
+		if ($can_edit) {
+			echo '<button class="mui-btn mui-btn--primary" type="submit" name="submit" id="submit" class="button-primary">Save</button>';
+		}
+		?>
+	</form>
+	<?php
+	if ($member->isCurrentUser()) {
+		$url = (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '?logout=success';
+		echo '<button type="button" class="mui-btn mui-btn--flat mui-btn--danger" href="' . wp_logout_url($url) . '" >Logout</button>';
 	}
 
 	return ob_get_clean();

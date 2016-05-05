@@ -1,19 +1,19 @@
 <?php
-
 /**
  * Created by: Jeroen Berkvens
  * Date: 23-4-2016
  * Time: 16:08
  */
-require_once 'FrontendMembersFieldInputTextSelectOption.php';
 
-class FrontendMembersFieldInputTextSelect extends FrontendMembersFieldInput
+require_once 'FrontendMembersFieldInputRoleSelectOption.php';
+
+class FrontendMembersFieldInputRoleSelect extends FrontendMembersFieldInput
 {
 	public $options;
 	public $display;
 
 	/**
-	 * FrontendMembersFieldInputTextSelect constructor.
+	 * FrontendMembersFieldInputRoleSelect constructor.
 	 *
 	 * @param FrontendMembersFieldInput $field   is the parent field.
 	 * @param string                    $display is the way the input field is displayed (readonly, disabled or normal) default is normal.
@@ -21,7 +21,9 @@ class FrontendMembersFieldInputTextSelect extends FrontendMembersFieldInput
 	protected function __construct($field, $display)
 	{
 		parent::__construct($field, $field->input_type, $field->name);
+		$this->options = $this->getOptions();
 		$this->display = $display;
+		$this->name = $this->name . '_role_select';
 	}
 
 	/**
@@ -35,7 +37,7 @@ class FrontendMembersFieldInputTextSelect extends FrontendMembersFieldInput
 	 */
 	public static function create($index, $title, $name, $options = array(), $display = "normal")
 	{
-		return new FrontendMembersFieldInputTextSelect(parent::createInput($index, $title, 'role_select', $name), $options, $display);
+		return new FrontendMembersFieldInputRoleSelect(parent::createInput($index, $title, 'role_select', $name), $options, $display);
 	}
 
 	/**
@@ -73,7 +75,7 @@ class FrontendMembersFieldInputTextSelect extends FrontendMembersFieldInput
 		$table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
 		foreach ($option_fields as $option_field) {
 			$option_field = json_decode(json_encode($option_field), true);
-			$option = new FrontendMembersFieldInputTextSelectOption($option_field['id'], $option_field['field_index'], $this->id);
+			$option = new FrontendMembersFieldInputRoleSelectOption($option_field['id'], $option_field['field_index'], $this->id);
 			$value = $wpdb->get_var(
 				"SELECT meta_value
 			FROM $table
@@ -94,7 +96,7 @@ class FrontendMembersFieldInputTextSelect extends FrontendMembersFieldInput
 		foreach ($variables as $name => $value) {
 			if (strpos($name, "_option") !== false) {
 				$id = str_replace("option", "", str_replace("_", "", $name));
-				$options[] = new FrontendMembersFieldInputTextSelectOption($id, $index, $this->id, $value);
+				$options[] = new FrontendMembersFieldInputRoleSelectOption($id, $index, $this->id, $value);
 				$index++;
 			}
 		}
@@ -111,7 +113,7 @@ class FrontendMembersFieldInputTextSelect extends FrontendMembersFieldInput
 		echo mp_ssv_get_td(mp_ssv_get_text_input("Name", $this->id, $this->name, "text", array("required")));
 		echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
 		echo mp_ssv_get_td(mp_ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
-		echo mp_ssv_get_td(mp_ssv_get_options($this->id, self::getOptionsAsArray(), "text"));
+		echo mp_ssv_get_td(mp_ssv_get_options($this->id, self::getOptionsAsArray(), "role"));
 		$content = ob_get_clean();
 
 		return parent::getOptionRowInput($content);
@@ -125,7 +127,7 @@ class FrontendMembersFieldInputTextSelect extends FrontendMembersFieldInput
 				if ($names_only) {
 					$array[] = $option->value;
 				} else {
-					$array[] = array('id' => $option->id, 'type' => 'text', 'value' => $option->value);
+					$array[] = array('id' => $option->id, 'type' => 'role', 'value' => $option->value);
 				}
 			}
 		}
@@ -137,8 +139,20 @@ class FrontendMembersFieldInputTextSelect extends FrontendMembersFieldInput
 	{
 		ob_start();
 		$value = $frontend_member->getMeta($this->name);
-		?>
-		<div class="mui-select mui-textfield">
+		if (current_theme_supports('mui')) {
+			?>
+			<div class="mui-select mui-textfield">
+				<label for="<?php echo $this->id; ?>"><?php echo $this->title; ?></label>
+				<select id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>">
+					<?php foreach ($this->options as $option) {
+						echo $option->getHTML($value);
+					}
+					?>
+				</select>
+			</div>
+			<?php
+		} else {
+			?>
 			<label for="<?php echo $this->id; ?>"><?php echo $this->title; ?></label>
 			<select id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>">
 				<?php foreach ($this->options as $option) {
@@ -146,8 +160,10 @@ class FrontendMembersFieldInputTextSelect extends FrontendMembersFieldInput
 				}
 				?>
 			</select>
-		</div>
-		<?php
+			<br/>
+			<?php
+		}
+
 		return ob_get_clean();
 	}
 

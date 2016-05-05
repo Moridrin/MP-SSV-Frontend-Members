@@ -59,15 +59,27 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
 		ob_start();
 		$value = $frontend_member->getMeta($this->name);
 		global $wp_roles;
-		?>
-		<input type="hidden" name="<?php echo $this->name; ?>" value="no"/>
-		<div class="mui-checkbox">
-			<label for="<?php echo $this->id; ?>">
+		if (current_theme_supports('mui')) {
+			?>
+			<input type="hidden" name="<?php echo $this->name; ?>" value="no"/>
+			<div class="mui-checkbox">
+				<label>
+					<input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="yes" <?php if ($value == "yes") : echo "checked"; endif; ?>>
+					<?php echo translate_user_role($wp_roles->roles[$this->role]['name']); ?>
+				</label>
+			</div>
+			<?php
+		} else {
+			?>
+			<input type="hidden" name="<?php echo $this->name; ?>" value="no"/>
+			<label>
 				<input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="yes" <?php if ($value == "yes") : echo "checked"; endif; ?>>
 				<?php echo translate_user_role($wp_roles->roles[$this->role]['name']); ?>
 			</label>
-		</div>
-		<?php
+			<br/>
+			<?php
+		}
+
 		return ob_get_clean();
 	}
 
