@@ -12,7 +12,7 @@ function mp_ssv_register_page_setup($content) {
 				$content = "";
 				?>
 				My computer is thinking that you are a computer. If his isn't so please contact the webmaster.
-				This ofthen happens when the recaptcha is not filled in correctly. Make sure that you do before submitting.
+				This often happens when the recaptcha is not filled in correctly. Make sure that you do before submitting.
 				<?php
 			} else {
 				$url = 'https://www.google.com/recaptcha/api/siteverify';

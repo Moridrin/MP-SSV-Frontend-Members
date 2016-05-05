@@ -23,6 +23,7 @@ class FrontendMembersFieldInputRoleSelect extends FrontendMembersFieldInput
 		parent::__construct($field, $field->input_type, $field->name);
 		$this->options = $this->getOptions();
 		$this->display = $display;
+		$this->name = $this->name.'_role_select';
 	}
 
 	/**

@@ -159,9 +159,23 @@ function mp_ssv_save_members_profile()
 		}
 		$update_success = $user->updateMeta($name, $val);
 		if (!$update_success) {
-			echo "Cannot change the user-login. Please concider setting the field display to 'read-only' or 'disabled'";
+			echo "Cannot change the user-login. Please consider setting the field display to 'read-only' or 'disabled'";
 		}
 	}
+	foreach ($_FILES as $name => $file) {
+		if (!function_exists('wp_handle_upload')) {
+			require_once(ABSPATH . 'wp-admin/includes/file.php');
+		}
+		$file_location = wp_handle_upload($file, array('test_form' => false));
+		if ($file_location && !isset($file_location['error'])) {
+			if ($user->getMeta($name) != $file_location['url']) {
+				unlink($user->getMeta($name . '_path'));
+				$user->updateMeta($name, $file_location["url"]);
+				$user->updateMeta($name . '_path', $file_location["file"]);
+			}
+		}
+	}
+	unset($_POST);
 }
 
 add_filter('the_content', 'mp_ssv_profile_page_setup');

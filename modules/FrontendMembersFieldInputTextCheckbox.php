@@ -59,9 +59,10 @@ class FrontendMembersFieldInputTextCheckbox extends FrontendMembersFieldInput
 		ob_start();
 		$value = $frontend_member->getMeta($this->name);
 		?>
+		<input type="hidden" name="<?php echo $this->name; ?>" value="no"/>
 		<div class="mui-checkbox">
 			<label for="<?php echo $this->id; ?>">
-				<input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" <?php if ($value == "yes") : echo "checked"; endif; ?>>
+				<input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="yes" <?php if ($value == "yes") : echo "checked"; endif; ?>>
 				<?php echo $this->title; ?>
 			</label>
 		</div>
