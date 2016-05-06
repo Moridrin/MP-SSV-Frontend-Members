@@ -19,7 +19,6 @@ global $wpdb;
 define('FRONTEND_MEMBERS_FIELDS_TABLE_NAME', $wpdb->prefix . "mp_ssv_frontend_members_fields");
 define('FRONTEND_MEMBERS_FIELD_META_TABLE_NAME', $wpdb->prefix . "mp_ssv_frontend_members_field_meta");
 
-require_once "models/FrontendMember.php";
 require_once "models/FrontendMembersField.php";
 require_once "frontend-pages/login-page.php";
 require_once "frontend-pages/profile-page.php";
