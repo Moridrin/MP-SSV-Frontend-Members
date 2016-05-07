@@ -53,10 +53,15 @@ class FrontendMembersFieldInputTextCheckbox extends FrontendMembersFieldInput
 		return parent::getOptionRowInput($content);
 	}
 
-	public function getHTML($frontend_member)
+	public function getHTML($frontend_member = null)
 	{
 		ob_start();
-		$value = $frontend_member->getMeta($this->name);
+		if ($frontend_member == null) {
+			$value = "";
+			$this->display = 'normal';
+		} else {
+			$value = $frontend_member->getMeta($this->name);
+		}
 		if (current_theme_supports('mui')) {
 			?>
 			<input type="hidden" name="<?php echo $this->name; ?>" value="no"/>

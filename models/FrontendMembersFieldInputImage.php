@@ -53,13 +53,19 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
 		return parent::getOptionRowInput($content);
 	}
 
-	public function getHTML($frontend_member, $size = 150)
+	public function getHTML($frontend_member = null, $size = 150)
 	{
 		ob_start();
-		$location = $frontend_member->getMeta($this->name);
+		if ($frontend_member == null) {
+			$location = "";
+			$this->preview = "no";
+		} else {
+			$location = $frontend_member->getMeta($this->name);
+		}
 		if (current_theme_supports('mui')) {
 			echo '<div class="mui-textfield">';
 		}
+		echo '<label>'.$this->title.'</label>';
 		if ($this->required == "yes" && $location == "") {
 			echo '<input type="file" id="' . $this->id . '" name="' . $this->name . '" required/>';
 		} else {

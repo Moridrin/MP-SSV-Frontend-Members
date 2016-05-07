@@ -135,10 +135,15 @@ class FrontendMembersFieldInputRoleSelect extends FrontendMembersFieldInput
 		return $array;
 	}
 
-	public function getHTML($frontend_member)
+	public function getHTML($frontend_member = null)
 	{
 		ob_start();
-		$value = $frontend_member->getMeta($this->name);
+		if ($frontend_member == null) {
+			$value = "";
+			$this->display = 'normal';
+		} else {
+			$value = $frontend_member->getMeta($this->name);
+		}
 		if (current_theme_supports('mui')) {
 			?>
 			<div class="mui-select mui-textfield">

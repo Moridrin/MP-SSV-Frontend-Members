@@ -26,17 +26,16 @@ require_once "frontend-pages/register-page.php";
 require_once "options/options.php";
 require_once "content_filters.php";
 
-if (function_exists("mp_ssv_use_recaptcha")) {
-	/**
-	 * This function adds the Google recaptcha API javascript file to the header. This is needed to use recaptcha.
-	 */
-	function mp_ssv_use_recaptcha()
-	{
-		echo '<script src="include/google_recaptcha_api.js"></script>';
-	}
-
-	add_action('wp_head', 'mp_ssv_use_recaptcha');
+/**
+ * This function adds the Google recaptcha API javascript file to the header. This is needed to use recaptcha.
+ */
+function mp_ssv_use_recaptcha()
+{
+	$url = plugins_url('mp-ssv-frontend-members/include/google_recaptcha_api.js');
+	echo '<script src="' . $url . '"></script>';
 }
+
+add_action('wp_head', 'mp_ssv_use_recaptcha');
 
 /**
  * This function sets up the plugin:
