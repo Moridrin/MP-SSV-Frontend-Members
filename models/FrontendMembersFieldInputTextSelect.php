@@ -80,7 +80,7 @@ class FrontendMembersFieldInputTextSelect extends FrontendMembersFieldInput
 			WHERE field_id = '$option->id'
 			AND meta_key = 'value';"
 			);
-			$option->value = $value;
+			$option->value = stripslashes($value);
 			$options[] = $option;
 		}
 

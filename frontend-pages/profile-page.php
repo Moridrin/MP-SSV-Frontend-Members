@@ -9,14 +9,14 @@ function mp_ssv_profile_page_login_redirect()
 	if ($post == null) {
 		return;
 	}
-	$post_name_correct = $post->post_name == 'profile';
-	if (!is_user_logged_in() && $post_name_correct) {
-		wp_redirect("/login");
+		$post_name_correct = $post->post_name == 'profile';
+		if (!is_user_logged_in() && $post_name_correct) {
+			wp_redirect("/login");
 		exit;
 	}
 }
 
-add_action('wp_head', 'mp_ssv_profile_page_login_redirect');
+add_action('wp_head', 'mp_ssv_profile_page_login_redirect', 9);
 
 /**
  * This function sets up the profile page.
@@ -70,8 +70,10 @@ function mp_ssv_profile_page_content_tabs()
 	$can_edit = false;
 	if (isset($_GET['user_id'])) {
 		$member = get_user_by('id', $_GET['user_id']);
+		$action_url = '/profile/?user_id='.$member->ID;
 	} else {
 		$member = wp_get_current_user();
+		$action_url = '/profile/';
 	}
 	if ($member == wp_get_current_user() || current_user_can('edit_user')) {
 		$can_edit = true;
@@ -88,7 +90,7 @@ function mp_ssv_profile_page_content_tabs()
 		}
 		?>
 		<div class="mui-tabs__pane <?php echo $active_class; ?>" id="pane-<?php echo $tab->id; ?>">
-			<form name="members_<?php echo $tab->title; ?>_form" id="member_<?php echo $tab->title; ?>_form" action="/profile" method="post" enctype="multipart/form-data">
+			<form name="members_<?php echo $tab->title; ?>_form" id="member_<?php echo $tab->title; ?>_form" action="<?php echo $action_url ?>" method="post" enctype="multipart/form-data">
 				<?php
 				$items_in_tab = FrontendMembersField::getItemsInTab($tab);
 				foreach ($items_in_tab as $item) {
@@ -189,7 +191,7 @@ function mp_ssv_save_members_profile()
 		}
 		$update_success = $user->updateMeta($name, $val);
 		if (!$update_success) {
-			echo "Cannot change the user-login. Please consider setting the field display to 'read-only' or 'disabled'";
+			echo "Cannot change the user-login. Please consider setting the field display to 'disabled'";
 		}
 	}
 	foreach ($_FILES as $name => $file) {

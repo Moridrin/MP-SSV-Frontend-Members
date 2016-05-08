@@ -88,7 +88,7 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
 		return ob_get_clean();
 	}
 
-	public function save($remove = false)
+	public function save($remove = false, $user = null)
 	{
 		parent::save($remove);
 		global $wpdb;

@@ -172,7 +172,7 @@ class FrontendMembersFieldInputRoleSelect extends FrontendMembersFieldInput
 		return ob_get_clean();
 	}
 
-	public function save($remove = false)
+	public function save($remove = false, $user = null)
 	{
 		$remove = parent::save($remove);
 		global $wpdb;

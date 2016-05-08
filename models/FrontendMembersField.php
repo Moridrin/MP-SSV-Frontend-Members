@@ -132,7 +132,7 @@ class FrontendMembersField
 			AND meta_key = '$key';"
 		);
 
-		return $value;
+		return stripslashes($value);
 	}
 
 	/**
