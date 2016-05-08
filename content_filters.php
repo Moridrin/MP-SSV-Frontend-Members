@@ -1,4 +1,5 @@
 <?php
+add_filter('the_content', 'mp_ssv_frontend_members_content_filters', 100);
 function mp_ssv_frontend_members_content_filters($content) {
 	if (strpos($content, '[mp_ssv_loop_committees]') !== false) {
 		$index = 0;
@@ -67,4 +68,3 @@ function get_members_list($role_name) {
 	$members_list .= "</ul>";
 	return $members_list;
 }
-?>

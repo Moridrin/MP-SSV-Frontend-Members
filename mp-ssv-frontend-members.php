@@ -19,25 +19,23 @@ global $wpdb;
 define('FRONTEND_MEMBERS_FIELDS_TABLE_NAME', $wpdb->prefix . "mp_ssv_frontend_members_fields");
 define('FRONTEND_MEMBERS_FIELD_META_TABLE_NAME', $wpdb->prefix . "mp_ssv_frontend_members_field_meta");
 
-include_once "frontend-pages/login-page.php";
-include_once "frontend-pages/profile-page.php";
-include_once "frontend-pages/register-page.php";
-include_once "options/options.php";
-require_once 'content_filters.php';
+require_once "models/FrontendMembersField.php";
+require_once "frontend-pages/login-page.php";
+require_once "frontend-pages/profile-page.php";
+require_once "frontend-pages/register-page.php";
+require_once "options/options.php";
+require_once "content_filters.php";
 
-add_filter('the_content', 'mp_ssv_frontend_members_content_filters', 100);
-
-if (function_exists("mp_ssv_use_recaptcha")) {
-	/**
-	 * This function adds the Google recaptcha API javascript file to the header. This is needed to use recaptcha.
-	 */
-	function mp_ssv_use_recaptcha()
-	{
-		echo '<script src="include/google_recaptcha_api.js"></script>';
-	}
-
-	add_action('wp_head', 'mp_ssv_use_recaptcha');
+/**
+ * This function adds the Google recaptcha API javascript file to the header. This is needed to use recaptcha.
+ */
+function mp_ssv_use_recaptcha()
+{
+	$url = plugins_url('mp-ssv-frontend-members/include/google_recaptcha_api.js');
+	echo '<script src="' . $url . '"></script>';
 }
+
+add_action('wp_head', 'mp_ssv_use_recaptcha');
 
 /**
  * This function sets up the plugin:
@@ -57,7 +55,7 @@ function mp_ssv_register_mp_ssv_frontend_members()
 	$table_name = $wpdb->prefix . "mp_ssv_frontend_members_fields";
 	$wpdb->show_errors();
 	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
-			id bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+			id bigint(20) NOT NULL PRIMARY KEY,
 			field_index bigint(20) NOT NULL,
 			field_type varchar(30) NOT NULL,
 			field_title varchar(30)
@@ -65,26 +63,19 @@ function mp_ssv_register_mp_ssv_frontend_members()
 	dbDelta($sql);
 	$table_name = $wpdb->prefix . "mp_ssv_frontend_members_field_meta";
 	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
-			id bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 			field_id bigint(20) NOT NULL,
-			meta_key varchar(255) NOT NULL,
-			meta_value varchar(255) NOT NULL
+			meta_key varchar(50) NOT NULL,
+			meta_value varchar(255) NOT NULL,
+			PRIMARY KEY (meta_key, field_id)
 		) $charset_collate;";
 	dbDelta($sql);
 
-	$first_name = FrontendMembersField::create(0, "input", "First Name");
-	$first_name->setMeta("input_type", "text");
-	$first_name->setMeta("name", "first_name");
-	$first_name->setMeta("placeholder", "");
-	$first_name->setMeta("required", "yes");
-	$first_name->setMeta("display", "normal");
-
-	$last_name = FrontendMembersField::create(0, "input", "Last Name");
-	$last_name->setMeta("input_type", "text");
-	$last_name->setMeta("name", "last_name");
-	$last_name->setMeta("placeholder", "");
-	$last_name->setMeta("required", "yes");
-	$last_name->setMeta("display", "normal");
+	FrontendMembersFieldTab::create(0, "General")->save();
+	FrontendMembersFieldHeader::create(1, "Account")->save();
+	FrontendMembersFieldInputText::create(2, "Email", "email", true)->save();
+	FrontendMembersFieldHeader::create(3, "Personal Info")->save();
+	FrontendMembersFieldInputText::create(4, "First Name", "first_name")->save();
+	FrontendMembersFieldInputText::create(5, "Last Name", "last_name")->save();
 
 	/* Pages */
 	$register_post = array(

@@ -1,8 +1,12 @@
+<?php
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+	FrontendMembersField::saveAllFromPost();
+}
+?>
 <form id="mp-ssv-frontend-members-options" name="mp-ssv-frontend-members-options" method="post" action="#">
 	<table id="container" style="width: 100%; border-spacing: 10px 0; margin-bottom: 20px; margin-top: 20px; border-collapse: collapse;">
 		<tbody class="sortable">
 		<?php
-		include plugin_dir_path(__FILE__) . "../modules/FrontendMembersField.php";
 		$fields = FrontendMembersField::getAll();
 		foreach ($fields as $field) {
 			echo $field->getOptionRow();
@@ -15,6 +19,7 @@
 	submit_button();
 	?>
 </form>
+<!-- Make the rows draggable. -->
 <script src="<?php echo plugins_url("/mp-ssv-frontend-members/include/jquery-2.2.0.js"); ?>"></script>
 <script src="<?php echo plugins_url("/mp-ssv-frontend-members/include/jquery-ui.js"); ?>"></script>
 <script>
@@ -23,46 +28,35 @@
 		$(".sortable").disableSelection();
 	});
 </script>
+<!-- Add new Field. -->
 <script>
 	<?php
 	global $wpdb;
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 	$table = $wpdb->prefix . "mp_ssv_frontend_members_fields";
-	$column = $wpdb->get_col("SELECT id FROM $table ORDER BY id DESC LIMIT 0 , 1");
-	if (count($column) > 0 ) { ?>
-	var id = <?php echo $column[0]; ?>;
-	<?php } else { ?>
-	var id = <?php echo 0; ?>;
-	<?php } ?>
+	$max_database_index = $wpdb->get_var("SELECT MAX(id) FROM $table");
+	print("var id;\n");
+	if (count($max_database_index) > 0) {
+		echo "id = " . $max_database_index . ";\n";
+	} else {
+		echo "id = 0\n";
+	}
+	$new_field_content = mp_ssv_get_td(mp_ssv_get_draggable_icon());
+	$new_field_content .= mp_ssv_get_td(mp_ssv_get_text_input("Field Title", '\' + id + \'', "", "text", array("required")));
+	$new_field_content .= mp_ssv_get_td(mp_ssv_get_select("Field Type", '\' + id + \'', "input", array("Tab", "Header", "Input"), array("onchange=\"mp_ssv_type_changed(' + id + ')\"")));
+	$new_field_content .= mp_ssv_get_td(mp_ssv_get_select("Input Type", '\' + id + \'', "text", array("Text", "Text Select", "Role Select", "Text Checkbox", "Role Checkbox", "Image"), array("onchange=\"mp_ssv_input_type_changed(' + id + ')\""), true));
+	$new_field_content .= mp_ssv_get_td(mp_ssv_get_text_input("Name", '\' + id + \'', "", "text", array("required")));
+	$new_field_content .= mp_ssv_get_td(mp_ssv_get_checkbox("Required", '\' + id + \'', "no"));
+	$new_field_content .= mp_ssv_get_td(mp_ssv_get_select("Display", '\' + id + \'', "normal", array("Normal", "ReadOnly", "Disabled")));
+	$new_field_content .= mp_ssv_get_td(mp_ssv_get_text_input("Placeholder", '\' + id + \'', ""));
+	$new_field = mp_ssv_get_tr('\' + id + \'', $new_field_content);
+	?>
 	function mp_ssv_add_new_field() {
 		id++;
-		$("#container > tbody:last-child").append(
-			$('<tr id="' + id + '" style="vertical-align: top; border-bottom: 1px solid gray; border-top: 1px solid gray;">').append(
-				$('<td style="vertical-align: middle; cursor: move;">').append(
-					'<img style="padding-right: 15px; margin: 10px 0;" src="<?php echo plugins_url("../images/icon-menu.svg", __FILE__); ?>"/>'
-				)
-			).append(
-				$('<td style="vertical-align: middle; cursor: move;">').append(
-					'Title<br/><input type="text" id="' + id + '_field_title" name="' + id + '_field_title"/>'
-				)
-			).append(
-				$('<td style="vertical-align: middle; cursor: move;">').append(
-					'Type<br/><select id="' + id + '_field_type" name="' + id + '_field_type" onchange="mp_ssv_type_changed(\'' + id + '\')"><option value="tab">Tab</option><option value="header">Header</option><option value="input">Input</option></select>'
-				)
-			).append(
-				'<td style="vertical-align: middle; cursor: move;"><div class="' + id + '_empty"></div></td>'
-			).append(
-				'<td style="vertical-align: middle; cursor: move;"><div class="' + id + '_empty"></div></td>'
-			).append(
-				'<td style="vertical-align: middle; cursor: move;"><div class="' + id + '_empty"></div></td>'
-			).append(
-				'<td style="vertical-align: middle; cursor: move;"><div class="' + id + '_empty"></div></td>'
-			).append(
-				'<td style="vertical-align: middle; cursor: move;"><div class="' + id + '_empty"></div></td>'
-			)
-		);
+		$("#container > tbody:last-child").append('<?php echo $new_field ?>');
 	}
 </script>
+<!-- Change Field Type. -->
 <script>
 	function mp_ssv_type_changed(sender_id) {
 		var tr = document.getElementById(sender_id);
@@ -81,31 +75,32 @@
 		$("." + sender_id + "_empty").parent().remove();
 		if (type == "input") {
 			$(tr).append(
-				'<?php echo mp_ssv_td(mp_ssv_select("Input Type", '\' + sender_id + \'', "text", array("Text", "Text Group Select", "Role Group Select", "Text Checkbox", "Role Checkbox", "Image"), array("onchange=\"mp_ssv_input_type_changed(' + sender_id + ')\""), true)); ?>'
+				'<?php echo mp_ssv_get_td(mp_ssv_get_select("Input Type", '\' + sender_id + \'', "text", array("Text", "Text Group Select", "Role Group Select", "Text Checkbox", "Role Checkbox", "Image"), array("onchange=\"mp_ssv_input_type_changed(' + sender_id + ')\""), true)); ?>'
 			).append(
-				'<?php echo mp_ssv_td(mp_ssv_text_input("Name", '\' + sender_id + \'', "")); ?>'
+				'<?php echo mp_ssv_get_td(mp_ssv_get_text_input("Name", '\' + sender_id + \'', "")); ?>'
 			).append(
-				'<?php echo mp_ssv_td(mp_ssv_checkbox("Required", '\' + sender_id + \'', "no")); ?>'
+				'<?php echo mp_ssv_get_td(mp_ssv_get_checkbox("Required", '\' + sender_id + \'', "no")); ?>'
 			).append(
-				'<?php echo mp_ssv_td(mp_ssv_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"))); ?>'
+				'<?php echo mp_ssv_get_td(mp_ssv_get_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"))); ?>'
 			).append(
-				'<?php echo mp_ssv_td(mp_ssv_text_input("Placeholder", '\' + sender_id + \'', "")); ?>'
+				'<?php echo mp_ssv_get_td(mp_ssv_get_text_input("Placeholder", '\' + sender_id + \'', "")); ?>'
 			);
 		} else {
 			$(tr).append(
-				'<td style="vertical-align: middle; cursor: move;"><div class="' + sender_id + '_empty"></div></td>'
+				'<?php echo mp_ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
 			).append(
-				'<td style="vertical-align: middle; cursor: move;"><div class="' + sender_id + '_empty"></div></td>'
+				'<?php echo mp_ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
 			).append(
-				'<td style="vertical-align: middle; cursor: move;"><div class="' + sender_id + '_empty"></div></td>'
+				'<?php echo mp_ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
 			).append(
-				'<td style="vertical-align: middle; cursor: move;"><div class="' + sender_id + '_empty"></div></td>'
+				'<?php echo mp_ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
 			).append(
-				'<td style="vertical-align: middle; cursor: move;"><div class="' + sender_id + '_empty"></div></td>'
+				'<?php echo mp_ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
 			);
 		}
 	}
 </script>
+<!-- Change Input Type. -->
 <script>
 	function mp_ssv_input_type_changed(sender_id) {
 		var tr = document.getElementById(sender_id);
@@ -123,227 +118,107 @@
 		$("#" + sender_id + "_input_type_custom").parent().remove();
 		$("." + sender_id + "_empty").parent().remove();
 		switch (input_type) {
-			case "text_group_select":
+			case "text_select":
 				$(tr).append(
-					'<?php echo mp_ssv_td(mp_ssv_text_input("Name", '\' + sender_id + \'', "")); ?>'
+					'<?php echo mp_ssv_get_td(mp_ssv_get_text_input("Name", '\' + sender_id + \'', "", "text", array("required"))); ?>'
 				).append(
-					'<td style="vertical-align: middle; cursor: move;"><div class="' + sender_id + '_empty"></div></td>'
+					'<?php echo mp_ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
 				).append(
-					'<?php echo mp_ssv_td(mp_ssv_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"))); ?>'
+					'<?php echo mp_ssv_get_td(mp_ssv_get_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"))); ?>'
 				).append(
-					'<?php echo mp_ssv_td(mp_ssv_options('\' + sender_id + \'', array(), "text")); ?>'
+					'<?php echo mp_ssv_get_td(mp_ssv_get_options('\' + sender_id + \'', array(), "text")); ?>'
 				);
 				break;
-			case "role_group_select":
+			case "role_select":
 				$(tr).append(
-					'<?php echo mp_ssv_td(mp_ssv_text_input("Name", '\' + sender_id + \'', "")); ?>'
+					'<?php echo mp_ssv_get_td(mp_ssv_get_text_input("Name", '\' + sender_id + \'', "", "text", array("required"))); ?>'
 				).append(
-					'<td style="vertical-align: middle; cursor: move;"><div class="' + sender_id + '_empty"></div></td>'
+					'<?php echo mp_ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
 				).append(
-					'<?php echo mp_ssv_td(mp_ssv_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"))); ?>'
+					'<?php echo mp_ssv_get_td(mp_ssv_get_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"))); ?>'
 				).append(
-					'<?php echo mp_ssv_td(mp_ssv_options('\' + sender_id + \'', array(), "role")); ?>'
+					'<?php echo mp_ssv_get_td(mp_ssv_get_options('\' + sender_id + \'', array(), "role")); ?>'
 				);
 				break;
 			case "text_checkbox":
 				$(tr).append(
-					'<?php echo mp_ssv_td(mp_ssv_text_input("Name", '\' + sender_id + \'', "")); ?>'
+					'<?php echo mp_ssv_get_td(mp_ssv_get_text_input("Name", '\' + sender_id + \'', "", "text", array("required"))); ?>'
 				).append(
-					'<td style="vertical-align: middle; cursor: move;"><div class="' + sender_id + '_empty"></div></td>'
+					'<?php echo mp_ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
 				).append(
-					'<?php echo mp_ssv_td(mp_ssv_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"))); ?>'
+					'<?php echo mp_ssv_get_td(mp_ssv_get_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"))); ?>'
 				).append(
-					'<td style="vertical-align: middle; cursor: move;"><div class="' + sender_id + '_empty"></div></td>'
+					'<?php echo mp_ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
 				);
 				break;
 			case "role_checkbox":
 				$(tr).append(
-					'<td style="vertical-align: middle; cursor: move;"><div class="' + sender_id + '_empty"></div></td>'
+					'<?php echo mp_ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
 				).append(
-					'<td style="vertical-align: middle; cursor: move;"><div class="' + sender_id + '_empty"></div></td>'
+					'<?php echo mp_ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
 				).append(
-					'<?php echo mp_ssv_td(mp_ssv_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"))); ?>'
+					'<?php echo mp_ssv_get_td(mp_ssv_get_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"))); ?>'
 				).append(
-					'<?php echo mp_ssv_td(mp_ssv_role_select('\' + sender_id + \'', "Role", "")); ?>'
+					'<?php echo mp_ssv_get_td(mp_ssv_get_role_select('\' + sender_id + \'', "Role", "")); ?>'
 				);
 				break;
 			case "image":
 				$(tr).append(
-					'<?php echo mp_ssv_td(mp_ssv_text_input("Name", '\' + sender_id + \'', "")); ?>'
+					'<?php echo mp_ssv_get_td(mp_ssv_get_text_input("Name", '\' + sender_id + \'', "", "text", array("required"))); ?>'
 				).append(
-					'<?php echo mp_ssv_td(mp_ssv_checkbox("Required", '\' + sender_id + \'', "no")); ?>'
+					'<?php echo mp_ssv_get_td(mp_ssv_get_checkbox("Required", '\' + sender_id + \'', "no")); ?>'
 				).append(
-					'<?php echo mp_ssv_td(mp_ssv_checkbox("Preview", '\' + sender_id + \'', "no")); ?>'
+					'<?php echo mp_ssv_get_td(mp_ssv_get_checkbox("Preview", '\' + sender_id + \'', "no")); ?>'
 				).append(
-					'<td style="vertical-align: middle; cursor: move;"><div class="' + sender_id + '_empty"></div></td>'
+					'<?php echo mp_ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
 				);
 				break;
 			case "text":
 				$(tr).append(
-					'<?php echo mp_ssv_td(mp_ssv_text_input("Name", '\' + sender_id + \'', "")); ?>'
+					'<?php echo mp_ssv_get_td(mp_ssv_get_text_input("Name", '\' + sender_id + \'', "", "text", array("required"))); ?>'
 				).append(
-					'<?php echo mp_ssv_td(mp_ssv_checkbox("Required", '\' + sender_id + \'', "no")); ?>'
+					'<?php echo mp_ssv_get_td(mp_ssv_get_checkbox("Required", '\' + sender_id + \'', "no")); ?>'
 				).append(
-					'<?php echo mp_ssv_td(mp_ssv_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"))); ?>'
+					'<?php echo mp_ssv_get_td(mp_ssv_get_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"))); ?>'
 				).append(
-					'<?php echo mp_ssv_td(mp_ssv_text_input("Placeholder", '\' + sender_id + \'', "")); ?>'
+					'<?php echo mp_ssv_get_td(mp_ssv_get_text_input("Placeholder", '\' + sender_id + \'', "")); ?>'
 				);
 				break;
 			case "custom":
 				$(input_type_custom).append(
-					'<div><input type="text" id="' + sender_id + '_input_type_custom" name="' + sender_id + '_input_type_custom"/></div>'
+					'<div><?php echo mp_ssv_get_text_input("", '\' + sender_id + \'_input_type_custom', ""); ?></div>'
 				);
 				$(tr).append(
-					'<?php echo mp_ssv_td(mp_ssv_text_input("Name", '\' + sender_id + \'', "")); ?>'
+					'<?php echo mp_ssv_get_td(mp_ssv_get_text_input("Name", '\' + sender_id + \'', "", "text", array("required"))); ?>'
 				).append(
-					'<?php echo mp_ssv_td(mp_ssv_checkbox("Required", '\' + sender_id + \'', "no")); ?>'
+					'<?php echo mp_ssv_get_td(mp_ssv_get_checkbox("Required", '\' + sender_id + \'', "no")); ?>'
 				).append(
-					'<?php echo mp_ssv_td(mp_ssv_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"))); ?>'
+					'<?php echo mp_ssv_get_td(mp_ssv_get_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"))); ?>'
 				).append(
-					'<?php echo mp_ssv_td(mp_ssv_text_input("Placeholder", '\' + sender_id + \'', "")); ?>'
+					'<?php echo mp_ssv_get_td(mp_ssv_get_text_input("Placeholder", '\' + sender_id + \'', "")); ?>'
 				);
 				break;
 		}
 	}
 </script>
+<!-- Add Text Option. -->
 <script>
 	function add_text_option(sender_id) {
-		var li = document.getElementById(sender_id + "_add_option").parentElement;
 		id++;
+		var li = document.getElementById(sender_id + "_add_option").parentElement;
 		$(li).before(
-			'<li><input type="text" id="' + sender_id + '_' + id + '_option" name="' + sender_id + '_' + id + '_option"/></li>'
+			'<li><?php echo mp_ssv_get_option('\' + sender_id + \'', array('id' => '\' + id + \'', 'type' => 'text', 'value' => "")); ?></li>'
 		);
 	}
 </script>
+<!-- Add Role Option. -->
 <script>
 	function add_role_option(sender_id) {
 		var li = document.getElementById(sender_id + "_add_option").parentElement;
 		id++;
+		<?php $object_name = '\' + sender_id + \'' . "_" . '\' + id + \''; ?>
 		$(li).before(
-			'<li><?php $object_name = '\' + sender_id + \'' . "_" . '\' + id + \''; echo mp_ssv_role_select($object_name, "option", "", false); ?></li>'
+			'<li><?php echo mp_ssv_get_role_select($object_name, "option", "", false); ?></li>'
 		);
 	}
 </script>
-
-<?php
-function mp_ssv_td($content)
-{
-	ob_start();
-	?>
-	<td style="vertical-align: middle; cursor: move;"><?php echo $content; ?></td><?php
-	return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
-}
-
-function mp_ssv_draggable_icon()
-{
-	ob_start();
-	?><img style="padding-right: 15px; margin: 10px 0;" src="<?php echo plugins_url('../images/icon-menu.svg', __FILE__); ?>"/><?php
-	return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
-}
-
-function mp_ssv_text_input($title, $id, $value, $type = "text", $args = array())
-{
-	ob_start();
-	$object_name = $id . "_" . strtolower(str_replace(" ", "_", $title));
-	echo $title; ?><br/><input type="<?php echo $type; ?>" id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" value="<?php echo $value; ?>" <?php foreach ($args as $arg) {
-	echo $arg;
-} ?>/><?php
-	return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
-}
-
-function mp_ssv_select($title, $id, $selected, $options, $args = array(), $allow_custom = false, $input_type_custom = null)
-{
-	ob_start();
-	if ($allow_custom) {
-		$options[] = "Custom";
-	}
-	$object_name = $id . "_" . strtolower(str_replace(" ", "_", $title));
-	$object_custom_name = $id . "_" . strtolower(str_replace(" ", "_", $title)) . "_custom";
-	echo $title; ?>
-	<br/>
-	<select id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" <?php foreach ($args as $arg) {
-		echo $arg;
-	} ?>>
-		<?php foreach ($options as $option) { ?>
-			<option value="<?php echo strtolower(str_replace(" ", "_", $option)); ?>" <?php if ($selected == strtolower(str_replace(" ", "_", $option))) {
-				echo "selected";
-			} ?>><?php echo $option; ?></option>
-		<?php } ?>
-	</select>
-	<?php if ($allow_custom && $selected == "custom") { ?>
-	<div><input type="text" id="<?php echo $object_custom_name; ?>" name="<?php echo $object_custom_name; ?>" value="<?php echo $input_type_custom; ?>"/></div>
-<?php }
-
-	return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
-}
-
-function mp_ssv_checkbox($title, $id, $value, $args = array())
-{
-	ob_start();
-	$object_name = $id . "_" . strtolower(str_replace(" ", "_", $title));
-	?><br/><input type="checkbox" id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" value="yes" <?php if ($value == "yes") {
-	echo "checked";
-} ?> <?php foreach ($args as $arg) {
-	echo $arg;
-} ?>/> <?php echo $title;
-
-	return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
-}
-
-function mp_ssv_options($parent_id, $options, $type, $args = array())
-{
-	ob_start();
-	?>
-<ul id="<?php echo $parent_id; ?>_options" style="margin: 0;">Options<br/><?php foreach ($options as $option) {
-		echo mp_ssv_option($parent_id, $option, $args);
-	} ?>
-	<li>
-		<button type="button" id="<?php echo $parent_id; ?>_add_option" onclick="add_<?php echo $type; ?>_option(<?php echo $parent_id; ?>)">Add Option</button>
-	</li></ul><?php
-	return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
-}
-
-function mp_ssv_option($parent_id, $option, $args = array())
-{
-	ob_start();
-	$object_name = $parent_id . "_" . $option["id"];
-	if ($option["type"] == "role") {
-		echo "<li>" . mp_ssv_role_select($object_name, "option", $option["value"], false) . "</li>";
-	} else {
-		?>
-		<li><input type="text" id="<?php echo $object_name; ?>_option" name="<?php echo $object_name; ?>_option" value="<?php echo $option["value"]; ?>" <?php foreach ($args as $arg) {
-				echo $arg;
-			} ?>/></li> <?php
-	}
-
-	return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
-}
-
-function mp_ssv_hidden($id, $name, $value)
-{
-	ob_start();
-	$object_name = $id . "_" . $name;
-	?><input type="hidden" id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" value="<?php echo $value; ?>"<?php
-	return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
-}
-
-function mp_ssv_role_select($id, $title, $value, $with_title = true, $args = array())
-{
-	$object_name = $id . "_" . strtolower(str_replace(" ", "_", $title));
-	ob_start();
-	wp_dropdown_roles($value);
-	$roles_options = trim(preg_replace('/\s+/', ' ', ob_get_clean()));
-	$roles_options = trim(preg_replace('/\s\s+/', ' ', $roles_options));
-	$roles_options = str_replace("'", '"', $roles_options);
-	ob_start();
-	if ($with_title) {
-		echo $title; ?><br/><?php
-	}
-	?> <select id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" <?php foreach ($args as $arg) {
-	echo $arg;
-} ?>>
-	<option value=""></option><?php echo $roles_options; ?></select> <?php
-	return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
-}
-
-?>
