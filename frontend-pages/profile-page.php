@@ -9,9 +9,9 @@ function mp_ssv_profile_page_login_redirect()
 	if ($post == null) {
 		return;
 	}
-		$post_name_correct = $post->post_name == 'profile';
-		if (!is_user_logged_in() && $post_name_correct) {
-			wp_redirect("/login");
+	$post_name_correct = $post->post_name == 'profile';
+	if (!is_user_logged_in() && $post_name_correct) {
+		wp_redirect("/login");
 		exit;
 	}
 }
@@ -30,8 +30,10 @@ function mp_ssv_profile_page_setup($content)
 	global $post;
 	if ($post->post_name != 'profile') { //Not the Profile Page
 		return $content;
-	} else if (strpos($content, '[mp-ssv-frontend-members-profile]') === false) { //Not the Profile Page Tag
-		return $content;
+	} else {
+		if (strpos($content, '[mp-ssv-frontend-members-profile]') === false) { //Not the Profile Page Tag
+			return $content;
+		}
 	}
 	if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		mp_ssv_save_members_profile();
@@ -70,7 +72,7 @@ function mp_ssv_profile_page_content_tabs()
 	$can_edit = false;
 	if (isset($_GET['user_id'])) {
 		$member = get_user_by('id', $_GET['user_id']);
-		$action_url = '/profile/?user_id='.$member->ID;
+		$action_url = '/profile/?user_id=' . $member->ID;
 	} else {
 		$member = wp_get_current_user();
 		$action_url = '/profile/';
@@ -206,6 +208,10 @@ function mp_ssv_save_members_profile()
 				$user->updateMeta($name . '_path', $file_location["file"]);
 			}
 		}
+	}
+	include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+	if (is_plugin_active('mp-ssv-mailchimp/mp-ssv-mailchimp.php')) {
+		mp_ssv_update_mailchimp_member($user);
 	}
 	unset($_POST);
 }
