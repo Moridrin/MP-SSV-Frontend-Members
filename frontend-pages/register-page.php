@@ -85,10 +85,7 @@ function mp_ssv_create_members_profile()
 		if (strpos($name, "_reset") !== false) {
 			$name = str_replace("_reset", "", $name);
 		}
-		$update_success = $user->updateMeta($name, $val);
-		if (!$update_success) {
-			echo "Cannot change the user-login. Please consider setting the field display to 'read-only' or 'disabled'";
-		}
+		$user->updateMeta($name, $val);
 	}
 	$user->updateMeta("display_name", $user->getMeta('first_name') . ' ' . $user->getMeta('last_name'));
 	foreach ($_FILES as $name => $file) {
@@ -110,6 +107,9 @@ function mp_ssv_create_members_profile()
 	$headers = "From: webmaster@AllTerrain.nl" . "\r\n";
 	add_filter('wp_mail_content_type',create_function('', 'return "text/html";'));
 	wp_mail($to, $subject, $message, $headers);
+	if (is_plugin_active('mp-ssv-mailchimp/mp-ssv-mailchimp.php')) {
+		mp_ssv_update_mailchimp_member($user);
+	}
 	unset($_POST);
 }
 
