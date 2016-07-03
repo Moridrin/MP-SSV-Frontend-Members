@@ -68,3 +68,12 @@ function get_members_list($role_name) {
 	$members_list .= "</ul>";
 	return $members_list;
 }
+
+add_filter( 'the_title', 'mp_ssv_profile_page_name');
+function mp_ssv_profile_page_name ($title) {
+	if( $title == 'My Profile' && isset($_GET['user_id']) && is_page()){
+		$member = FrontendMember::get_by_id($_GET['user_id']);
+		$title = $member->display_name;
+	}
+	return $title;
+}
