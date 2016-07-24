@@ -209,7 +209,7 @@ function mp_ssv_save_members_profile()
 			}
 		}
 	}
-	include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+	require_once(ABSPATH . 'wp-admin/includes/plugin.php');
 	if (is_plugin_active('mp-ssv-mailchimp/mp-ssv-mailchimp.php')) {
 		mp_ssv_update_mailchimp_member($user);
 	}
