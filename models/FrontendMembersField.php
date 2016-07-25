@@ -12,9 +12,9 @@ require_once "FrontendMembersFieldInput.php";
 class FrontendMembersField
 {
 	public $id;
-	protected $index;
 	public $type;
 	public $title;
+    protected $index;
 
 	/**
 	 * FrontendMembersField constructor.
@@ -30,44 +30,6 @@ class FrontendMembersField
 		$this->index = $index;
 		$this->type = $type;
 		$this->title = $title;
-	}
-
-	/**
-	 * This function creates a new FrontendMembersField and adds it to the database.
-	 *
-	 * @param int    $index is an id that specifies the display (/tab) order for the field.
-	 * @param string $title is the title of this component.
-	 * @param string $type  specifies the type of field. Either "tab", "header", "input" or "group_option".
-	 *
-	 * @return FrontendMembersField the just created instance.
-	 */
-	protected static function createField($index, $title, $type)
-	{
-		global $wpdb;
-		$table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
-		$max_in_database = $wpdb->get_var('SELECT MAX(id) FROM ' . $table . ';');
-		if ($max_in_database == null) {
-			$id = 0;
-		} else {
-			$id = $max_in_database + 1;
-		}
-		$wpdb->insert(
-			$table,
-			array(
-				'id'          => $id,
-				'field_index' => $index,
-				'field_type'  => $type,
-				'field_title' => $title
-			),
-			array(
-				'%d',
-				'%d',
-				'%s',
-				'%s'
-			)
-		);
-
-		return new FrontendMembersField($id, $index, $type, $title);
 	}
 
 	/**
@@ -115,66 +77,32 @@ class FrontendMembersField
 	}
 
 	/**
-	 * This function gets the field metadata specified by the key.
+     * @param array $filters are applied to the SQL query.
 	 *
-	 * @param string $key is the key defining what metadata should be returned.
-	 *
-	 * @return string the meta value linked to the given key.
+     * @return array of all the FrontendMembersFields.
 	 */
-	public function getMeta($key)
+    public static function getAll($filters = array("field_type" => '!group_option'))
 	{
 		global $wpdb;
-		$table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
-		$value = $wpdb->get_var(
-			"SELECT meta_value
-			FROM $table
-			WHERE field_id = '$this->id'
-			AND meta_key = '$key';"
-		);
+        $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
+        $sql = "SELECT id FROM $table";
+        foreach ($filters as $filter => $value) {
+            if (substr($value, 0, 1) == "!") {
+                $sql .= " WHERE " . $filter . " != '" . str_replace("!", "", $value) . "'";
+            } else {
+                $sql .= " WHERE " . $filter . " = '" . $value . "'";
+            }
+        }
+        $sql .= " ORDER BY field_index ASC;";
 
-		return stripslashes($value);
-	}
-
-	/**
-	 * This function gets the field metadata specified by the key.
-	 *
-	 * @param string $key is the key defining what metadata should be returned.
-	 *
-	 * @return string the meta value linked to the given key.
-	 */
-	public function getMetaFromPOST($key)
-	{
-		if (!isset($_POST[$this->id . "_" . $key])) {
-			return "no";
+        $database_fields = json_decode(json_encode($wpdb->get_results($sql)), true);
+        $fields = array();
+        foreach ($database_fields as $database_field) {
+            $field = self::fromID($database_field['id']);
+            $fields[] = $field;
 		}
 
-		return $_POST[$this->id . "_" . $key];
-	}
-
-	/**
-	 * This function adds a property to this FrontendMembersField.
-	 *
-	 * @param string $key   is the key value that defines the property of the field.
-	 * @param string $value is the value of the property.
-	 */
-	public function setMeta($key, $value)
-	{
-		global $wpdb;
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-		$table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
-		$wpdb->insert(
-			$table,
-			array(
-				'id'         => $this->id,
-				'meta_key'   => $key,
-				'meta_value' => $value
-			),
-			array(
-				'%d',
-				'%s',
-				'%s'
-			)
-		);
+        return $fields;
 	}
 
 	/**
@@ -244,32 +172,24 @@ class FrontendMembersField
 	}
 
 	/**
-	 * @param array $filters are applied to the SQL query.
+     * This function gets the field metadata specified by the key.
 	 *
-	 * @return array of all the FrontendMembersFields.
+     * @param string $key is the key defining what metadata should be returned.
+     *
+     * @return string the meta value linked to the given key.
 	 */
-	public static function getAll($filters = array("field_type" => '!group_option'))
+    public function getMeta($key)
 	{
 		global $wpdb;
-		$table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
-		$sql = "SELECT id FROM $table";
-		foreach ($filters as $filter => $value) {
-			if (substr($value, 0, 1) == "!") {
-				$sql .= " WHERE " . $filter . " != '" . str_replace("!", "", $value) . "'";
-			} else {
-				$sql .= " WHERE " . $filter . " = '" . $value . "'";
-			}
-		}
-		$sql .= " ORDER BY field_index ASC;";
+        $table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
+        $value = $wpdb->get_var(
+            "SELECT meta_value
+			FROM $table
+			WHERE field_id = '$this->id'
+			AND meta_key = '$key';"
+        );
 
-		$database_fields = json_decode(json_encode($wpdb->get_results($sql)), true);
-		$fields = array();
-		foreach ($database_fields as $database_field) {
-			$field = self::fromID($database_field['id']);
-			$fields[] = $field;
-		}
-
-		return $fields;
+        return stripslashes($value);
 	}
 
 	public static function saveAllFromPost()
@@ -284,28 +204,6 @@ class FrontendMembersField
 			}
 		}
 	}
-
-	/**
-	 * @param string $content is the extra content that it gets from it's child.
-	 * @param bool   $visible defines if this option row should be displayed (used to hide tab rows for themes that do not support mui).
-	 *
-	 * @return string a row that can be added to the profile page options table.
-	 */
-	protected function getOptionRowField($content, $visible = true)
-	{
-		ob_start();
-		echo mp_ssv_get_td(mp_ssv_get_draggable_icon());
-		echo mp_ssv_get_td(mp_ssv_get_text_input("Field Title", $this->id, $this->title));
-		if (get_theme_support('mui')) {
-			echo mp_ssv_get_td(mp_ssv_get_select("Field Type", $this->id, $this->type, array("Tab", "Header", "Input"), array('onchange="mp_ssv_type_changed(\'' . $this->id . '\')"')));
-		} else {
-			echo mp_ssv_get_td(mp_ssv_get_select("Field Type", $this->id, $this->type, array("Header", "Input"), array('onchange="mp_ssv_type_changed(\'' . $this->id . '\')"')));
-		}
-		echo $content;
-
-		return mp_ssv_get_tr($this->id, ob_get_clean(), $visible);
-	}
-
 
 	/**
 	 * This method returns a FrontendMembersField created from the POST values from a form.
@@ -366,6 +264,107 @@ class FrontendMembersField
 		}
 
 		return $field;
+    }
+
+    /**
+     * This function gets the field metadata specified by the key.
+     *
+     * @param string $key is the key defining what metadata should be returned.
+     *
+     * @return string the meta value linked to the given key.
+     */
+    public function getMetaFromPOST($key)
+    {
+        if (!isset($_POST[$this->id . "_" . $key])) {
+            return "no";
+        }
+
+        return $_POST[$this->id . "_" . $key];
+    }
+
+    /**
+     * This function creates a new FrontendMembersField and adds it to the database.
+     *
+     * @param int    $index is an id that specifies the display (/tab) order for the field.
+     * @param string $title is the title of this component.
+     * @param string $type  specifies the type of field. Either "tab", "header", "input" or "group_option".
+     *
+     * @return FrontendMembersField the just created instance.
+     */
+    protected static function createField($index, $title, $type)
+    {
+        global $wpdb;
+        $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
+        $max_in_database = $wpdb->get_var('SELECT MAX(id) FROM ' . $table . ';');
+        if ($max_in_database == null) {
+            $id = 0;
+        } else {
+            $id = $max_in_database + 1;
+        }
+        $wpdb->insert(
+            $table,
+            array(
+                'id'          => $id,
+                'field_index' => $index,
+                'field_type'  => $type,
+                'field_title' => $title
+            ),
+            array(
+                '%d',
+                '%d',
+                '%s',
+                '%s'
+            )
+        );
+
+        return new FrontendMembersField($id, $index, $type, $title);
+    }
+
+    /**
+     * This function adds a property to this FrontendMembersField.
+     *
+     * @param string $key   is the key value that defines the property of the field.
+     * @param string $value is the value of the property.
+     */
+    public function setMeta($key, $value)
+    {
+        global $wpdb;
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        $table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
+        $wpdb->insert(
+            $table,
+            array(
+                'id'         => $this->id,
+                'meta_key'   => $key,
+                'meta_value' => $value
+            ),
+            array(
+                '%d',
+                '%s',
+                '%s'
+            )
+        );
+    }
+
+    /**
+     * @param string $content is the extra content that it gets from it's child.
+     * @param bool   $visible defines if this option row should be displayed (used to hide tab rows for themes that do not support mui).
+     *
+     * @return string a row that can be added to the profile page options table.
+     */
+    protected function getOptionRowField($content, $visible = true)
+    {
+        ob_start();
+        echo mp_ssv_get_td(mp_ssv_get_draggable_icon());
+        echo mp_ssv_get_td(mp_ssv_get_text_input("Field Title", $this->id, $this->title));
+        if (get_theme_support('mui')) {
+            echo mp_ssv_get_td(mp_ssv_get_select("Field Type", $this->id, $this->type, array("Tab", "Header", "Input"), array('onchange="mp_ssv_type_changed(\'' . $this->id . '\')"')));
+        } else {
+            echo mp_ssv_get_td(mp_ssv_get_select("Field Type", $this->id, $this->type, array("Header", "Input"), array('onchange="mp_ssv_type_changed(\'' . $this->id . '\')"')));
+        }
+        echo $content;
+
+        return mp_ssv_get_tr($this->id, ob_get_clean(), $visible);
 	}
 
 	protected function save($remove = false)

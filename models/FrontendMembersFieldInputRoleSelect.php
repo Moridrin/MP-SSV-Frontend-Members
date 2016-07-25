@@ -27,20 +27,6 @@ class FrontendMembersFieldInputRoleSelect extends FrontendMembersFieldInput
 	}
 
 	/**
-	 * @param int    $index   is an index that specifies the display (/tab) order for the field.
-	 * @param string $title   is the title of this component.
-	 * @param string $name    is the name of the input field.
-	 * @param array  $options is an array with all the options for the select field.
-	 * @param string $display is the way the input field is displayed (readonly, disabled or normal) default is normal.
-	 *
-	 * @return FrontendMembersFieldInputRoleCheckbox
-	 */
-	public static function create($index, $title, $name, $options = array(), $display = "normal")
-	{
-		return new FrontendMembersFieldInputRoleSelect(parent::createInput($index, $title, 'role_select', $name), $options, $display);
-	}
-
-	/**
 	 * This function returns all the group options for this field.
 	 * @return array|null with all options linked to this FrontendMembersField or null if this is not a group field.
 	 */
@@ -87,6 +73,20 @@ class FrontendMembersFieldInputRoleSelect extends FrontendMembersFieldInput
 		}
 
 		return $options;
+	}
+
+	/**
+	 * @param int    $index   is an index that specifies the display (/tab) order for the field.
+	 * @param string $title   is the title of this component.
+	 * @param string $name    is the name of the input field.
+	 * @param array  $options is an array with all the options for the select field.
+	 * @param string $display is the way the input field is displayed (readonly, disabled or normal) default is normal.
+	 *
+	 * @return FrontendMembersFieldInputRoleCheckbox
+	 */
+	public static function create($index, $title, $name, $options = array(), $display = "normal")
+	{
+		return new FrontendMembersFieldInputRoleSelect(parent::createInput($index, $title, 'role_select', $name), $options, $display);
 	}
 
 	public function getOptionsFromPOST($variables)

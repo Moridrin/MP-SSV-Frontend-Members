@@ -15,8 +15,8 @@ require_once "FrontendMembersFieldInputTextSelect.php";
 
 class FrontendMembersFieldInput extends FrontendMembersField
 {
-	protected $input_type;
 	public $name;
+    protected $input_type;
 
 	/**
 	 * FrontendMembersFieldInput constructor.

@@ -96,13 +96,14 @@ function mp_ssv_profile_page_content_tabs()
 				<?php
 				$items_in_tab = FrontendMembersField::getItemsInTab($tab);
 				foreach ($items_in_tab as $item) {
+					/** @noinspection PhpUndefinedMethodInspection */
 					echo $item->getHTML($member);
 				}
 				?>
 				<?php
 				if ($can_edit) {
 					?>
-					<button class="mui-btn mui-btn--primary" type="submit" name="submit" id="submit" class="button-primary">Save</button>
+					<button class="mui-btn mui-btn--primary button-primary" type="submit" name="submit" id="submit">Save</button>
 					<?php
 				}
 				?>
@@ -129,15 +130,17 @@ function mp_ssv_profile_page_content_single_page()
 	ob_start();
 	$items = FrontendMembersField::getAll();
 	?>
+	<!--suppress HtmlUnknownTarget -->
 	<form name="members_form" id="members_form" action="/profile" method="post" enctype="multipart/form-data">
 		<?php
 		foreach ($items as $item) {
 			if (!$item instanceof FrontendMembersFieldTab) {
+				/** @noinspection PhpUndefinedMethodInspection */
 				echo $item->getHTML($member);
 			}
 		}
 		if ($can_edit) {
-			echo '<button class="mui-btn mui-btn--primary" type="submit" name="submit" id="submit" class="button-primary">Save</button>';
+			echo '<button class="mui-btn mui-btn--primary button-primary" type="submit" name="submit" id="submit">Save</button>';
 		}
 		?>
 	</form>
@@ -198,6 +201,7 @@ function mp_ssv_save_members_profile()
 	}
 	foreach ($_FILES as $name => $file) {
 		if (!function_exists('wp_handle_upload')) {
+			/** @noinspection PhpIncludeInspection */
 			require_once(ABSPATH . 'wp-admin/includes/file.php');
 		}
 		$file_location = wp_handle_upload($file, array('test_form' => false));
@@ -209,6 +213,7 @@ function mp_ssv_save_members_profile()
 			}
 		}
 	}
+	/** @noinspection PhpIncludeInspection */
 	require_once(ABSPATH . 'wp-admin/includes/plugin.php');
 	if (is_plugin_active('mp-ssv-mailchimp/mp-ssv-mailchimp.php')) {
 		mp_ssv_update_mailchimp_member($user);
