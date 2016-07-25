@@ -12,14 +12,14 @@ function mp_ssv_login_page_content($content) {
 		$url = (is_ssl() ? 'https://' : 'http://').$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'?logout=success';
 		$link = '<a href="'.wp_logout_url($url).'">Logout</a>';
 		ob_start(); ?>
-		<div class="notification">
+		<div class="mui-panel notification">
 			<?php echo $current_user->user_firstname.' '.$current_user->user_lastname.' you\'re already logged in. Do you want to '.$link.'?'; ?>
 		</div>
 		<?php
 		return ob_get_clean();
 	} else if (isset($_GET['logout']) && strpos($_GET['logout'], 'success') !== false) {
 		?>
-		<div class="notification">Logout successful</div>
+		<div class="mui-panel notification">Logout successful</div>
 		<?php
 	}
 	if (current_theme_supports('mui')) {
