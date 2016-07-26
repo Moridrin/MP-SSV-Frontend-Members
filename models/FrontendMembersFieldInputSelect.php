@@ -47,7 +47,11 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
         $table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
         foreach ($option_fields as $option_field) {
             $option_field = json_decode(json_encode($option_field), true);
-            $option = new FrontendMembersFieldInputSelectTextOption($option_field['id'], $option_field['field_index'], $this->id);
+            if ($this instanceof FrontendMembersFieldInputSelectText) {
+                $option = new FrontendMembersFieldInputSelectTextOption($option_field['id'], $option_field['field_index'], $this->id);
+            } else {
+                $option = new FrontendMembersFieldInputSelectRoleOption($option_field['id'], $option_field['field_index'], $this->id);
+            }
             $value = $wpdb->get_var(
                 "SELECT meta_value
 			FROM $table
@@ -99,7 +103,7 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
                 <label for="<?php echo $this->id; ?>"><?php echo $this->title; ?></label>
                 <select id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>">
                     <?php foreach ($this->options as $option) {
-                        /* @var $option FrontendMembersFieldInputSelectOption */
+                        /* @var $option FrontendMembersFieldInputSelectRoleOption|FrontendMembersFieldInputSelectTextOption */
                         echo $option->getHTML($value);
                     }
                     ?>
@@ -111,7 +115,7 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
             <label for="<?php echo $this->id; ?>"><?php echo $this->title; ?></label>
             <select id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>">
                 <?php foreach ($this->options as $option) {
-                    /* @var $option FrontendMembersFieldInputSelectOption */
+                    /* @var $option FrontendMembersFieldInputSelectRoleOption|FrontendMembersFieldInputSelectTextOption */
                     echo $option->getHTML($value);
                 }
                 ?>

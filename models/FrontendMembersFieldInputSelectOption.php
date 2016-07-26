@@ -55,8 +55,6 @@ class FrontendMembersFieldInputSelectOption
 
     public function save($remove = false) { }
 
-    public function getHTML($value) { }
-
     protected function replace()
     {
         global $wpdb;
