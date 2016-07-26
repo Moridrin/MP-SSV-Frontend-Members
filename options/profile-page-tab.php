@@ -59,7 +59,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	function mp_ssv_add_new_field() {
 		id++;
         $("#container").find("> tbody:last-child").append('<?php echo $new_field ?>');
-        <!--$("#container > tbody:last-child").append('<?php echo $new_field ?>');-->
 	}
 </script>
 <!-- Change Field Type. -->
