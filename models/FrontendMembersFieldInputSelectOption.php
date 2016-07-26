@@ -21,8 +21,13 @@ class FrontendMembersFieldInputSelectOption
         $this->value = $value;
     }
 
-    public function create($index, $parent_id, $value = "")
-    {
+    public function create(
+        $index,
+        /** @noinspection PhpUnusedParameterInspection */
+        $parent_id,
+        /** @noinspection PhpUnusedParameterInspection */
+        $value = ""
+    ) {
         global $wpdb;
         $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
         $max_in_database = $wpdb->get_var('SELECT MAX(id) FROM ' . $table . ';');
@@ -54,6 +59,7 @@ class FrontendMembersFieldInputSelectOption
 
     protected function replace()
     {
+        global $wpdb;
         $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
         $wpdb->replace(
             $table,
