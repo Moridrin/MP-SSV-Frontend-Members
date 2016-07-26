@@ -31,8 +31,8 @@ require_once "content_filters.php";
  */
 function mp_ssv_use_recaptcha()
 {
-	$url = plugins_url('mp-ssv-frontend-members/include/google_recaptcha_api.js');
-	echo '<script src="' . $url . '"></script>';
+    $url = plugins_url('mp-ssv-frontend-members/include/google_recaptcha_api.js');
+    echo '<script src="' . $url . '"></script>';
 }
 
 add_action('wp_head', 'mp_ssv_use_recaptcha');
@@ -44,64 +44,70 @@ add_action('wp_head', 'mp_ssv_use_recaptcha');
  */
 function mp_ssv_register_mp_ssv_frontend_members()
 {
-	if (!is_plugin_active('mp-ssv-general/mp-ssv-general.php')) {
-		wp_die('Sorry, but this plugin requires <a href="http://studentensurvival.com/plugins/mp-ssv-general">SSV General</a> to be installed and active. <br><a href="' . admin_url('plugins.php') . '">&laquo; Return to Plugins</a>');
-	}
+    if (!is_plugin_active('mp-ssv-general/mp-ssv-general.php')) {
+        wp_die('Sorry, but this plugin requires <a href="http://studentensurvival.com/plugins/mp-ssv-general">SSV General</a> to be installed and active. <br><a href="' . admin_url('plugins.php') . '">&laquo; Return to Plugins</a>');
+    }
 
-	/* Database */
-	global $wpdb;
-	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-	$charset_collate = $wpdb->get_charset_collate();
-	$table_name = $wpdb->prefix . "mp_ssv_frontend_members_fields";
-	$wpdb->show_errors();
-	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
+    /* Database */
+    global $wpdb;
+    /** @noinspection PhpIncludeInspection */
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    $charset_collate = $wpdb->get_charset_collate();
+    $table_name = $wpdb->prefix . "mp_ssv_frontend_members_fields";
+    $wpdb->show_errors();
+    $sql
+        = "CREATE TABLE IF NOT EXISTS $table_name (
 			id bigint(20) NOT NULL PRIMARY KEY,
 			field_index bigint(20) NOT NULL,
 			field_type varchar(30) NOT NULL,
 			field_title varchar(30)
 		) $charset_collate;";
-	dbDelta($sql);
-	$table_name = $wpdb->prefix . "mp_ssv_frontend_members_field_meta";
-	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
+    dbDelta($sql);
+    $table_name = $wpdb->prefix . "mp_ssv_frontend_members_field_meta";
+    $sql
+        = "CREATE TABLE IF NOT EXISTS $table_name (
 			field_id bigint(20) NOT NULL,
 			meta_key varchar(50) NOT NULL,
 			meta_value varchar(255) NOT NULL,
 			PRIMARY KEY (meta_key, field_id)
 		) $charset_collate;";
-	dbDelta($sql);
+    dbDelta($sql);
 
-	FrontendMembersFieldTab::create(0, "General")->save();
-	FrontendMembersFieldHeader::create(1, "Account")->save();
-	FrontendMembersFieldInputText::create(2, "Email", "email", true)->save();
-	FrontendMembersFieldHeader::create(3, "Personal Info")->save();
-	FrontendMembersFieldInputText::create(4, "First Name", "first_name")->save();
-	FrontendMembersFieldInputText::create(5, "Last Name", "last_name")->save();
+    FrontendMembersFieldTab::create(0, "General")->save();
+    FrontendMembersFieldHeader::create(1, "Account")->save();
+    FrontendMembersFieldInputText::create(2, "Email", "email", true)->save();
+    FrontendMembersFieldHeader::create(3, "Personal Info")->save();
+    FrontendMembersFieldInputText::create(4, "First Name", "first_name")->save();
+    FrontendMembersFieldInputText::create(5, "Last Name", "last_name")->save();
 
-	/* Pages */
-	$register_post = array(
-		'post_content' => '[mp-ssv-frontend-members-register]',
-		'post_name'    => 'register',
-		'post_title'   => 'Register',
-		'post_status'  => 'publish',
-		'post_type'    => 'page'
-	);
-	wp_insert_post($register_post);
-	$login_post = array(
-		'post_content' => '[mp-ssv-frontend-members-login]',
-		'post_name'    => 'login',
-		'post_title'   => 'Login',
-		'post_status'  => 'publish',
-		'post_type'    => 'page'
-	);
-	wp_insert_post($login_post);
-	$profile_post = array(
-		'post_content' => '[mp-ssv-frontend-members-profile]',
-		'post_name'    => 'profile',
-		'post_title'   => 'My Profile',
-		'post_status'  => 'publish',
-		'post_type'    => 'page'
-	);
-	wp_insert_post($profile_post);
+    /* Pages */
+    $register_post = array(
+        'post_content' => '[mp-ssv-frontend-members-register]',
+        'post_name'    => 'register',
+        'post_title'   => 'Register',
+        'post_status'  => 'publish',
+        'post_type'    => 'page'
+    );
+    $register_post_id = wp_insert_post($register_post);
+    update_option('register_post_id', $register_post_id);
+    $login_post = array(
+        'post_content' => '[mp-ssv-frontend-members-login]',
+        'post_name'    => 'login',
+        'post_title'   => 'Login',
+        'post_status'  => 'publish',
+        'post_type'    => 'page'
+    );
+    $login_post_id = wp_insert_post($login_post);
+    update_option('login_post_id', $login_post_id);
+    $profile_post = array(
+        'post_content' => '[mp-ssv-frontend-members-profile]',
+        'post_name'    => 'profile',
+        'post_title'   => 'My Profile',
+        'post_status'  => 'publish',
+        'post_type'    => 'page'
+    );
+    $profile_post_id = wp_insert_post($profile_post);
+    update_option('profile_post_id', $profile_post_id);
 }
 
 register_activation_hook(__FILE__, 'mp_ssv_register_mp_ssv_frontend_members');
@@ -113,23 +119,21 @@ register_activation_hook(__FILE__, 'mp_ssv_register_mp_ssv_frontend_members');
  */
 function mp_ssv_unregister_mp_ssv_frontend_members()
 {
-	if (is_plugin_active('MP-SSV-Google-Apps/mp-ssv-google-apps.php')) {
-		wp_die('Sorry, but this plugin is required by SSV Frontend Members. Deactivate SSV Frontend Members before deactivating this plugin. <br><a href="' . admin_url('plugins.php') . '">&laquo; Return to Plugins</a>');
-	}
-	$register_page = get_page_by_title('Register');
-	wp_delete_post($register_page->ID, true);
-	$login_page = get_page_by_title('Login');
-	wp_delete_post($login_page->ID, true);
-	$profile_page = get_page_by_title('My Profile');
-	wp_delete_post($profile_page->ID, true);
-	global $wpdb;
-	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-	$table_name = $wpdb->prefix . "mp_ssv_frontend_members_fields";
-	$sql = "DROP TABLE $table_name;";
-	$wpdb->query($sql);
-	$table_name = $wpdb->prefix . "mp_ssv_frontend_members_field_meta";
-	$sql = "DROP TABLE $table_name;";
-	$wpdb->query($sql);
+    if (is_plugin_active('MP-SSV-Google-Apps/mp-ssv-google-apps.php')) {
+        wp_die('Sorry, but this plugin is required by SSV Frontend Members. Deactivate SSV Frontend Members before deactivating this plugin. <br><a href="' . admin_url('plugins.php') . '">&laquo; Return to Plugins</a>');
+    }
+    wp_delete_post(get_option('register_post_id'), true);
+    wp_delete_post(get_option('login_post_id'), true);
+    wp_delete_post(get_option('profile_post_id'), true);
+    global $wpdb;
+    /** @noinspection PhpIncludeInspection */
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    $table_name = $wpdb->prefix . "mp_ssv_frontend_members_fields";
+    $sql = "DROP TABLE $table_name;";
+    $wpdb->query($sql);
+    $table_name = $wpdb->prefix . "mp_ssv_frontend_members_field_meta";
+    $sql = "DROP TABLE $table_name;";
+    $wpdb->query($sql);
 }
 
 register_deactivation_hook(__FILE__, 'mp_ssv_unregister_mp_ssv_frontend_members');
@@ -147,28 +151,28 @@ register_deactivation_hook(__FILE__, 'mp_ssv_unregister_mp_ssv_frontend_members'
  */
 function mp_ssv_frontend_members_avatar($avatar, $id_or_email, $size = 150, $default = null, $alt = "")
 {
-	$user = false;
+    $user = false;
 
-	if (is_numeric($id_or_email)) {
-		$id = (int)$id_or_email;
-		$user = get_user_by('id', $id);
-	} elseif (is_object($id_or_email)) {
-		if (!empty($id_or_email->user_id)) {
-			$id = (int)$id_or_email->user_id;
-			$user = get_user_by('id', $id);
-		}
-	} else {
-		$user = get_user_by('email', $id_or_email);
-	}
+    if (is_numeric($id_or_email)) {
+        $id = (int)$id_or_email;
+        $user = get_user_by('id', $id);
+    } elseif (is_object($id_or_email)) {
+        if (!empty($id_or_email->user_id)) {
+            $id = (int)$id_or_email->user_id;
+            $user = get_user_by('id', $id);
+        }
+    } else {
+        $user = get_user_by('email', $id_or_email);
+    }
 
-	if ($user && is_object($user)) {
-		$custom_avatar = get_user_meta($user->ID, 'profile_picture', true);
-		if (isset($custom_avatar) && !empty($custom_avatar)) {
-			$avatar = "<img alt='{$alt}' src='{$custom_avatar}' class='avatar avatar-{$size} photo' height='{$size}' width='{$size}' />";
-		}
-	}
+    if ($user && is_object($user)) {
+        $custom_avatar = get_user_meta($user->ID, 'profile_picture', true);
+        if (isset($custom_avatar) && !empty($custom_avatar)) {
+            $avatar = "<img alt='{$alt}' src='{$custom_avatar}' class='avatar avatar-{$size} photo' height='{$size}' width='{$size}' />";
+        }
+    }
 
-	return $avatar;
+    return $avatar ?: $default;
 }
 
 add_filter('get_avatar', 'mp_ssv_frontend_members_avatar', 1, 5);
@@ -186,37 +190,39 @@ add_filter('get_avatar', 'mp_ssv_frontend_members_avatar', 1, 5);
  */
 function mp_ssv_authenticate($user, $login, $password)
 {
-	if (empty($login) || empty ($password)) {
-		$error = new WP_Error();
-		if (empty($login)) {
-			$error->add('empty_username', __('<strong>ERROR</strong>: Email/Username field is empty.'));
-		}
-		if (empty($password)) {
-			$error->add('empty_password', __('<strong>ERROR</strong>: Password field is empty.'));
-		}
+    if (empty($login) || empty ($password)) {
+        $error = new WP_Error();
+        if (empty($login)) {
+            $error->add('empty_username', __('<strong>ERROR</strong>: Email/Username field is empty.'));
+        }
+        if (empty($password)) {
+            $error->add('empty_password', __('<strong>ERROR</strong>: Password field is empty.'));
+        }
 
-		return $error;
-	}
+        return $error;
+    }
 
-	$user = get_user_by('email', $login);
-	if (!$user) {
-		$user = get_user_by('login', $login);
-	}
-	if (!$user) {
-		$error = new WP_Error();
-		$error->add('invalid', __('<strong>ERROR</strong>: Either the email/username or password you entered is invalid. The email you entered was: ' . $login));
+    if (!$user) {
+        $user = get_user_by('email', $login);
+    }
+    if (!$user) {
+        $user = get_user_by('login', $login);
+    }
+    if (!$user) {
+        $error = new WP_Error();
+        $error->add('invalid', __('<strong>ERROR</strong>: Either the email/username or password you entered is invalid. The email you entered was: ' . $login));
 
-		return $error;
-	} else {
-		if (!wp_check_password($password, $user->user_pass, $user->ID)) {
-			$error = new WP_Error();
-			$error->add('invalid', __('<strong>ERROR</strong>: The password you entered is invalid.'));
+        return $error;
+    } else {
+        if (!wp_check_password($password, $user->user_pass, $user->ID)) {
+            $error = new WP_Error();
+            $error->add('invalid', __('<strong>ERROR</strong>: The password you entered is invalid.'));
 
-			return $error;
-		} else {
-			return $user;
-		}
-	}
+            return $error;
+        } else {
+            return $user;
+        }
+    }
 }
 
 add_filter('authenticate', 'mp_ssv_authenticate', 20, 3);

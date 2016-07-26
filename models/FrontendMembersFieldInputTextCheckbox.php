@@ -31,7 +31,7 @@ class FrontendMembersFieldInputTextCheckbox extends FrontendMembersFieldInput
 	 * @param string $help_text is the name of the role or the role itself associated with this checkbox.
 	 * @param string $display   is the way the input field is displayed (readonly, disabled or normal) default is normal.
 	 *
-	 * @return FrontendMembersFieldInputRoleCheckbox
+     * @return FrontendMembersFieldInputTextCheckbox
 	 */
 	public static function create($index, $title, $name, $help_text = "", $display = "normal")
 	{
@@ -53,6 +53,11 @@ class FrontendMembersFieldInputTextCheckbox extends FrontendMembersFieldInput
 		return parent::getOptionRowInput($content);
 	}
 
+    /**
+     * @param FrontendMember $frontend_member
+     *
+     * @return string the HTML element
+     */
 	public function getHTML($frontend_member = null)
 	{
 		ob_start();

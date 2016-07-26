@@ -8,10 +8,11 @@
 require_once "FrontendMembersFieldInputCustom.php";
 require_once "FrontendMembersFieldInputImage.php";
 require_once "FrontendMembersFieldInputRoleCheckbox.php";
-require_once "FrontendMembersFieldInputRoleSelect.php";
+require_once "FrontendMembersFieldInputSelect.php";
+require_once "FrontendMembersFieldInputSelectRole.php";
+require_once "FrontendMembersFieldInputSelectText.php";
 require_once "FrontendMembersFieldInputText.php";
 require_once "FrontendMembersFieldInputTextCheckbox.php";
-require_once "FrontendMembersFieldInputTextSelect.php";
 
 class FrontendMembersFieldInput extends FrontendMembersField
 {

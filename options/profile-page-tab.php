@@ -3,12 +3,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	FrontendMembersField::saveAllFromPost();
 }
 ?>
+<!--suppress JSUnusedLocalSymbols -->
 <form id="mp-ssv-frontend-members-options" name="mp-ssv-frontend-members-options" method="post" action="#">
 	<table id="container" style="width: 100%; border-spacing: 10px 0; margin-bottom: 20px; margin-top: 20px; border-collapse: collapse;">
 		<tbody class="sortable">
 		<?php
 		$fields = FrontendMembersField::getAll();
 		foreach ($fields as $field) {
+            /** @noinspection PhpUndefinedMethodInspection */
+            /* @var $field FrontendMembersField */
 			echo $field->getOptionRow();
 		}
 		?>
@@ -24,14 +27,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <script src="<?php echo plugins_url("/mp-ssv-frontend-members/include/jquery-ui.js"); ?>"></script>
 <script>
 	$(function () {
-		$(".sortable").sortable();
-		$(".sortable").disableSelection();
+        var sortable = $(".sortable");
+        sortable.sortable();
+        sortable.disableSelection();
 	});
 </script>
 <!-- Add new Field. -->
 <script>
 	<?php
 	global $wpdb;
+    /** @noinspection PhpIncludeInspection */
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 	$table = $wpdb->prefix . "mp_ssv_frontend_members_fields";
 	$max_database_index = $wpdb->get_var("SELECT MAX(id) FROM $table");
@@ -53,7 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	?>
 	function mp_ssv_add_new_field() {
 		id++;
-		$("#container > tbody:last-child").append('<?php echo $new_field ?>');
+        $("#container").find("> tbody:last-child").append('<?php echo $new_field ?>');
+        <!--$("#container > tbody:last-child").append('<?php echo $new_field ?>');-->
 	}
 </script>
 <!-- Change Field Type. -->

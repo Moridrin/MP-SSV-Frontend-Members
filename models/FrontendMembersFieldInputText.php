@@ -58,6 +58,11 @@ class FrontendMembersFieldInputText extends FrontendMembersFieldInput
 		return parent::getOptionRowInput($content);
 	}
 
+    /**
+     * @param FrontendMember $frontend_member
+     *
+     * @return string the HTML element
+     */
 	public function getHTML($frontend_member = null)
 	{
 		ob_start();

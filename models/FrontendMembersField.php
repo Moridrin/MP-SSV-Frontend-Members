@@ -108,7 +108,7 @@ class FrontendMembersField
 	/**
 	 * @param int $id is the id to find the field in the database.
 	 *
-	 * @return FrontendMembersField|FrontendMembersFieldHeader|FrontendMembersFieldInputText|FrontendMembersFieldInputTextCheckbox|FrontendMembersFieldInputTextSelect|FrontendMembersFieldTab
+     * @return FrontendMembersField|FrontendMembersFieldHeader|FrontendMembersFieldInputText|FrontendMembersFieldInputTextCheckbox|FrontendMembersFieldInputSelectText|FrontendMembersFieldTab
 	 */
 	protected static function fromID($id)
 	{
@@ -142,7 +142,7 @@ class FrontendMembersField
 						$field = new FrontendMembersFieldInputRoleCheckbox($field, $field->getMeta('role'), $field->getMeta('display'));
 						break;
 					case "role_select":
-						$field = new FrontendMembersFieldInputRoleSelect($field, $field->getMeta('display'));
+                        $field = new FrontendMembersFieldInputSelectRole($field, $field->getMeta('display'));
 						break;
 					case "text":
 						$field = new FrontendMembersFieldInputText($field, $field->getMeta('required'), $field->getMeta('display'), $field->getMeta('placeholder'));
@@ -151,7 +151,7 @@ class FrontendMembersField
 						$field = new FrontendMembersFieldInputTextCheckbox($field, $field->getMeta('help_text'), $field->getMeta('display'));
 						break;
 					case "text_select":
-						$field = new FrontendMembersFieldInputTextSelect($field, $field->getMeta('display'));
+                        $field = new FrontendMembersFieldInputSelectText($field, $field->getMeta('display'));
 						$field->options = $field->getOptions();
 						break;
 				}
@@ -210,7 +210,7 @@ class FrontendMembersField
 	 *
 	 * @param int $id is the id of the FrontendMembersField that should be created.
 	 *
-	 * @return FrontendMembersField|FrontendMembersFieldHeader|FrontendMembersFieldInputText|FrontendMembersFieldInputTextCheckbox|FrontendMembersFieldInputTextSelect|FrontendMembersFieldTab
+     * @return FrontendMembersField|FrontendMembersFieldHeader|FrontendMembersFieldInputText|FrontendMembersFieldInputTextCheckbox|FrontendMembersFieldInputSelectText|FrontendMembersFieldTab
 	 */
 	public static function fromPOST($id)
 	{
@@ -246,7 +246,7 @@ class FrontendMembersField
 						$field = new FrontendMembersFieldInputRoleCheckbox($field, $field->getMetaFromPOST('role'), $field->getMetaFromPOST('display'));
 						break;
 					case "role_select":
-						$field = new FrontendMembersFieldInputRoleSelect($field, $field->getMetaFromPOST('display'));
+                        $field = new FrontendMembersFieldInputSelectRole($field, $field->getMetaFromPOST('display'));
 						$field->options = $field->getOptionsFromPOST($variables);
 						break;
 					case "text":
@@ -256,7 +256,7 @@ class FrontendMembersField
 						$field = new FrontendMembersFieldInputTextCheckbox($field, $field->getMetaFromPOST('help_text'), $field->getMetaFromPOST('display'));
 						break;
 					case "text_select":
-						$field = new FrontendMembersFieldInputTextSelect($field, $field->getMetaFromPOST('display'));
+                        $field = new FrontendMembersFieldInputSelectText($field, $field->getMetaFromPOST('display'));
 						$field->options = $field->getOptionsFromPOST($variables);
 						break;
 				}
@@ -329,6 +329,7 @@ class FrontendMembersField
     public function setMeta($key, $value)
     {
         global $wpdb;
+        /** @noinspection PhpIncludeInspection */
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         $table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
         $wpdb->insert(

@@ -37,7 +37,8 @@ function mp_ssv_members_filter($content) {
 
 function mp_ssv_loop_committees($looping_string) {
 	if ( !function_exists('get_editable_roles') ) {
-		require_once( ABSPATH . '/wp-admin/includes/user.php' );
+        /** @noinspection PhpIncludeInspection */
+        require_once(ABSPATH . '/wp-admin/includes/user.php');
 	}
 	$roles = get_editable_roles();
 	$replacingString = "";

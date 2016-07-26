@@ -43,17 +43,18 @@ function mp_ssv_register_page_content()
 		<?php
 		foreach ($items as $item) {
 			if (!$item instanceof FrontendMembersFieldTab) {
-				echo $item->getHTML();
+                /** @noinspection PhpUndefinedMethodInspection */
+                echo $item->getHTML();
 			}
 		}
 		?>
 		<div class="mui-textfield mui-textfield--float-label">
-			<input type="password" name="password" class="mui--is-empty mui--is-dirty" required>
-			<label>Password</label>
+            <input id="password" type="password" name="password" class="mui--is-empty mui--is-dirty" required>
+            <label for="password">Password</label>
 		</div>
 		<div class="mui-textfield mui-textfield--float-label">
-			<input type="password" name="password_confirm" class="mui--is-empty mui--is-dirty" required>
-			<label>Confirm Password</label>
+            <input id="password_confirm" type="password" name="password_confirm" class="mui--is-empty mui--is-dirty" required>
+            <label for="password_confirm">Confirm Password</label>
 		</div>
 		<?php $site_key = get_option('mp_ssv_recaptcha_site_key'); ?>
 		<div class="g-recaptcha" data-sitekey="<?php echo $site_key; ?>"></div>
@@ -90,6 +91,7 @@ function mp_ssv_create_members_profile()
 	$user->updateMeta("display_name", $user->getMeta('first_name') . ' ' . $user->getMeta('last_name'));
 	foreach ($_FILES as $name => $file) {
 		if (!function_exists('wp_handle_upload')) {
+            /** @noinspection PhpIncludeInspection */
 			require_once(ABSPATH . 'wp-admin/includes/file.php');
 		}
 		$file_location = wp_handle_upload($file, array('test_form' => false));

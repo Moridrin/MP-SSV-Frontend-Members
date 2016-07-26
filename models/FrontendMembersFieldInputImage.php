@@ -53,6 +53,12 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
 		return parent::getOptionRowInput($content);
 	}
 
+    /**
+     * @param FrontendMember $frontend_member
+     * @param int            $size
+     *
+     * @return string the HTML element
+     */
 	public function getHTML($frontend_member = null, $size = 150)
 	{
 		ob_start();
