@@ -46,9 +46,11 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
 	{
 		ob_start();
 		echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
-		echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
-		echo mp_ssv_get_td(mp_ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
 		echo mp_ssv_get_td(mp_ssv_get_role_select($this->id, "Role", $this->role));
+		echo mp_ssv_get_td(mp_ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
+		if (get_option('mp_ssv_view_advanced_profile_page', false)) {
+			echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+		}
 		$content = ob_get_clean();
 
 		return parent::getOptionRowInput($content);
@@ -74,7 +76,7 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
 			<input type="hidden" name="<?php echo $this->name; ?>" value="no"/>
 			<div class="mui-checkbox">
 				<label>
-					<input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="yes" <?php if ($value == "yes") : echo "checked"; endif; ?>>
+					<input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="yes" <?php if ($value == "yes") : echo "checked"; endif; ?>>
 					<?php echo translate_user_role($wp_roles->roles[$this->role]['name']); ?>
 				</label>
 			</div>
@@ -83,7 +85,7 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
 			?>
 			<input type="hidden" name="<?php echo $this->name; ?>" value="no"/>
 			<label>
-				<input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="yes" <?php if ($value == "yes") : echo "checked"; endif; ?>>
+				<input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="yes" <?php if ($value == "yes") : echo "checked"; endif; ?>>
 				<?php echo translate_user_role($wp_roles->roles[$this->role]['name']); ?>
 			</label>
 			<br/>

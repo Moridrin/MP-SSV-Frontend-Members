@@ -57,7 +57,9 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
         echo mp_ssv_get_td(mp_ssv_get_text_input("Name", $this->id, $this->name));
         echo mp_ssv_get_td(mp_ssv_get_checkbox("Required", $this->id, $this->required));
         echo mp_ssv_get_td(mp_ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled"), array()));
-        echo mp_ssv_get_td(mp_ssv_get_text_input("Placeholder", $this->id, $this->placeholder));
+        if (get_option('mp_ssv_view_advanced_profile_page', false)) {
+            echo mp_ssv_get_td(mp_ssv_get_text_input("Placeholder", $this->id, $this->placeholder));
+        }
         $content = ob_get_clean();
 
         return parent::getOptionRowInput($content, $this->input_type_custom);
@@ -83,7 +85,7 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
                 <input type="<?php echo $this->input_type_custom; ?>" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="<?php echo $value; ?>" <?php echo $this->display; ?>
                        placeholder="<?php echo $this->placeholder; ?>" <?php if ($this->required == "yes") {
                     echo "required";
-                } ?>/>
+                } ?> class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>"/>
                 <label><?php echo $this->title; ?></label>
             </div>
             <?php
@@ -93,7 +95,7 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
             <input type="<?php echo $this->input_type_custom; ?>" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="<?php echo $value; ?>" <?php echo $this->display; ?>
                    placeholder="<?php echo $this->placeholder; ?>" <?php if ($this->required == "yes") {
                 echo "required";
-            } ?>/>
+            } ?> class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>"/>
             <br/>
             <?php
         }

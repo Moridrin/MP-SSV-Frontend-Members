@@ -72,7 +72,7 @@ class FrontendMembersFieldInputTextCheckbox extends FrontendMembersFieldInput
 			<input type="hidden" name="<?php echo $this->name; ?>" value="no"/>
 			<div class="mui-checkbox">
 				<label>
-					<input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="yes" <?php if ($value == "yes") : echo "checked"; endif; ?>>
+                    <input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="yes" <?php if ($value == "yes") : echo "checked"; endif; ?>>
 					<?php echo $this->title; ?>
 				</label>
 			</div>
@@ -81,7 +81,7 @@ class FrontendMembersFieldInputTextCheckbox extends FrontendMembersFieldInput
 			?>
 			<input type="hidden" name="<?php echo $this->name; ?>" value="no"/>
 			<label>
-				<input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="yes" <?php if ($value == "yes") : echo "checked"; endif; ?>>
+                <input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="yes" <?php if ($value == "yes") : echo "checked"; endif; ?>>
 				<?php echo $this->title; ?>
 			</label>
 			<br/>

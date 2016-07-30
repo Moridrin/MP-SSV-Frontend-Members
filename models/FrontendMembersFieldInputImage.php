@@ -47,7 +47,9 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
 		echo mp_ssv_get_td(mp_ssv_get_text_input("Name", $this->id, $this->name));
 		echo mp_ssv_get_td(mp_ssv_get_checkbox("Required", $this->id, $this->required));
 		echo mp_ssv_get_td(mp_ssv_get_checkbox("Preview", $this->id, $this->preview));
-		echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+        if (get_option('mp_ssv_view_advanced_profile_page', false)) {
+            echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+        }
 		$content = ob_get_clean();
 
 		return parent::getOptionRowInput($content);
@@ -73,9 +75,9 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
 		}
 		echo '<label>'.$this->title.'</label>';
 		if ($this->required == "yes" && $location == "") {
-			echo '<input type="file" id="' . $this->id . '" name="' . $this->name . '" required/>';
+            echo '<input type="file" id="' . $this->id . '" name="' . $this->name . '" class="' . $this->class . '" style="' . $this->style . '" required/>';
 		} else {
-			echo '<input type="file" id="' . $this->id . '" name="' . $this->name . '" />';
+            echo '<input type="file" id="' . $this->id . '" name="' . $this->name . '" class="' . $this->class . '" style="' . $this->style . '" />';
 		}
 		if ($this->preview == "yes") {
 			echo '<img src="' . $location . '" style="padding-top: 10px;" height="' . $size . '" width="' . $size . '">';

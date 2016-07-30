@@ -10,7 +10,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		<?php
 		$fields = FrontendMembersField::getAll();
 		foreach ($fields as $field) {
-            /** @noinspection PhpUndefinedMethodInspection */
             /* @var $field FrontendMembersField */
 			echo $field->getOptionRow();
 		}

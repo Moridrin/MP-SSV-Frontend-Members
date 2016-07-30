@@ -15,7 +15,7 @@ class FrontendMembersFieldTab extends FrontendMembersField
 	 */
 	protected function __construct($field)
 	{
-		parent::__construct($field->id, $field->index, $field->type, $field->title);
+        parent::__construct($field->id, $field->index, $field->type, $field->title, $field->class, $field->style);
 	}
 
 	/**
@@ -58,9 +58,9 @@ class FrontendMembersFieldTab extends FrontendMembersField
 	public function getTabButton($active = false)
 	{
 		if ($active) {
-			return '<li class="mui--is-active"><a class="mui-btn mui-btn--flat" data-mui-toggle="tab" data-mui-controls="pane-' . $this->id . '">' . $this->title . '</a></li>';
+            return '<li class="mui--is-active"><a class="mui-btn mui-btn--flat" data-mui-toggle="tab" data-mui-controls="pane-' . $this->id . '"><p class="' . $this->class . '" style="' . $this->style . '">' . $this->title . '</p></a></li>';
 		} else {
-			return '<li><a class="mui-btn mui-btn--flat" data-mui-toggle="tab" data-mui-controls="pane-' . $this->id . '">' . $this->title . '</a></li>';
+            return '<li><a class="mui-btn mui-btn--flat" data-mui-toggle="tab" data-mui-controls="pane-' . $this->id . '"><p class="' . $this->class . '" style="' . $this->style . '">' . $this->title . '</p></a></li>';
 		}
 	}
 

@@ -59,6 +59,8 @@ class FrontendMembersFieldInputSelectRole extends FrontendMembersFieldInputSelec
 		ob_start();
         echo parent::getOptionRow();
 		echo mp_ssv_get_td(mp_ssv_get_options($this->id, self::getOptionsAsArray(), "role"));
+        echo mp_ssv_get_td(mp_ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
+        echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
 		$content = ob_get_clean();
 
 		return parent::getOptionRowInput($content);

@@ -52,7 +52,9 @@ class FrontendMembersFieldInputText extends FrontendMembersFieldInput
 		echo mp_ssv_get_td(mp_ssv_get_text_input("Name", $this->id, $this->name, "text", array("required")));
 		echo mp_ssv_get_td(mp_ssv_get_checkbox("Required", $this->id, $this->required));
 		echo mp_ssv_get_td(mp_ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
-		echo mp_ssv_get_td(mp_ssv_get_text_input("Placeholder", $this->id, $this->placeholder));
+		if (get_option('mp_ssv_view_advanced_profile_page', false)) {
+			echo mp_ssv_get_td(mp_ssv_get_text_input("Placeholder", $this->id, $this->placeholder));
+		}
 		$content = ob_get_clean();
 
 		return parent::getOptionRowInput($content);
@@ -75,16 +77,16 @@ class FrontendMembersFieldInputText extends FrontendMembersFieldInput
 		if (current_theme_supports('mui')) {
 			?>
 			<div class="mui-textfield <?php if ($this->placeholder == "") echo "mui-textfield--float-label"; ?>">
-				<input type="text" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="<?php echo $value; ?>" <?php echo $this->display; ?>
-				       placeholder="<?php echo $this->placeholder; ?>" <?php if ($this->required == "yes") echo "required"; ?>/>
+				<input type="text" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="<?php echo $value; ?>" <?php echo $this->display; ?>
+					   placeholder="<?php echo $this->placeholder; ?>" <?php if ($this->required == "yes") echo "required"; ?>/>
 				<label><?php echo $this->title; ?></label>
 			</div>
 			<?php
 		} else {
 			?>
 			<label><?php echo $this->title; ?></label>
-			<input type="text" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="<?php echo $value; ?>" <?php echo $this->display; ?>
-			       placeholder="<?php echo $this->placeholder; ?>" <?php if ($this->required == "yes") echo "required"; ?>/>
+			<input type="text" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="<?php echo $value; ?>" <?php echo $this->display; ?>
+				   placeholder="<?php echo $this->placeholder; ?>" <?php if ($this->required == "yes") echo "required"; ?>/>
 			<br/>
 			<?php
 		}

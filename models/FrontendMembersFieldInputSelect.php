@@ -101,7 +101,7 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
             ?>
             <div class="mui-select mui-textfield">
                 <label for="<?php echo $this->id; ?>"><?php echo $this->title; ?></label>
-                <select id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>">
+                <select id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>">
                     <?php foreach ($this->options as $option) {
                         /* @var $option FrontendMembersFieldInputSelectRoleOption|FrontendMembersFieldInputSelectTextOption */
                         echo $option->getHTML($value);
@@ -113,7 +113,7 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
         } else {
             ?>
             <label for="<?php echo $this->id; ?>"><?php echo $this->title; ?></label>
-            <select id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>">
+            <select id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>">
                 <?php foreach ($this->options as $option) {
                     /* @var $option FrontendMembersFieldInputSelectRoleOption|FrontendMembersFieldInputSelectTextOption */
                     echo $option->getHTML($value);
@@ -131,8 +131,6 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
     {
         ob_start();
         echo mp_ssv_get_td(mp_ssv_get_text_input("Name", $this->id, $this->name, "text", array("required")));
-        echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
-        echo mp_ssv_get_td(mp_ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
         return ob_get_clean();
     }
 }

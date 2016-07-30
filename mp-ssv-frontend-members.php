@@ -60,7 +60,9 @@ function mp_ssv_register_mp_ssv_frontend_members()
 			id bigint(20) NOT NULL PRIMARY KEY,
 			field_index bigint(20) NOT NULL,
 			field_type varchar(30) NOT NULL,
-			field_title varchar(30)
+			field_title varchar(30),
+			field_class VARCHAR(255),
+			field_style VARCHAR(255)
 		) $charset_collate;";
     dbDelta($sql);
     $table_name = $wpdb->prefix . "mp_ssv_frontend_members_field_meta";
