@@ -82,6 +82,9 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
 		if ($this->preview == "yes") {
 			echo '<img src="' . $location . '" style="padding-top: 10px;" height="' . $size . '" width="' . $size . '">';
 		}
+        if ($this->required == 'no' && $location != "") {
+            echo '<br/><button class="mui-btn mui-btn--accent button-accent" type="button" id="' . $this->id . '_remove" name="' . $this->name . '_remove">Remove</button>';
+        }
 		if (current_theme_supports('mui')) {
 			echo '</div>';
 		} else {
