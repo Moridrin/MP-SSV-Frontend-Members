@@ -1,7 +1,6 @@
 <?php
 function mp_ssv_login_page_content($content) {
 	global $post;
-	/* Return */
 	ob_start();
 	if ($post->post_name != 'login') {
 		return $content;
