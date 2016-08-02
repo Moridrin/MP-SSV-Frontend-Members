@@ -228,3 +228,47 @@ function mp_ssv_authenticate($user, $login, $password)
 }
 
 add_filter('authenticate', 'mp_ssv_authenticate', 20, 3);
+
+function mp_ssv_custom_user_column_types($contactmethods)
+{
+    $contactmethods['mp_ssv_emergency_contact_name'] = 'Emergency Contact Name / Relation';
+    return $contactmethods;
+}
+
+add_filter('user_contactmethods', 'mp_ssv_custom_user_column_types', 10, 1);
+
+function mp_ssv_custom_user_column_values($val, $column_name, $user_id)
+{
+    $frontendMember = FrontendMember::get_by_id($user_id);
+    if ($column_name == 'mp_ssv_username') {
+        $username_block = '';
+        $username_block .= '<img style="float: left; margin-right: 10px; margin-top: 1px;" class="avatar avatar-32 photo" src="' . $frontendMember->getMeta('profile_picture') . '" height="32" width="32"/>';
+        $username_block .= '<strong>' . $frontendMember->getProfileLink() . '</strong><br/>';
+        $editURL = 'user-edit.php?user_id=' . $frontendMember->ID . '&wp_http_referer=%2Fwp-admin%2Fusers.php';
+        $capebilitiesURL = 'users.php?page=users-user-role-editor.php&object=user&user_id=' . $frontendMember->ID;
+        $username_block .= '<div class="row-actions"><span class="edit"><a href="' . $editURL . '">Edit</a> | </span><span class="capabilities"><a href="' . $capebilitiesURL . '">Capabilities</a></span></div>';
+        return $username_block;
+    } elseif (mp_ssv_starts_with($column_name, 'mp_ssv_')) {
+        return $frontendMember->getMeta(str_replace('mp_ssv_', '', $column_name));
+    }
+    return $val;
+}
+
+add_filter('manage_users_custom_column', 'mp_ssv_custom_user_column_values', 10, 3);
+
+function mp_ssv_custom_user_columns($column_headers)
+{
+//    mp_ssv_print($column_headers, true);
+    unset($column_headers);
+    $column_headers['cb'] = '<input type="checkbox" />';
+//    $column_headers['username'] = 'Username';
+    $column_headers['mp_ssv_username'] = 'Username';
+//    $column_headers['mp_ssv_name'] = 'Name';
+    $column_headers['mp_ssv_email'] = 'Email';
+//    $column_headers['role'] = 'Roles';
+//    $column_headers['posts'] = 'Posts';
+    $column_headers['mp_ssv_emergency_contact_name'] = 'Emergency Contact Name / Relation';
+    return $column_headers;
+}
+
+add_action('manage_users_columns', 'mp_ssv_custom_user_columns');
