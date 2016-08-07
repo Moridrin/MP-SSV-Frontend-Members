@@ -17,9 +17,12 @@ function mp_ssv_frontend_members_settings_page()
 			<a href="?page=<?php echo __FILE__; ?>&tab=general" class="nav-tab <?php if ($active_tab == "general") {
 				echo "nav-tab-active";
 			} ?>">General</a>
-			<a href="?page=<?php echo __FILE__; ?>&tab=profile_page" class="nav-tab <?php if ($active_tab == "frontend-pages") {
+            <a href="?page=<?php echo __FILE__; ?>&tab=profile_page" class="nav-tab <?php if ($active_tab == "profile_page") {
 				echo "nav-tab-active";
 			} ?>">Profile Page</a>
+            <a href="?page=<?php echo __FILE__; ?>&tab=users_page_columns" class="nav-tab <?php if ($active_tab == "users_page_columns") {
+                echo "nav-tab-active";
+            } ?>">Users Page Columns</a>
 			<a href="http://studentensurvival.com/mp-ssv/mp-ssv-frontend-members/" target="_blank" class="nav-tab">Help <img src="<?php echo plugin_dir_url('mp-ssv-general/images/link-new-tab.png'); ?>link-new-tab.png" width="14px"
 			                                                                                                                 style="vertical-align:middle"></a>
 		</h2>
@@ -28,6 +31,8 @@ function mp_ssv_frontend_members_settings_page()
 			require_once "general-tab.php";
 		} else if ($active_tab == "profile_page") {
 			require_once "profile-page-tab.php";
+        } else if ($active_tab == "users_page_columns") {
+            require_once "users-page-columns.php";
 		}
 		?>
 	</div>

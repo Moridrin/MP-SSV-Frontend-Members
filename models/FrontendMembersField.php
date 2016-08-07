@@ -212,6 +212,27 @@ class FrontendMembersField
         return stripslashes($value);
     }
 
+    /**
+     *
+     * @return array of all the FrontendMembersFields.
+     */
+    public static function getAllFieldNames()
+    {
+        global $wpdb;
+        $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
+        $sql = "SELECT id FROM $table WHERE field_type = 'input' ORDER BY field_index ASC;";
+        $ids = json_decode(json_encode($wpdb->get_results($sql)), true);
+
+        $table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
+        $names = array();
+        foreach ($ids as $id) {
+            $sql = "SELECT meta_value FROM $table WHERE meta_key = 'name' AND field_id = " . $id['id'];
+            $names[] = json_decode(json_encode($wpdb->get_var($sql)), true);
+        }
+
+        return $names;
+    }
+
     public static function saveAllFromPost()
     {
         $id = 0;
