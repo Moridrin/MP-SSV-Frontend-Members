@@ -28,7 +28,7 @@ class FrontendMembersFieldInput extends FrontendMembersField
      */
     protected function __construct($field, $input_type, $name)
     {
-        parent::__construct($field->id, $field->index, $field->type, $field->title, $field->class, $field->style);
+        parent::__construct($field->id, $field->index, $field->type, $field->title, $field->registration_page, $field->class, $field->style);
         $this->input_type = $input_type;
         $this->name = $name;
     }

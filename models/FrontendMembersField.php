@@ -14,6 +14,7 @@ class FrontendMembersField
     public $id;
     public $type;
     public $title;
+    public $registration_page;
     public $class;
     public $style;
     protected $index;
@@ -21,19 +22,21 @@ class FrontendMembersField
     /**
      * FrontendMembersField constructor.
      *
-     * @param int    $id    identifies the field in the database.
-     * @param int    $index identifies the order in which it is displayed.
-     * @param string $type  is the type of FrontendMembersField.
-     * @param string $title is the title of this FrontendMembersField.
-     * @param string $class is a string of classes added to the field.
-     * @param string $style is a string of styles added to the field.
+     * @param int    $id                identifies the field in the database.
+     * @param int    $index             identifies the order in which it is displayed.
+     * @param string $type              is the type of FrontendMembersField.
+     * @param string $title             is the title of this FrontendMembersField.
+     * @param string $registration_page is true if this field should be displayed on the registration page.
+     * @param string $class             is a string of classes added to the field.
+     * @param string $style             is a string of styles added to the field.
      */
-    protected function __construct($id, $index, $type, $title, $class, $style)
+    protected function __construct($id, $index, $type, $title, $registration_page, $class, $style)
     {
         $this->id = $id;
         $this->index = $index;
         $this->type = $type;
         $this->title = $title;
+        $this->registration_page = $registration_page;
         $this->class = $class;
         $this->style = $style;
     }
@@ -186,6 +189,7 @@ class FrontendMembersField
             $database_fields['field_index'],
             $database_fields['field_type'],
             $database_fields['field_title'],
+            $database_fields['registration_page'],
             $database_fields['field_class'],
             $database_fields['field_style']
         );
@@ -261,10 +265,13 @@ class FrontendMembersField
                 $variables[str_replace($id . "_", "", $name)] = $value;
             }
         }
-        $field = new FrontendMembersField($id, $variables['field_index'], $variables["field_type"], $variables["field_title"], $variables['field_class'], $variables['field_style']);
+        $field = new FrontendMembersField($id, $variables['field_index'], $variables["field_type"], $variables["field_title"], $variables["registration_page"], $variables['field_class'], $variables['field_style']);
         unset($variables["id"]);
         unset($variables["field_type"]);
         unset($variables["field_title"]);
+        unset($variables["registration_page"]);
+        unset($variables["field_class"]);
+        unset($variables["field_style"]);
         switch ($field->type) {
             case "tab":
                 $field = new FrontendMembersFieldTab($field);
@@ -326,15 +333,16 @@ class FrontendMembersField
     /**
      * This function creates a new FrontendMembersField and adds it to the database.
      *
-     * @param int    $index is an id that specifies the display (/tab) order for the field.
-     * @param string $title is the title of this component.
-     * @param string $type  specifies the type of field. Either "tab", "header", "input" or "group_option".
-     * @param string $class is a string that is added to the class field.
-     * @param string $style is a string that is added to the style field.
+     * @param int    $index             is an id that specifies the display (/tab) order for the field.
+     * @param string $title             is the title of this component.
+     * @param string $type              specifies the type of field. Either "tab", "header", "input" or "group_option".
+     * @param string $registration_page is set to false if the field should not be displayed on the registration page.
+     * @param string $class             is a string that is added to the class field.
+     * @param string $style             is a string that is added to the style field.
      *
      * @return FrontendMembersField the just created instance.
      */
-    protected static function createField($index, $title, $type, $class = '', $style = '')
+    protected static function createField($index, $title, $type, $registration_page = 'true', $class = '', $style = '')
     {
         global $wpdb;
         $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
@@ -347,12 +355,13 @@ class FrontendMembersField
         $wpdb->insert(
             $table,
             array(
-                'id'          => $id,
-                'field_index' => $index,
-                'field_type'  => $type,
-                'field_title' => $title,
-                'field_class' => $class,
-                'field_style' => $style
+                'id'                => $id,
+                'field_index'       => $index,
+                'field_type'        => $type,
+                'field_title'       => $title,
+                'registration_page' => $registration_page,
+                'field_class'       => $class,
+                'field_style'       => $style
             ),
             array(
                 '%d',
@@ -362,7 +371,7 @@ class FrontendMembersField
             )
         );
 
-        return new FrontendMembersField($id, $index, $type, $title, $class, $style);
+        return new FrontendMembersField($id, $index, $type, $title, $registration_page, $class, $style);
     }
 
     /**
@@ -419,7 +428,10 @@ class FrontendMembersField
             echo mp_ssv_get_td(mp_ssv_get_select("Field Type", $this->id, $this->type, array("Header", "Input"), array('onchange="mp_ssv_type_changed(\'' . $this->id . '\')"')));
         }
         echo $content;
-        if (get_option('mp_ssv_view_advanced_profile_page', false)) {
+        if (get_option('mp_ssv_frontend_members_register_page', 'same_as_profile_page') == 'custom') {
+            echo mp_ssv_get_td(mp_ssv_get_checkbox('Registration Page', $this->id, $this->registration_page, array(), true));
+        }
+        if (get_option('mp_ssv_view_advanced_profile_page', 'false') == 'true') {
             echo mp_ssv_get_td(mp_ssv_get_text_input('Field Class', $this->id, $this->class));
             echo mp_ssv_get_td(mp_ssv_get_text_input('Field Style', $this->id, $this->style));
         }
@@ -450,28 +462,30 @@ class FrontendMembersField
                 $wpdb->update(
                     $table,
                     array(
-                        "field_index" => $this->index,
-                        "field_type"  => $this->type,
-                        "field_title" => $this->title,
-                        "field_class" => $this->class,
-                        "field_style" => $this->style,
+                        "field_index"       => $this->index,
+                        "field_type"        => $this->type,
+                        "field_title"       => $this->title,
+                        "registration_page" => $this->registration_page,
+                        "field_class"       => $this->class,
+                        "field_style"       => $this->style,
                     ),
                     array("id" => $this->id),
-                    array('%d', '%s', '%s', '%s', '%s'),
+                    array('%d', '%s', '%s', '%s', '%s', '%s'),
                     array('%d')
                 );
             } else {
                 $wpdb->insert(
                     $table,
                     array(
-                        "id"          => $this->id,
-                        "field_index" => $this->index,
-                        "field_type"  => $this->type,
-                        "field_title" => $this->title,
-                        "field_class" => $this->class,
-                        "field_style" => $this->style,
+                        "id"                => $this->id,
+                        "field_index"       => $this->index,
+                        "field_type"        => $this->type,
+                        "field_title"       => $this->title,
+                        "registration_page" => $this->registration_page,
+                        "field_class"       => $this->class,
+                        "field_style"       => $this->style,
                     ),
-                    array('%d', '%d', '%s', '%s', '%s', '%s')
+                    array('%d', '%d', '%s', '%s', '%s', '%s', '%s')
                 );
             }
         }

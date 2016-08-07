@@ -3,6 +3,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	global $options;
 	update_option('mp_ssv_frontend_members_register_page', $_POST['mp_ssv_frontend_members_register_page']);
 	update_option('mp_ssv_frontend_members_board_role', $_POST['mp_ssv_frontend_members_board_role']);
+	if (isset($_POST['mp_ssv_view_advanced_profile_page'])) {
+		update_option('mp_ssv_view_advanced_profile_page', 'true');
+	} else {
+		update_option('mp_ssv_view_advanced_profile_page', 'false');
+	}
 	if (isset($_POST['mp_ssv_frontend_members_show_admin_bar_front'])) {
 		update_option('mp_ssv_frontend_members_show_admin_bar_front', 'true');
 	} else {
@@ -30,6 +35,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				<select name="mp_ssv_frontend_members_board_role" title="Board Role">
 					<?php wp_dropdown_roles(esc_attr(stripslashes(get_option('mp_ssv_frontend_members_board_role')))); ?>
 				</select>
+			</td>
+		</tr>
+		<tr>
+			<th scope="row">Advanced Profile Page Tab</th>
+			<td>
+				<label>
+					<input type="checkbox" name="mp_ssv_view_advanced_profile_page" value="true" <?php if (get_option('mp_ssv_view_advanced_profile_page') == 'true') {
+						echo "checked";
+					} ?>/>
+				</label>
 			</td>
 		</tr>
 		<tr>

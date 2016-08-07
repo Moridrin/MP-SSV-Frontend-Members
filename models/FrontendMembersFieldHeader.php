@@ -15,7 +15,7 @@ class FrontendMembersFieldHeader extends FrontendMembersField
      */
     protected function __construct($field)
     {
-        parent::__construct($field->id, $field->index, $field->type, $field->title, $field->class, $field->style);
+        parent::__construct($field->id, $field->index, $field->type, $field->title, $field->registration_page, $field->class, $field->style);
     }
 
     /**
