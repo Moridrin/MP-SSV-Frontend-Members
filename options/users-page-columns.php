@@ -6,16 +6,9 @@
  */
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    //TODO Save the data from this page.
     global $options;
-    update_option('mp_ssv_frontend_members_register_page', $_POST['mp_ssv_frontend_members_register_page']);
-    if (isset($_POST['mp_ssv_frontend_members_show_admin_bar_front'])) {
-        update_option('mp_ssv_frontend_members_show_admin_bar_front', 'true');
-    } else {
-        update_option('mp_ssv_frontend_members_show_admin_bar_front', 'false');
-    }
-    update_option('mp_ssv_recaptcha_site_key', $_POST['mp_ssv_recaptcha_site_key']);
-    update_option('mp_ssv_recaptcha_secret_key', $_POST['mp_ssv_recaptcha_secret_key']);
+    update_option('mp_ssv_frontend_members_main_column', $_POST['mp_ssv_frontend_members_main_column']);
+    update_option('mp_ssv_frontend_members_user_columns', json_encode($_POST['mp_ssv_frontend_members_user_columns']));
 }
 ?>
 <form method="post" action="#">
@@ -43,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $selected = $selected ?: array();
                 $fieldNames = FrontendMembersField::getAllFieldNames();
                 ?>
-                <select size="<?= count($fieldNames) ?>" name="mp_ssv_frontend_members_user_columns" multiple>
+                <select size="<?= count($fieldNames) ?>" name="mp_ssv_frontend_members_user_columns[]" multiple title="Columns to Display">
                     <?php
                     foreach ($fieldNames as $fieldName) {
                         echo '<option value="' . $fieldName . '" ';
