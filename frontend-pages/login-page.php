@@ -38,7 +38,7 @@ function mp_ssv_login_page_content($content) {
                 <label for="rememberme">Remember Me</label>
 			</div>
             <button class="mui-btn mui-btn--primary button-primary" type="submit" name="wp-submit" id="wp-submit">Login</button>
-			<input type="hidden" name="redirect_to" value="http://allterrain.nl/profile">
+			<input type="hidden" name="redirect_to" value="<?= get_site_url() ?>/profile">
 		</form>
 		Don't have an account? <!--suppress HtmlUnknownTarget -->
 		<a href="register">Click Here</a> to register.
@@ -60,7 +60,7 @@ function mp_ssv_login_page_content($content) {
 				<input name="rememberme" type="checkbox" id="rememberme" value="forever" checked="checked" style="width: auto; margin-right: 10px;">
 			</div>
             <button class="mui-btn mui-btn--primary button-primary" type="submit" name="wp-submit" id="wp-submit">Login</button>
-			<input type="hidden" name="redirect_to" value="http://allterrain.nl/profile">
+			<input type="hidden" name="redirect_to" value="<?= get_site_url() ?>/profile">
 		</form>
 		<br/>
 		Don't have an account? <!--suppress HtmlUnknownTarget -->

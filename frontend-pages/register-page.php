@@ -104,7 +104,7 @@ function mp_ssv_create_members_profile()
 	$user->add_role('member');
 	$to = 'mp.berkvens@gmail.com';
 	$subject = "New Member Registration";
-	$message = 'A new member has registered:<br/><br/><a href="http://allterrain.nl/profile/?user_id=' . $user->ID . '" target="_blank">' . $user->display_name . '</a><br/><br/>Greetings, Jeroen Berkvens.';
+    $message = 'A new member has registered:<br/><br/><a href="' . get_site_url() . '/profile/?user_id=' . $user->ID . '" target="_blank">' . $user->display_name . '</a><br/><br/>Greetings, Jeroen Berkvens.';
 
 	$headers = "From: webmaster@AllTerrain.nl" . "\r\n";
 	add_filter('wp_mail_content_type',create_function('', 'return "text/html";'));

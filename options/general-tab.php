@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				if (is_plugin_active('user-role-editor/user-role-editor.php')) { ?>
                     <label>
                         <input type="checkbox" name="mp_ssv_frontend_members_show_admin_bar_front" value="true" checked disabled/>
-                        Show the wordpress admin bar for new members. Specify this in <a href="http://allterrain.nl/wp-admin/users.php?page=users-user-role-editor.php">User Role Editor</a>
+						Show the wordpress admin bar for new members. Specify this in <a href="<?= get_site_url() ?>/wp-admin/users.php?page=users-user-role-editor.php">User Role Editor</a>
                     </label>
 				<?php } else { ?>
                     <label>
