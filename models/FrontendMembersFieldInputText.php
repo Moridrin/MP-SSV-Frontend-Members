@@ -77,7 +77,9 @@ class FrontendMembersFieldInputText extends FrontendMembersFieldInput
 		if (current_theme_supports('mui')) {
 			?>
 			<div class="mui-textfield <?php if ($this->placeholder == "") echo "mui-textfield--float-label"; ?>">
-				<input type="text" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="<?php echo $value; ?>" <?php echo $this->display; ?>
+				<input type="text" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="<?php echo $value; ?>" <?php if (!(new FrontendMember(wp_get_current_user()))->isBoard()) {
+					echo $this->display;
+				} ?>
 					   placeholder="<?php echo $this->placeholder; ?>" <?php if ($this->required == "yes") echo "required"; ?>/>
 				<label><?php echo $this->title; ?></label>
 			</div>
@@ -85,7 +87,9 @@ class FrontendMembersFieldInputText extends FrontendMembersFieldInput
 		} else {
 			?>
 			<label><?php echo $this->title; ?></label>
-			<input type="text" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="<?php echo $value; ?>" <?php echo $this->display; ?>
+			<input type="text" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="<?php echo $value; ?>" <?php if (!(new FrontendMember(wp_get_current_user()))->isBoard()) {
+				echo $this->display;
+			} ?>
 				   placeholder="<?php echo $this->placeholder; ?>" <?php if ($this->required == "yes") echo "required"; ?>/>
 			<br/>
 			<?php

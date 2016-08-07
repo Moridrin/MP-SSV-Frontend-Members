@@ -240,7 +240,7 @@ add_filter('user_contactmethods', 'mp_ssv_custom_user_column_types', 10, 1);
 function mp_ssv_custom_user_column_values($val, $column_name, $user_id)
 {
     $frontendMember = FrontendMember::get_by_id($user_id);
-    if ($column_name == 'mp_ssv_username') {
+    if ($column_name == 'mp_ssv_member') {
         $username_block = '';
         $username_block .= '<img style="float: left; margin-right: 10px; margin-top: 1px;" class="avatar avatar-32 photo" src="' . $frontendMember->getMeta('profile_picture') . '" height="32" width="32"/>';
         $username_block .= '<strong>' . $frontendMember->getProfileLink() . '</strong><br/>';
@@ -258,16 +258,27 @@ add_filter('manage_users_custom_column', 'mp_ssv_custom_user_column_values', 10,
 
 function mp_ssv_custom_user_columns($column_headers)
 {
-//    mp_ssv_print($column_headers, true);
     unset($column_headers);
     $column_headers['cb'] = '<input type="checkbox" />';
-//    $column_headers['username'] = 'Username';
-    $column_headers['mp_ssv_username'] = 'Username';
-//    $column_headers['mp_ssv_name'] = 'Name';
-    $column_headers['mp_ssv_email'] = 'Email';
-//    $column_headers['role'] = 'Roles';
-//    $column_headers['posts'] = 'Posts';
-    $column_headers['mp_ssv_emergency_contact_name'] = 'Emergency Contact Name / Relation';
+    global $wpdb;
+    if (get_option('mp_ssv_frontend_members_main_column') == 'wordpress_default') {
+        $column_headers['username'] = 'Username';
+    } else {
+        $column_headers['mp_ssv_member'] = 'Member';
+    }
+    $selected_columns = json_decode(get_option('mp_ssv_frontend_members_user_columns'));
+    $selected_columns = $selected_columns ?: array();
+    foreach ($selected_columns as $column) {
+        $sql = 'SELECT field_id FROM ' . FRONTEND_MEMBERS_FIELD_META_TABLE_NAME . ' WHERE meta_key = "name" AND meta_value = "' . $column . '"';
+        $sql = 'SELECT field_title FROM ' . FRONTEND_MEMBERS_FIELDS_TABLE_NAME . ' WHERE id = (' . $sql . ')';
+        $title = $wpdb->get_var($sql);
+        if (mp_ssv_starts_with($column, 'wp_')) {
+            $column = str_replace('wp_', '', $column);
+            $column_headers[strtolower($column)] = $column;
+        } else {
+            $column_headers['mp_ssv_' . $column] = $title;
+        }
+    }
     return $column_headers;
 }
 

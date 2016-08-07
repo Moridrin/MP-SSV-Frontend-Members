@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $selected = $selected ?: array();
                 $fieldNames = FrontendMembersField::getAllFieldNames();
                 ?>
-                <select size="<?= count($fieldNames) ?>" name="mp_ssv_frontend_members_user_columns[]" multiple title="Columns to Display">
+                <select size="<?= count($fieldNames) + 3 ?>" name="mp_ssv_frontend_members_user_columns[]" multiple title="Columns to Display">
                     <?php
                     foreach ($fieldNames as $fieldName) {
                         echo '<option value="' . $fieldName . '" ';
@@ -45,6 +45,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         }
                         echo '>' . $fieldName . '</option>';
                     }
+                    echo '<option value="blank" disabled>--- WP Defaults ---</option>';
+                    echo '<option value="wp_Role" ';
+                    if (in_array('wp_Role', $selected)) {
+                        echo 'selected';
+                    }
+                    echo '>Role</option>';
+                    echo '<option value="wp_Posts" ';
+                    if (in_array('wp_Posts', $selected)) {
+                        echo 'selected';
+                    }
+                    echo '>Posts</option>';
                     ?>
                 </select>
             </td>

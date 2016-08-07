@@ -2,6 +2,7 @@
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	global $options;
 	update_option('mp_ssv_frontend_members_register_page', $_POST['mp_ssv_frontend_members_register_page']);
+	update_option('mp_ssv_frontend_members_board_role', $_POST['mp_ssv_frontend_members_board_role']);
 	if (isset($_POST['mp_ssv_frontend_members_show_admin_bar_front'])) {
 		update_option('mp_ssv_frontend_members_show_admin_bar_front', 'true');
 	} else {
@@ -20,6 +21,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 					<option value="same_as_profile_page" <?php if (esc_attr(stripslashes(get_option('mp_ssv_frontend_members_register_page'))) == 'same_as_profile_page') { echo "selected"; } ?>>Same as Profile Page</option>
 					<option value="required_profile_page_fields_only"<?php if (esc_attr(stripslashes(get_option('mp_ssv_frontend_members_register_page'))) == 'required_profile_page_fields_only') { echo "selected"; } ?>>Required fields Only</option>
 					<option value="custom"<?php if (esc_attr(stripslashes(get_option('mp_ssv_frontend_members_register_page'))) == 'custom') { echo "selected"; } ?>>Custom</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th scope="row">Board Role</th>
+			<td>
+				<select name="mp_ssv_frontend_members_board_role" title="Board Role">
+					<?php wp_dropdown_roles(esc_attr(stripslashes(get_option('mp_ssv_frontend_members_board_role')))); ?>
 				</select>
 			</td>
 		</tr>
