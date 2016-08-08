@@ -82,7 +82,7 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
         if (current_theme_supports('mui')) {
             ?>
             <div class="mui-textfield">
-                <input type="<?php echo $this->input_type_custom; ?>" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="<?php echo $value; ?>" <?php if (!(new FrontendMember(wp_get_current_user()))->isBoard()) {
+                <input type="<?php echo $this->input_type_custom; ?>" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="<?php echo $value; ?>" <?php if (wp_get_current_user()->ID == 0 || !(new FrontendMember(wp_get_current_user()))->isBoard()) {
                     echo $this->display;
                 } ?>
                        placeholder="<?php echo $this->placeholder; ?>" <?php if ($this->required == "yes") {
@@ -94,7 +94,7 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
         } else {
             ?>
             <label><?php echo $this->title; ?></label>
-            <input type="<?php echo $this->input_type_custom; ?>" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="<?php echo $value; ?>" <?php if (!(new FrontendMember(wp_get_current_user()))->isBoard()) {
+            <input type="<?php echo $this->input_type_custom; ?>" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="<?php echo $value; ?>" <?php if (wp_get_current_user()->ID == 0 || !(new FrontendMember(wp_get_current_user()))->isBoard()) {
                 echo $this->display;
             } ?>
                    placeholder="<?php echo $this->placeholder; ?>" <?php if ($this->required == "yes") {
