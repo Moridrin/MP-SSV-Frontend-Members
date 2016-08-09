@@ -23,8 +23,8 @@ function mp_ssv_frontend_members_settings_page()
             <a href="?page=<?php echo __FILE__; ?>&tab=users_page_columns" class="nav-tab <?php if ($active_tab == "users_page_columns") {
                 echo "nav-tab-active";
             } ?>">Users Page Columns</a>
-			<a href="http://studentensurvival.com/mp-ssv/mp-ssv-frontend-members/" target="_blank" class="nav-tab">Help <img src="<?php echo plugin_dir_url('mp-ssv-general/images/link-new-tab.png'); ?>link-new-tab.png" width="14px"
-			                                                                                                                 style="vertical-align:middle"></a>
+            <a href="http://studentensurvival.com/mp-ssv/mp-ssv-frontend-members/" target="_blank" class="nav-tab">Help <img src="<?php echo plugin_dir_url('general/images/link-new-tab.png'); ?>link-new-tab.png" width="14px"
+                                                                                                                             style="vertical-align:middle"></a>
 		</h2>
 		<?php
 		if ($active_tab == "general") {

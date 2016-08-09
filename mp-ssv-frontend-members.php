@@ -44,8 +44,8 @@ add_action('wp_head', 'mp_ssv_use_recaptcha');
  */
 function mp_ssv_register_mp_ssv_frontend_members()
 {
-    if (!is_plugin_active('mp-ssv-general/mp-ssv-general.php')) {
-        wp_die('Sorry, but this plugin requires <a href="http://studentensurvival.com/plugins/mp-ssv-general">SSV General</a> to be installed and active. <br><a href="' . admin_url('plugins.php') . '">&laquo; Return to Plugins</a>');
+    if (!is_plugin_active('general/general.php')) {
+        wp_die('Sorry, but this plugin requires <a href="http://studentensurvival.com/plugins/general">SSV General</a> to be installed and active. <br><a href="' . admin_url('plugins.php') . '">&laquo; Return to Plugins</a>');
     }
 
     /* Database */
