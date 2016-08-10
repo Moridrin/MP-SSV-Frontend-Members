@@ -15,6 +15,8 @@
  * License URI: http://www.wtfpl.net/txt/copying/
  */
 
+require_once 'general/general.php';
+
 global $wpdb;
 define('FRONTEND_MEMBERS_FIELDS_TABLE_NAME', $wpdb->prefix . "mp_ssv_frontend_members_fields");
 define('FRONTEND_MEMBERS_FIELD_META_TABLE_NAME', $wpdb->prefix . "mp_ssv_frontend_members_field_meta");
