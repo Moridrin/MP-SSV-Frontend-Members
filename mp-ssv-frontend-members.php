@@ -1,14 +1,14 @@
 <?php
 /**
  * Plugin Name: SSV Frontend Members
- * Plugin URI: http://moridrin.com/mp-ssv-frontend-members
- * Description: SSV Frontend Members is a plugin that allows you to manage members of a Students Sports Club without
- * giving them access to the WordPress backend. With this plugin you can:
- *  - Have a frontend registration and login page
- *  - Add (mandatory) member data fields,
- *  - Easy manage and export (sections) of the members list.
- *  - Etc.
- * Version: 1.0
+ * Plugin URI: http://studentensurvival.com/mp-ssv-frontend-members
+ * Description: SSV Frontend Members is a plugin that allows you to manage members of a Students Sports Club the way you want to. With this plugin you can:
+ * - Have a frontend registration and login page
+ * - Customize member data fields,
+ * - Easy manage, view and edit member profiles.
+ * - Etc.
+ * This plugin is fully compatible with the MP-SSV library which can add functionality like: MailChimp, Events, etc.
+ * Version: 1.1.0
  * Author: Jeroen Berkvens
  * Author URI: http://nl.linkedin.com/in/jberkvens/
  * License: WTFPL
