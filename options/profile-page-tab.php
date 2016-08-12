@@ -53,6 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$new_field_content .= mp_ssv_get_td(mp_ssv_get_checkbox("Required", '\' + id + \'', "no"));
 	$new_field_content .= mp_ssv_get_td(mp_ssv_get_select("Display", '\' + id + \'', "normal", array("Normal", "ReadOnly", "Disabled")));
 	$new_field_content .= mp_ssv_get_td(mp_ssv_get_text_input("Placeholder", '\' + id + \'', ""));
+	$new_field_content .= mp_ssv_get_td(mp_ssv_get_checkbox("Registration Page", '\' + id + \'', "yes", array(), true));
+	$new_field_content .= mp_ssv_get_td(mp_ssv_get_text_input("Field Class", '\' + id + \'', ""));
+	$new_field_content .= mp_ssv_get_td(mp_ssv_get_text_input("Field Style", '\' + id + \'', ""));
 	$new_field = mp_ssv_get_tr('\' + id + \'', $new_field_content);
 	?>
 	function mp_ssv_add_new_field() {
