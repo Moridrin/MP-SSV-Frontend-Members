@@ -15,6 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	}
 	update_option('mp_ssv_recaptcha_site_key', $_POST['mp_ssv_recaptcha_site_key']);
 	update_option('mp_ssv_recaptcha_secret_key', $_POST['mp_ssv_recaptcha_secret_key']);
+	update_option('mp_ssv_member_admin', $_POST['mp_ssv_member_admin']);
 }
 ?>
 <form method="post" action="#">
@@ -76,6 +77,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			<th scope="row">reCAPTCHA Secret Key</th>
 			<td>
                 <input type="text" name="mp_ssv_recaptcha_secret_key" value="<?php echo get_option('mp_ssv_recaptcha_secret_key'); ?>" title="reCAPTCHA Secret Key">
+			</td>
+		</tr>
+		<tr>
+			<th scope="row">Members Admin (email)</th>
+			<td>
+				<input type="text" name="mp_ssv_member_admin" value="<?php echo get_option('mp_ssv_member_admin'); ?>" title="Members Admin (email)">
 			</td>
 		</tr>
 	</table>
