@@ -80,11 +80,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$("#" + sender_id + "_role").parent().remove();
 		$("#" + sender_id + "_input_type_custom").parent().remove();
 		$("." + sender_id + "_empty").parent().remove();
+        $("#" + sender_id + "_registration_page").parent().remove();
+        $("#" + sender_id + "_field_class").parent().remove();
+        $("#" + sender_id + "_field_style").parent().remove();
 		if (type == "input") {
 			$(tr).append(
 				'<?php echo mp_ssv_get_td(mp_ssv_get_select("Input Type", '\' + sender_id + \'', "text", array("Text", "Text Group Select", "Role Group Select", "Text Checkbox", "Role Checkbox", "Image"), array("onchange=\"mp_ssv_input_type_changed(' + sender_id + ')\""), true)); ?>'
 			).append(
-				'<?php echo mp_ssv_get_td(mp_ssv_get_text_input("Name", '\' + sender_id + \'', "")); ?>'
+                '<?php echo mp_ssv_get_td(mp_ssv_get_text_input("Name", '\' + sender_id + \'', "", 'text', array('required'))); ?>'
 			).append(
 				'<?php echo mp_ssv_get_td(mp_ssv_get_checkbox("Required", '\' + sender_id + \'', "no")); ?>'
 			).append(
@@ -105,6 +108,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				'<?php echo mp_ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
 			);
 		}
+        $(tr).append(
+            '<?php echo mp_ssv_get_td(mp_ssv_get_checkbox("Registration Page", '\' + sender_id + \'', "yes", array(), true)); ?>'
+        ).append(
+            '<?php echo mp_ssv_get_td(mp_ssv_get_text_input("Field Class", '\' + sender_id + \'', "")); ?>'
+        ).append(
+            '<?php echo mp_ssv_get_td(mp_ssv_get_text_input("Field Style", '\' + sender_id + \'', "")); ?>'
+        );
 	}
 </script>
 <!-- Change Input Type. -->
@@ -124,34 +134,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$("#" + sender_id + "_role").parent().remove();
 		$("#" + sender_id + "_input_type_custom").parent().remove();
 		$("." + sender_id + "_empty").parent().remove();
+        $("#" + sender_id + "_registration_page").parent().remove();
+        $("#" + sender_id + "_field_class").parent().remove();
+        $("#" + sender_id + "_field_style").parent().remove();
 		switch (input_type) {
 			case "text_select":
 				$(tr).append(
 					'<?php echo mp_ssv_get_td(mp_ssv_get_text_input("Name", '\' + sender_id + \'', "", "text", array("required"))); ?>'
 				).append(
-					'<?php echo mp_ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
+                    '<?php echo mp_ssv_get_td(mp_ssv_get_options('\' + sender_id + \'', array(), "text")); ?>'
 				).append(
-					'<?php echo mp_ssv_get_td(mp_ssv_get_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"))); ?>'
+                    '<?php echo mp_ssv_get_td(mp_ssv_get_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"))); ?>'
 				).append(
-					'<?php echo mp_ssv_get_td(mp_ssv_get_options('\' + sender_id + \'', array(), "text")); ?>'
+                    '<?php echo mp_ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
 				);
 				break;
 			case "role_select":
 				$(tr).append(
 					'<?php echo mp_ssv_get_td(mp_ssv_get_text_input("Name", '\' + sender_id + \'', "", "text", array("required"))); ?>'
 				).append(
-					'<?php echo mp_ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
+                    '<?php echo mp_ssv_get_td(mp_ssv_get_options('\' + sender_id + \'', array(), "role")); ?>'
 				).append(
 					'<?php echo mp_ssv_get_td(mp_ssv_get_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"))); ?>'
 				).append(
-					'<?php echo mp_ssv_get_td(mp_ssv_get_options('\' + sender_id + \'', array(), "role")); ?>'
+                    '<?php echo mp_ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
 				);
 				break;
 			case "text_checkbox":
 				$(tr).append(
 					'<?php echo mp_ssv_get_td(mp_ssv_get_text_input("Name", '\' + sender_id + \'', "", "text", array("required"))); ?>'
 				).append(
-					'<?php echo mp_ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
+                    '<?php echo mp_ssv_get_td(mp_ssv_get_checkbox("Required", '\' + sender_id + \'', "no")); ?>'
 				).append(
 					'<?php echo mp_ssv_get_td(mp_ssv_get_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"))); ?>'
 				).append(
@@ -160,13 +173,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				break;
 			case "role_checkbox":
 				$(tr).append(
-					'<?php echo mp_ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
+                    '<?php echo mp_ssv_get_td(mp_ssv_get_role_select('\' + sender_id + \'', "Role", "")); ?>'
 				).append(
 					'<?php echo mp_ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
 				).append(
 					'<?php echo mp_ssv_get_td(mp_ssv_get_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"))); ?>'
 				).append(
-					'<?php echo mp_ssv_get_td(mp_ssv_get_role_select('\' + sender_id + \'', "Role", "")); ?>'
+                    '<?php echo mp_ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
 				);
 				break;
 			case "image":
@@ -206,6 +219,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				);
 				break;
 		}
+        $(tr).append(
+            '<?php echo mp_ssv_get_td(mp_ssv_get_checkbox("Registration Page", '\' + sender_id + \'', "yes", array(), true)); ?>'
+        ).append(
+            '<?php echo mp_ssv_get_td(mp_ssv_get_text_input("Field Class", '\' + sender_id + \'', "")); ?>'
+        ).append(
+            '<?php echo mp_ssv_get_td(mp_ssv_get_text_input("Field Style", '\' + sender_id + \'', "")); ?>'
+        );
 	}
 </script>
 <!-- Add Text Option. -->
