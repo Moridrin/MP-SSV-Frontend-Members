@@ -90,7 +90,7 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
                 var removeImageClickHandler = function (e) {
                     $.ajax({
                         type: "POST",
-                        url: "/profile",
+                        url: "<?php echo wp_nonce_url('/profile', 'mp_ssv_remove_image_from_profile'); ?>",
                         data: {
                             remove_image: <?php echo $this->id; ?>,
                             user_id: <?php echo $frontend_member->ID; ?>

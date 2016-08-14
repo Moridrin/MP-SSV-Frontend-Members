@@ -34,7 +34,7 @@ function mp_ssv_profile_page_setup($content)
         return $content;
     }
 
-    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['remove_image'])) {
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['remove_image']) && check_admin_referer('mp_ssv_remove_image_from_profile')) {
         global $wpdb;
         $field_id = $_POST['remove_image'];
         $table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
@@ -45,7 +45,7 @@ function mp_ssv_profile_page_setup($content)
         $frontendMember->updateMeta($image_name . '_path', '');
         echo 'image successfully removed success';
         return '';
-    } elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('mp_ssv_save_frontend_member_profile')) {
         mp_ssv_save_members_profile();
     }
     $content = mp_ssv_profile_page_content();
@@ -79,7 +79,6 @@ function mp_ssv_profile_page_content()
 
 function mp_ssv_profile_page_content_tabs()
 {
-    $can_edit = false;
     if (isset($_GET['user_id'])) {
         $member = get_user_by('id', $_GET['user_id']);
         $action_url = '/profile/?user_id=' . $member->ID;
@@ -87,9 +86,8 @@ function mp_ssv_profile_page_content_tabs()
         $member = wp_get_current_user();
         $action_url = '/profile/';
     }
-    if ($member == wp_get_current_user() || current_user_can('edit_user')) {
-        $can_edit = true;
-    }
+    $can_edit = ($member == wp_get_current_user() || current_user_can('edit_user'));
+
     $member = new FrontendMember($member);
     ob_start();
     echo mp_ssv_get_profile_page_tab_select($member);
@@ -112,6 +110,7 @@ function mp_ssv_profile_page_content_tabs()
                 ?>
                 <?php
                 if ($can_edit) {
+                    wp_nonce_field('mp_ssv_save_frontend_member_profile');
                     ?>
                     <button class="mui-btn mui-btn--primary button-primary" type="submit" name="submit" id="submit">Save</button>
                     <?php
@@ -150,6 +149,7 @@ function mp_ssv_profile_page_content_single_page()
             }
         }
         if ($can_edit) {
+            wp_nonce_field('mp_ssv_save_frontend_member_profile');
             echo '<button class="mui-btn mui-btn--primary button-primary" type="submit" name="submit" id="submit">Save</button>';
         }
         ?>
@@ -206,7 +206,11 @@ function mp_ssv_save_members_profile()
         }
         $update_success = $user->updateMeta($name, $val);
         if (!$update_success) {
-            echo "Cannot change the user-login. Please consider setting the field display to 'disabled'";
+            ?>
+            <div class="mui-panel notification notification-error">
+                Cannot change the user-login. Please consider setting the field display to 'disabled'
+            </div>
+            <?php
         }
     }
     foreach ($_FILES as $name => $file) {

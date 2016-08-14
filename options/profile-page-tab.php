@@ -1,5 +1,12 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if (!current_user_can('manage_options')) {
+	?>
+	<p>You are unauthorized to view or edit this page.</p>
+	<?php
+	return;
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('mp_ssv_save_frontend_members_profile_page_options')) {
 	FrontendMembersField::saveAllFromPost();
 }
 ?>
@@ -18,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	</table>
 	<button type="button" id="add_field_button" onclick="mp_ssv_add_new_field()">Add Field</button>
 	<?php
+	wp_nonce_field('mp_ssv_save_frontend_members_profile_page_options');
 	submit_button();
 	?>
 </form>
@@ -64,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	}
 </script>
 <!-- Change Field Type. -->
+<!--suppress JSUnusedLocalSymbols -->
 <script>
 	function mp_ssv_type_changed(sender_id) {
 		var tr = document.getElementById(sender_id);
@@ -118,6 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	}
 </script>
 <!-- Change Input Type. -->
+<!--suppress JSUnusedLocalSymbols -->
 <script>
 	function mp_ssv_input_type_changed(sender_id) {
 		var tr = document.getElementById(sender_id);
@@ -229,6 +239,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	}
 </script>
 <!-- Add Text Option. -->
+<!--suppress JSUnusedLocalSymbols -->
 <script>
 	function add_text_option(sender_id) {
 		id++;
@@ -239,6 +250,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	}
 </script>
 <!-- Add Role Option. -->
+<!--suppress JSUnusedLocalSymbols -->
 <script>
 	function add_role_option(sender_id) {
 		var li = document.getElementById(sender_id + "_add_option").parentElement;

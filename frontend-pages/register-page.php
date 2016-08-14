@@ -16,7 +16,7 @@ function mp_ssv_register_page_setup($content)
             return $content;
         }
     }
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('mp_ssv_create_members_profile')) {
         mp_ssv_create_members_profile();
         ob_start();
         ?>
@@ -64,6 +64,7 @@ function mp_ssv_register_page_content()
         <div class="g-recaptcha" data-sitekey="<?php echo $site_key; ?>"></div>
         <input type="hidden" name="register" value="yes"/>
         <button class="mui-btn mui-btn--primary" type="submit" name="submit" id="submit">Register</button>
+        <?php wp_nonce_field('mp_ssv_create_members_profile'); ?>
     </form>
     <?php
 

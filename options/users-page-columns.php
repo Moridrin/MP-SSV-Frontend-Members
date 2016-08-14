@@ -1,11 +1,12 @@
 <?php
-/**
- * User: moridrin
- * Date: 7-8-16
- * Time: 9:50
- */
+if (!current_user_can('manage_options')) {
+    ?>
+    <p>You are unauthorized to view or edit this page.</p>
+    <?php
+    return;
+}
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('mp_ssv_save_frontend_members_users_page_columns_options')) {
     global $options;
     update_option('mp_ssv_frontend_members_main_column', $_POST['mp_ssv_frontend_members_main_column']);
     update_option('mp_ssv_frontend_members_user_columns', json_encode($_POST['mp_ssv_frontend_members_user_columns']));
@@ -61,5 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </td>
         </tr>
     </table>
+    <?php wp_nonce_field('mp_ssv_save_frontend_members_users_page_columns_options'); ?>
     <?php submit_button(); ?>
 </form>
