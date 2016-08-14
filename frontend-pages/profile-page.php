@@ -1,4 +1,7 @@
 <?php
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 /**
  * This function redirects the user to the login page if he/she is not signed in.

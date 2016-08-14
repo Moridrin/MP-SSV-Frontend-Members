@@ -1,4 +1,7 @@
 <?php
+if (!defined('ABSPATH')) {
+    exit;
+}
 add_filter('the_content', 'mp_ssv_frontend_members_content_filters', 100);
 function mp_ssv_frontend_members_content_filters($content)
 {

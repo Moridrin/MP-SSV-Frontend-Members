@@ -1,4 +1,8 @@
 <?php
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 /**
  * This function sets up the profile page.
  *

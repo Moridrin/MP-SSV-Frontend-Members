@@ -1,4 +1,7 @@
 <?php
+if (!defined('ABSPATH')) {
+	exit;
+}
 if (!current_user_can('manage_options')) {
 	?>
 	<p>You are unauthorized to view or edit this page.</p>

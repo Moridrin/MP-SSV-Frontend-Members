@@ -1,4 +1,7 @@
 <?php
+if (!defined('ABSPATH')) {
+	exit;
+}
 function mp_ssv_add_mp_ssv_frontend_members_options()
 {
 	add_submenu_page('mp_ssv_settings', 'Frontend Members Options', 'Frontend Members', 'manage_options', __FILE__, 'mp_ssv_frontend_members_settings_page');

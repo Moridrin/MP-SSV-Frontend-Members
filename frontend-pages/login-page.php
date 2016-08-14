@@ -1,4 +1,7 @@
 <?php
+if (!defined('ABSPATH')) {
+    exit;
+}
 function mp_ssv_login_page_content($content)
 {
     global $post;

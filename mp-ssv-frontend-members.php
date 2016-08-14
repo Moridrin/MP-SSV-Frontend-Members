@@ -1,4 +1,7 @@
 <?php
+if (!defined('ABSPATH')) {
+    exit;
+}
 /**
  * Plugin Name: SSV Frontend Members
  * Plugin URI: http://studentensurvival.com/mp-ssv-frontend-members
@@ -8,7 +11,7 @@
  * - Easy manage, view and edit member profiles.
  * - Etc.
  * This plugin is fully compatible with the MP-SSV library which can add functionality like: MailChimp, Events, etc.
- * Version: 1.1.0
+ * Version: 1.1.2
  * Author: Jeroen Berkvens
  * Author URI: http://nl.linkedin.com/in/jberkvens/
  * License: WTFPL
