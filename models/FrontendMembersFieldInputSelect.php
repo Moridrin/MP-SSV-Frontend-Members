@@ -103,8 +103,8 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
         if (current_theme_supports('mui')) {
             ?>
             <div class="mui-select mui-textfield">
-                <label for="<?php echo $this->id; ?>"><?php echo $this->title; ?></label>
-                <select id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>">
+                <label for="<?php echo esc_html($this->id); ?>"><?php echo esc_html($this->title); ?></label>
+                <select id="<?php echo esc_html($this->id); ?>" name="<?php echo esc_html($this->name); ?>" class="<?php echo esc_html($this->class); ?>" style="<?php echo $this->style; ?>">
                     <?php foreach ($this->options as $option) {
                         /* @var $option FrontendMembersFieldInputSelectRoleOption|FrontendMembersFieldInputSelectTextOption */
                         echo $option->getHTML($value);
@@ -115,8 +115,8 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
             <?php
         } else {
             ?>
-            <label for="<?php echo $this->id; ?>"><?php echo $this->title; ?></label>
-            <select id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>">
+            <label for="<?php echo esc_html($this->id); ?>"><?php echo esc_html($this->title); ?></label>
+            <select id="<?php echo esc_html($this->id); ?>" name="<?php echo esc_html($this->name); ?>" class="<?php echo esc_html($this->class); ?>" style="<?php echo $this->style; ?>">
                 <?php foreach ($this->options as $option) {
                     /* @var $option FrontendMembersFieldInputSelectRoleOption|FrontendMembersFieldInputSelectTextOption */
                     echo $option->getHTML($value);

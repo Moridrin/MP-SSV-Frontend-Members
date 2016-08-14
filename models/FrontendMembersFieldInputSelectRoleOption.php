@@ -28,7 +28,7 @@ class FrontendMembersFieldInputSelectRoleOption extends FrontendMembersFieldInpu
         ob_start();
         global $wp_roles;
         ?>
-        <option value="<?php echo $this->value; ?>" <?php if ($this->value == $selected_value) : echo "selected"; endif; ?>><?php echo translate_user_role($wp_roles->roles[$this->value]['name']); ?></option>
+        <option value="<?php echo esc_html($this->value); ?>" <?php if ($this->value == $selected_value) : echo "selected"; endif; ?>><?php echo esc_html(translate_user_role($wp_roles->roles[$this->value]['name'])); ?></option>
         <?php
         return ob_get_clean();
     }
