@@ -99,8 +99,8 @@ function mp_ssv_profile_page_content_tabs()
             $active_class = "";
         }
         ?>
-        <div class="mui-tabs__pane <?php echo $active_class; ?>" id="pane-<?php echo $tab->id; ?>">
-            <form name="members_<?php echo $tab->title; ?>_form" id="member_<?php echo $tab->title; ?>_form" action="<?php echo $action_url ?>" method="post" enctype="multipart/form-data">
+        <div class="mui-tabs__pane <?php echo esc_html($active_class); ?>" id="pane-<?php echo esc_html($tab->id); ?>">
+            <form name="members_<?php echo esc_html($tab->title); ?>_form" id="member_<?php echo esc_html($tab->title); ?>_form" action="<?php echo esc_html($action_url) ?>" method="post" enctype="multipart/form-data">
                 <?php
                 $items_in_tab = FrontendMembersField::getItemsInTab($tab);
                 foreach ($items_in_tab as $item) {

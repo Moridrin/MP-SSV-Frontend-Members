@@ -8,8 +8,8 @@ if (!current_user_can('manage_options')) {
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('mp_ssv_save_frontend_members_users_page_columns_options')) {
     global $options;
-    update_option('mp_ssv_frontend_members_main_column', $_POST['mp_ssv_frontend_members_main_column']);
-    update_option('mp_ssv_frontend_members_user_columns', json_encode($_POST['mp_ssv_frontend_members_user_columns']));
+    update_option('mp_ssv_frontend_members_main_column', sanitize_text_field($_POST['mp_ssv_frontend_members_main_column']));
+    update_option('mp_ssv_frontend_members_user_columns', sanitize_text_field(json_encode($_POST['mp_ssv_frontend_members_user_columns'])));
 }
 ?>
 <form method="post" action="#">

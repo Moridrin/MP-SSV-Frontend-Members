@@ -91,7 +91,7 @@ function mp_ssv_create_members_profile()
         if (strpos($name, "_reset") !== false) {
             $name = str_replace("_reset", "", $name);
         }
-        $user->updateMeta($name, $val);
+        $user->updateMeta($name, sanitize_text_field($val));
     }
     $user->updateMeta("display_name", $user->getMeta('first_name') . ' ' . $user->getMeta('last_name'));
     foreach ($_FILES as $name => $file) {
@@ -106,12 +106,12 @@ function mp_ssv_create_members_profile()
         }
     }
     $user->remove_role('subscriber');
-    $user->add_role('member');
+    $user->add_role(get_option('mp_ssv_frontend_members_default_member_role'));
     $to = get_option('mp_ssv_member_admin');
     $subject = "New Member Registration";
-    $message = 'A new member has registered:<br/><br/><a href="' . get_site_url() . '/profile/?user_id=' . $user->ID . '" target="_blank">' . $user->display_name . '</a><br/><br/>Greetings, Jeroen Berkvens.';
+    $message = 'A new member has registered:<br/><br/><a href="' . get_site_url() . '/profile/?user_id=' . $user->ID . '" target="_blank">' . $user->display_name . '</a><br/><br/>Greetings.';
 
-    $headers = "From: webmaster@AllTerrain.nl" . "\r\n";
+    $headers = "From: $to" . "\r\n";
     add_filter('wp_mail_content_type', create_function('', 'return "text/html";'));
     wp_mail($to, $subject, $message, $headers);
     if (is_plugin_active('mp-ssv-mailchimp/mp-ssv-mailchimp.php')) {
@@ -121,5 +121,4 @@ function mp_ssv_create_members_profile()
 }
 
 add_filter('the_content', 'mp_ssv_register_page_setup', 9);
-
 ?>

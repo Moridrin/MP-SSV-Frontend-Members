@@ -8,8 +8,9 @@ if (!current_user_can('manage_options')) {
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('mp_ssv_save_frontend_members_general_options')) {
     global $options;
-    update_option('mp_ssv_frontend_members_register_page', $_POST['mp_ssv_frontend_members_register_page']);
-    update_option('mp_ssv_frontend_members_board_role', $_POST['mp_ssv_frontend_members_board_role']);
+    update_option('mp_ssv_frontend_members_register_page', sanitize_text_field($_POST['mp_ssv_frontend_members_register_page']));
+    update_option('mp_ssv_frontend_members_default_member_role', sanitize_text_field($_POST['mp_ssv_frontend_members_default_member_role']));
+    update_option('mp_ssv_frontend_members_board_role', sanitize_text_field($_POST['mp_ssv_frontend_members_board_role']));
     if (isset($_POST['mp_ssv_view_advanced_profile_page'])) {
         update_option('mp_ssv_view_advanced_profile_page', 'true');
     } else {
@@ -20,9 +21,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('mp_ssv_save_fro
     } else {
         update_option('mp_ssv_frontend_members_show_admin_bar_front', 'false');
     }
-    update_option('mp_ssv_recaptcha_site_key', $_POST['mp_ssv_recaptcha_site_key']);
-    update_option('mp_ssv_recaptcha_secret_key', $_POST['mp_ssv_recaptcha_secret_key']);
-    update_option('mp_ssv_member_admin', $_POST['mp_ssv_member_admin']);
+    update_option('mp_ssv_recaptcha_site_key', sanitize_text_field($_POST['mp_ssv_recaptcha_site_key']));
+    update_option('mp_ssv_recaptcha_secret_key', sanitize_text_field($_POST['mp_ssv_recaptcha_secret_key']));
+    update_option('mp_ssv_member_admin', sanitize_text_field($_POST['mp_ssv_member_admin']));
 }
 ?>
 <form method="post" action="#">
@@ -43,6 +44,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('mp_ssv_save_fro
                         echo "selected";
                     } ?>>Custom
                     </option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">Default Member Role</th>
+            <td>
+                <select name="mp_ssv_frontend_members_default_member_role" title="Default Member Role">
+                    <?php wp_dropdown_roles(esc_attr(stripslashes(get_option('mp_ssv_frontend_members_default_member_role')))); ?>
                 </select>
             </td>
         </tr>

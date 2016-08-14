@@ -265,7 +265,15 @@ class FrontendMembersField
                 $variables[str_replace($id . "_", "", $name)] = $value;
             }
         }
-        $field = new FrontendMembersField($id, $variables['field_index'], $variables["field_type"], $variables["field_title"], $variables["registration_page"], $variables['field_class'], $variables['field_style']);
+        $field = new FrontendMembersField(
+            $id,
+            sanitize_text_field($variables['field_index']),
+            sanitize_text_field($variables["field_type"]),
+            sanitize_text_field($variables["field_title"]),
+            sanitize_text_field($variables["registration_page"]),
+            sanitize_text_field($variables['field_class']),
+            sanitize_text_field($variables['field_style'])
+        );
         unset($variables["id"]);
         unset($variables["field_type"]);
         unset($variables["field_title"]);
@@ -327,7 +335,7 @@ class FrontendMembersField
             return "no";
         }
 
-        return $_POST[$this->id . "_" . $key];
+        return sanitize_text_field($_POST[$this->id . "_" . $key]);
     }
 
     /**
