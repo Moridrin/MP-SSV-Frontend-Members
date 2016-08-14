@@ -34,7 +34,7 @@ require_once "content_filters.php";
 function mp_ssv_use_recaptcha()
 {
     $url = plugins_url('mp-ssv-frontend-members/include/google_recaptcha_api.js');
-    echo '<script src="' . $url . '"></script>';
+    echo '<script src="' . esc_url($url) . '"></script>';
 }
 
 add_action('wp_head', 'mp_ssv_use_recaptcha');
@@ -46,10 +46,6 @@ add_action('wp_head', 'mp_ssv_use_recaptcha');
  */
 function mp_ssv_register_mp_ssv_frontend_members()
 {
-    if (!is_plugin_active('general/general.php')) {
-        wp_die('Sorry, but this plugin requires <a href="http://studentensurvival.com/plugins/general">SSV General</a> to be installed and active. <br><a href="' . admin_url('plugins.php') . '">&laquo; Return to Plugins</a>');
-    }
-
     /* Database */
     global $wpdb;
     /** @noinspection PhpIncludeInspection */
@@ -124,9 +120,6 @@ register_activation_hook(__FILE__, 'mp_ssv_register_mp_ssv_frontend_members');
  */
 function mp_ssv_unregister_mp_ssv_frontend_members()
 {
-    if (is_plugin_active('MP-SSV-Google-Apps/mp-ssv-google-apps.php')) {
-        wp_die('Sorry, but this plugin is required by SSV Frontend Members. Deactivate SSV Frontend Members before deactivating this plugin. <br><a href="' . admin_url('plugins.php') . '">&laquo; Return to Plugins</a>');
-    }
     wp_delete_post(get_option('register_post_id'), true);
     wp_delete_post(get_option('login_post_id'), true);
     wp_delete_post(get_option('profile_post_id'), true);
@@ -171,7 +164,7 @@ function mp_ssv_frontend_members_avatar($avatar, $id_or_email, $size = 150, $def
     }
 
     if ($user && is_object($user)) {
-        $custom_avatar = get_user_meta($user->ID, 'profile_picture', true);
+        $custom_avatar = esc_url(get_user_meta($user->ID, 'profile_picture', true));
         if (isset($custom_avatar) && !empty($custom_avatar)) {
             $avatar = "<img alt='{$alt}' src='{$custom_avatar}' class='avatar avatar-{$size} photo' height='{$size}' width='{$size}' />";
         }
@@ -245,11 +238,11 @@ function mp_ssv_custom_user_column_values($val, $column_name, $user_id)
     $frontendMember = FrontendMember::get_by_id($user_id);
     if ($column_name == 'mp_ssv_member') {
         $username_block = '';
-        $username_block .= '<img style="float: left; margin-right: 10px; margin-top: 1px;" class="avatar avatar-32 photo" src="' . $frontendMember->getMeta('profile_picture') . '" height="32" width="32"/>';
+        $username_block .= '<img style="float: left; margin-right: 10px; margin-top: 1px;" class="avatar avatar-32 photo" src="' . esc_url($frontendMember->getMeta('profile_picture')) . '" height="32" width="32"/>';
         $username_block .= '<strong>' . $frontendMember->getProfileLink() . '</strong><br/>';
         $editURL = 'user-edit.php?user_id=' . $frontendMember->ID . '&wp_http_referer=%2Fwp-admin%2Fusers.php';
         $capebilitiesURL = 'users.php?page=users-user-role-editor.php&object=user&user_id=' . $frontendMember->ID;
-        $username_block .= '<div class="row-actions"><span class="edit"><a href="' . $editURL . '">Edit</a> | </span><span class="capabilities"><a href="' . $capebilitiesURL . '">Capabilities</a></span></div>';
+        $username_block .= '<div class="row-actions"><span class="edit"><a href="' . esc_url($editURL) . '">Edit</a> | </span><span class="capabilities"><a href="' . esc_url($capebilitiesURL) . '">Capabilities</a></span></div>';
         return $username_block;
     } elseif (mp_ssv_starts_with($column_name, 'mp_ssv_')) {
         return $frontendMember->getMeta(str_replace('mp_ssv_', '', $column_name));

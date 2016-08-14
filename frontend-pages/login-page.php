@@ -12,7 +12,7 @@ function mp_ssv_login_page_content($content)
             if (is_user_logged_in()) {
                 $current_user = wp_get_current_user();
                 $url = (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '?logout=success';
-                $link = '<a href="' . wp_logout_url($url) . '">Logout</a>';
+                $link = '<a href="' . esc_url(wp_logout_url($url)) . '">Logout</a>';
                 ob_start();
                 ?>
                 <div class="mui-panel notification">

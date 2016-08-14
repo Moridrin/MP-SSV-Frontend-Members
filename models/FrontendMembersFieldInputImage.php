@@ -80,7 +80,7 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
             echo '<input type="file" id="' . $this->id . '" name="' . $this->name . '" class="' . $this->class . '" style="' . $this->style . '" />';
         }
         if ($this->preview == "yes" && $location != '') {
-            echo '<img id="' . $this->id . '_preview" src="' . $location . '" style="padding-top: 10px;" height="' . $size . '" width="' . $size . '">';
+            echo '<img id="' . $this->id . '_preview" src="' . esc_url($location) . '" style="padding-top: 10px;" height="' . $size . '" width="' . $size . '">';
         }
         if ($this->required == 'no' && $location != "") {
             ?>

@@ -109,7 +109,8 @@ function mp_ssv_create_members_profile()
     $user->add_role(get_option('mp_ssv_frontend_members_default_member_role'));
     $to = get_option('mp_ssv_member_admin');
     $subject = "New Member Registration";
-    $message = 'A new member has registered:<br/><br/><a href="' . get_site_url() . '/profile/?user_id=' . $user->ID . '" target="_blank">' . $user->display_name . '</a><br/><br/>Greetings.';
+    $url = get_site_url() . '/profile/?user_id=' . $user->ID;
+    $message = 'A new member has registered:<br/><br/><a href="' . esc_url($url) . '" target="_blank">' . $user->display_name . '</a><br/><br/>Greetings.';
 
     $headers = "From: $to" . "\r\n";
     add_filter('wp_mail_content_type', create_function('', 'return "text/html";'));
