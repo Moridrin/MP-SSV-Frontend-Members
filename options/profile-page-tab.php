@@ -38,8 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('mp_ssv_save_fro
 <?php wp_enqueue_script('jquery-ui-tabs'); ?>
 <?php wp_enqueue_script('jquery-ui-sortable'); ?>
 <?php wp_enqueue_script('jquery-ui-draggable'); ?>
-<!--<script src="--><?php //echo plugins_url("/mp-ssv-frontend-members/include/jquery-2.2.0.js"); ?><!--"></script>-->
-<!--<script src="--><?php //echo plugins_url("/mp-ssv-frontend-members/include/jquery-ui.js"); ?><!--"></script>-->
 <script>
     var $ = jQuery.noConflict();
     $(function () {
