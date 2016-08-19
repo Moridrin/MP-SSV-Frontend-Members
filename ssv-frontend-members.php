@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
  * - Easy manage, view and edit member profiles.
  * - Etc.
  * This plugin is fully compatible with the SSV library which can add functionality like: MailChimp, Events, etc.
- * Version: 1.1.5
+ * Version: 1.2.0
  * Author: Jeroen Berkvens
  * Author URI: http://nl.linkedin.com/in/jberkvens/
  * License: WTFPL

@@ -37,6 +37,9 @@ The best way is to add an issue on GitHub (https://github.com/Moridrin/ssv-front
 
 == Changelog ==
 
+= 1.2.0 =
+* Fixed all bugs that came as result of 1.1.5
+
 = 1.1.5 =
 * MP-SSV changed to SSV.
 
