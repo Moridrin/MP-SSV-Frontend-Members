@@ -47,11 +47,11 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
     public function getOptionRow()
     {
         ob_start();
-        echo mp_ssv_get_td(mp_ssv_get_text_input("Name", $this->id, $this->name, 'text', array('required')));
-        echo mp_ssv_get_td(mp_ssv_get_checkbox("Required", $this->id, $this->required));
-        echo mp_ssv_get_td(mp_ssv_get_checkbox("Preview", $this->id, $this->preview));
-        if (get_option('mp_ssv_view_advanced_profile_page', false)) {
-            echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+        echo ssv_get_td(ssv_get_text_input("Name", $this->id, $this->name, 'text', array('required')));
+        echo ssv_get_td(ssv_get_checkbox("Required", $this->id, $this->required));
+        echo ssv_get_td(ssv_get_checkbox("Preview", $this->id, $this->preview));
+        if (get_option('ssv_view_advanced_profile_page', false)) {
+            echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
         }
         $content = ob_get_clean();
 
@@ -93,7 +93,7 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
                 var removeImageClickHandler = function (e) {
                     $.ajax({
                         type: "POST",
-                        url: "<?php echo wp_nonce_url('/profile', 'mp_ssv_remove_image_from_profile'); ?>",
+                        url: "<?php echo wp_nonce_url('/profile', 'ssv_remove_image_from_profile'); ?>",
                         data: {
                             remove_image: <?php echo $this->id; ?>,
                             user_id: <?php echo $frontend_member->ID; ?>

@@ -47,10 +47,10 @@ class FrontendMembersFieldInputTextCheckbox extends FrontendMembersFieldInput
 	public function getOptionRow()
 	{
 		ob_start();
-		echo mp_ssv_get_td(mp_ssv_get_text_input("Name", $this->id, $this->name, "text", array("required")));
-		echo mp_ssv_get_td(mp_ssv_get_checkbox("Required", $this->id, $this->required));
-		echo mp_ssv_get_td(mp_ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
-		echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+        echo ssv_get_td(ssv_get_text_input("Name", $this->id, $this->name, "text", array("required")));
+        echo ssv_get_td(ssv_get_checkbox("Required", $this->id, $this->required));
+        echo ssv_get_td(ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
+        echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
 		$content = ob_get_clean();
 
 		return parent::getOptionRowInput($content);

@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 /**
  * This function redirects the user to the login page if he/she is not signed in.
  */
-function mp_ssv_profile_page_login_redirect()
+function ssv_profile_page_login_redirect()
 {
     global $post;
     if ($post == null) {
@@ -19,7 +19,7 @@ function mp_ssv_profile_page_login_redirect()
     }
 }
 
-add_action('wp_head', 'mp_ssv_profile_page_login_redirect', 9);
+add_action('wp_head', 'ssv_profile_page_login_redirect', 9);
 
 /**
  * This function sets up the profile page.
@@ -28,16 +28,16 @@ add_action('wp_head', 'mp_ssv_profile_page_login_redirect', 9);
  *
  * @return string the edited post content.
  */
-function mp_ssv_profile_page_setup($content)
+function ssv_profile_page_setup($content)
 {
     global $post;
     if ($post->post_name != 'profile') { //Not the Profile Page
         return $content;
-    } elseif (strpos($content, '[mp-ssv-frontend-members-profile]') === false) { //Not the Profile Page Tag
+    } elseif (strpos($content, '[ssv-frontend-members-profile]') === false) { //Not the Profile Page Tag
         return $content;
     }
 
-    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['remove_image']) && check_admin_referer('mp_ssv_remove_image_from_profile')) {
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['remove_image']) && check_admin_referer('ssv_remove_image_from_profile')) {
         global $wpdb;
         $field_id = $_POST['remove_image'];
         $table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
@@ -48,10 +48,10 @@ function mp_ssv_profile_page_setup($content)
         $frontendMember->updateMeta($image_name . '_path', '');
         echo 'image successfully removed success';
         return '';
-    } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('mp_ssv_save_frontend_member_profile')) {
-        mp_ssv_save_members_profile();
+    } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_frontend_member_profile')) {
+        ssv_save_members_profile();
     }
-    $content = mp_ssv_profile_page_content();
+    $content = ssv_profile_page_content();
 
     return $content;
 }
@@ -59,28 +59,28 @@ function mp_ssv_profile_page_setup($content)
 /**
  * @return string the content of the Profile Page.
  */
-function mp_ssv_profile_page_content()
+function ssv_profile_page_content()
 {
     $tabs = FrontendMembersField::getTabs();
     if (current_theme_supports('mui')) {
         if (count($tabs) > 0) {
             $content = '<div class="mui--hidden-xs">';
-            $content .= mp_ssv_profile_page_content_tabs();
+            $content .= ssv_profile_page_content_tabs();
             $content .= '</div>';
             $content .= '<div class="mui--visible-xs-block">';
-            $content .= mp_ssv_profile_page_content_single_page();
+            $content .= ssv_profile_page_content_single_page();
             $content .= '</div>';
         } else {
-            $content = mp_ssv_profile_page_content_single_page();
+            $content = ssv_profile_page_content_single_page();
         }
     } else {
-        $content = mp_ssv_profile_page_content_single_page();
+        $content = ssv_profile_page_content_single_page();
     }
 
     return $content;
 }
 
-function mp_ssv_profile_page_content_tabs()
+function ssv_profile_page_content_tabs()
 {
     if (isset($_GET['user_id'])) {
         $member = get_user_by('id', $_GET['user_id']);
@@ -93,7 +93,7 @@ function mp_ssv_profile_page_content_tabs()
 
     $member = new FrontendMember($member);
     ob_start();
-    echo mp_ssv_get_profile_page_tab_select($member);
+    echo ssv_get_profile_page_tab_select($member);
     $tabs = FrontendMembersField::getTabs();
     foreach ($tabs as $tab) {
         if ($tabs[0] == $tab) {
@@ -113,7 +113,7 @@ function mp_ssv_profile_page_content_tabs()
                 ?>
                 <?php
                 if ($can_edit) {
-                    wp_nonce_field('mp_ssv_save_frontend_member_profile');
+                    wp_nonce_field('ssv_save_frontend_member_profile');
                     ?>
                     <button class="mui-btn mui-btn--primary button-primary" type="submit" name="submit" id="submit">Save</button>
                     <?php
@@ -127,7 +127,7 @@ function mp_ssv_profile_page_content_tabs()
     return ob_get_clean();
 }
 
-function mp_ssv_profile_page_content_single_page()
+function ssv_profile_page_content_single_page()
 {
     $can_edit = false;
     if (isset($_GET['user_id'])) {
@@ -152,7 +152,7 @@ function mp_ssv_profile_page_content_single_page()
             }
         }
         if ($can_edit) {
-            wp_nonce_field('mp_ssv_save_frontend_member_profile');
+            wp_nonce_field('ssv_save_frontend_member_profile');
             echo '<button class="mui-btn mui-btn--primary button-primary" type="submit" name="submit" id="submit">Save</button>';
         }
         ?>
@@ -171,7 +171,7 @@ function mp_ssv_profile_page_content_single_page()
  *
  * @return string containing a mui-tabs__bar.
  */
-function mp_ssv_get_profile_page_tab_select($member)
+function ssv_get_profile_page_tab_select($member)
 {
     ob_start();
     $tabs = FrontendMembersField::getTabs();
@@ -195,7 +195,7 @@ function mp_ssv_get_profile_page_tab_select($member)
     return ob_get_clean();
 }
 
-function mp_ssv_save_members_profile()
+function ssv_save_members_profile()
 {
     if (isset($_GET['user_id'])) {
         $user = get_user_by('id', $_GET['user_id']);
@@ -237,12 +237,12 @@ function mp_ssv_save_members_profile()
     }
     /** @noinspection PhpIncludeInspection */
     require_once(ABSPATH . 'wp-admin/includes/plugin.php');
-    if (is_plugin_active('mp-ssv-mailchimp/mp-ssv-mailchimp.php')) {
-        mp_ssv_update_mailchimp_member($user);
+    if (is_plugin_active('ssv-mailchimp/ssv-mailchimp.php')) {
+        ssv_update_mailchimp_member($user);
     }
     unset($_POST);
 }
 
-add_filter('the_content', 'mp_ssv_profile_page_setup');
+add_filter('the_content', 'ssv_profile_page_setup');
 
 ?>

@@ -133,7 +133,7 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
     public function getOptionRow()
     {
         ob_start();
-        echo mp_ssv_get_td(mp_ssv_get_text_input("Name", $this->id, $this->name, "text", array("required")));
+        echo ssv_get_td(ssv_get_text_input("Name", $this->id, $this->name, "text", array("required")));
         return ob_get_clean();
     }
 }

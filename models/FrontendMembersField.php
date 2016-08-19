@@ -431,23 +431,23 @@ class FrontendMembersField
     protected function getOptionRowField($content, $visible = true)
     {
         ob_start();
-        echo mp_ssv_get_td(mp_ssv_get_draggable_icon());
-        echo mp_ssv_get_td(mp_ssv_get_text_input("Field Title", $this->id, $this->title));
+        echo ssv_get_td(ssv_get_draggable_icon());
+        echo ssv_get_td(ssv_get_text_input("Field Title", $this->id, $this->title));
         if (get_theme_support('mui')) {
-            echo mp_ssv_get_td(mp_ssv_get_select("Field Type", $this->id, $this->type, array("Tab", "Header", "Input"), array('onchange="mp_ssv_type_changed(\'' . $this->id . '\')"')));
+            echo ssv_get_td(ssv_get_select("Field Type", $this->id, $this->type, array("Tab", "Header", "Input"), array('onchange="ssv_type_changed(\'' . $this->id . '\')"')));
         } else {
-            echo mp_ssv_get_td(mp_ssv_get_select("Field Type", $this->id, $this->type, array("Header", "Input"), array('onchange="mp_ssv_type_changed(\'' . $this->id . '\')"')));
+            echo ssv_get_td(ssv_get_select("Field Type", $this->id, $this->type, array("Header", "Input"), array('onchange="ssv_type_changed(\'' . $this->id . '\')"')));
         }
         echo $content;
-        if (get_option('mp_ssv_frontend_members_register_page', 'same_as_profile_page') == 'custom') {
-            echo mp_ssv_get_td(mp_ssv_get_checkbox('Registration Page', $this->id, $this->registration_page, array(), true));
+        if (get_option('ssv_frontend_members_register_page', 'same_as_profile_page') == 'custom') {
+            echo ssv_get_td(ssv_get_checkbox('Registration Page', $this->id, $this->registration_page, array(), true));
         }
-        if (get_option('mp_ssv_view_advanced_profile_page', 'false') == 'true') {
-            echo mp_ssv_get_td(mp_ssv_get_text_input('Field Class', $this->id, $this->class));
-            echo mp_ssv_get_td(mp_ssv_get_text_input('Field Style', $this->id, $this->style));
+        if (get_option('ssv_view_advanced_profile_page', 'false') == 'true') {
+            echo ssv_get_td(ssv_get_text_input('Field Class', $this->id, $this->class));
+            echo ssv_get_td(ssv_get_text_input('Field Style', $this->id, $this->style));
         }
 
-        return mp_ssv_get_tr($this->id, ob_get_clean(), $visible);
+        return ssv_get_tr($this->id, ob_get_clean(), $visible);
     }
 
     protected function save($remove = false)

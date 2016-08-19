@@ -2,14 +2,14 @@
 if (!defined('ABSPATH')) {
     exit;
 }
-function mp_ssv_login_page_content($content)
+function ssv_login_page_content($content)
 {
     global $post;
     ob_start();
     if ($post->post_name != 'login') {
         return $content;
     } else {
-        if (strpos($content, '[mp-ssv-frontend-members-login]') === false) {
+        if (strpos($content, '[ssv-frontend-members-login]') === false) {
             return $content;
         } else {
             if (is_user_logged_in()) {
@@ -82,5 +82,5 @@ function mp_ssv_login_page_content($content)
     return $content;
 }
 
-add_filter('the_content', 'mp_ssv_login_page_content');
+add_filter('the_content', 'ssv_login_page_content');
 ?>

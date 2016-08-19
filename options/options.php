@@ -2,12 +2,12 @@
 if (!defined('ABSPATH')) {
 	exit;
 }
-function mp_ssv_add_mp_ssv_frontend_members_options()
+function ssv_add_ssv_frontend_members_options()
 {
-	add_submenu_page('mp_ssv_settings', 'Frontend Members Options', 'Frontend Members', 'manage_options', __FILE__, 'mp_ssv_frontend_members_settings_page');
+    add_submenu_page('ssv_settings', 'Frontend Members Options', 'Frontend Members', 'manage_options', __FILE__, 'ssv_frontend_members_settings_page');
 }
 
-function mp_ssv_frontend_members_settings_page()
+function ssv_frontend_members_settings_page()
 {
 	$active_tab = "general";
 	if (isset($_GET['tab'])) {
@@ -26,8 +26,8 @@ function mp_ssv_frontend_members_settings_page()
             <a href="?page=<?php echo __FILE__; ?>&tab=users_page_columns" class="nav-tab <?php if ($active_tab == "users_page_columns") {
                 echo "nav-tab-active";
             } ?>">Users Page Columns</a>
-			<a href="http://studentensurvival.com/mp-ssv/mp-ssv-frontend-members/" target="_blank" class="nav-tab">Help <img src="<?php echo plugin_dir_url(__DIR__); ?>general/images/link-new-tab.png" width="14px"
-																															 style="vertical-align:middle"></a>
+            <a href="http://studentensurvival.com/ssv/ssv-frontend-members/" target="_blank" class="nav-tab">Help <img src="<?php echo plugin_dir_url(__DIR__); ?>general/images/link-new-tab.png" width="14px"
+                                                                                                                       style="vertical-align:middle"></a>
 		</h2>
 		<?php
 		if ($active_tab == "general") {
@@ -42,5 +42,5 @@ function mp_ssv_frontend_members_settings_page()
 	<?php
 }
 
-add_action('admin_menu', 'mp_ssv_add_mp_ssv_frontend_members_options');
+add_action('admin_menu', 'ssv_add_ssv_frontend_members_options');
 ?>

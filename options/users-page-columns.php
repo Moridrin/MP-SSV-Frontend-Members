@@ -9,10 +9,10 @@ if (!current_user_can('manage_options')) {
     return;
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('mp_ssv_save_frontend_members_users_page_columns_options')) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_frontend_members_users_page_columns_options')) {
     global $options;
-    update_option('mp_ssv_frontend_members_main_column', sanitize_text_field($_POST['mp_ssv_frontend_members_main_column']));
-    update_option('mp_ssv_frontend_members_user_columns', sanitize_text_field(json_encode($_POST['mp_ssv_frontend_members_user_columns'])));
+    update_option('ssv_frontend_members_main_column', sanitize_text_field($_POST['ssv_frontend_members_main_column']));
+    update_option('ssv_frontend_members_user_columns', sanitize_text_field(json_encode($_POST['ssv_frontend_members_user_columns'])));
 }
 ?>
 <form method="post" action="#">
@@ -20,12 +20,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('mp_ssv_save_fro
         <tr>
             <th scope="row">Main Column</th>
             <td>
-                <select name="mp_ssv_frontend_members_main_column" title="Main Column">
-                    <option value="plugin_default" <?php if (esc_attr(stripslashes(get_option('mp_ssv_frontend_members_main_column'))) == 'plugin_default') {
+                <select name="ssv_frontend_members_main_column" title="Main Column">
+                    <option value="plugin_default" <?php if (esc_attr(stripslashes(get_option('ssv_frontend_members_main_column'))) == 'plugin_default') {
                         echo "selected";
                     } ?>>Plugin Default
                     </option>
-                    <option value="wordpress_default"<?php if (esc_attr(stripslashes(get_option('mp_ssv_frontend_members_main_column'))) == 'wordpress_default') {
+                    <option value="wordpress_default"<?php if (esc_attr(stripslashes(get_option('ssv_frontend_members_main_column'))) == 'wordpress_default') {
                         echo "selected";
                     } ?>>Wordpress Default
                     </option>
@@ -36,11 +36,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('mp_ssv_save_fro
             <th scope="row">Columns to Display</th>
             <td>
                 <?php
-                $selected = json_decode(get_option('mp_ssv_frontend_members_user_columns'));
+                $selected = json_decode(get_option('ssv_frontend_members_user_columns'));
                 $selected = $selected ?: array();
                 $fieldNames = FrontendMembersField::getAllFieldNames();
                 ?>
-                <select size="<?= count($fieldNames) + 3 ?>" name="mp_ssv_frontend_members_user_columns[]" multiple title="Columns to Display">
+                <select size="<?= count($fieldNames) + 3 ?>" name="ssv_frontend_members_user_columns[]" multiple title="Columns to Display">
                     <?php
                     foreach ($fieldNames as $fieldName) {
                         echo '<option value="' . $fieldName . '" ';
@@ -65,6 +65,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('mp_ssv_save_fro
             </td>
         </tr>
     </table>
-    <?php wp_nonce_field('mp_ssv_save_frontend_members_users_page_columns_options'); ?>
+    <?php wp_nonce_field('ssv_save_frontend_members_users_page_columns_options'); ?>
     <?php submit_button(); ?>
 </form>

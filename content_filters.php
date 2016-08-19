@@ -2,30 +2,30 @@
 if (!defined('ABSPATH')) {
     exit;
 }
-add_filter('the_content', 'mp_ssv_frontend_members_content_filters', 100);
-function mp_ssv_frontend_members_content_filters($content)
+add_filter('the_content', 'ssv_frontend_members_content_filters', 100);
+function ssv_frontend_members_content_filters($content)
 {
-    if (strpos($content, '[mp_ssv_loop_committees]') !== false) {
+    if (strpos($content, '[ssv_loop_committees]') !== false) {
         $index = 0;
         $counter = 0;
-        while (strpos($content, '[mp_ssv_loop_committees]', $index) !== false) {
-            $looping_string = explode('[mp_ssv_loop_committees]', $content)[$counter + 1];
-            $looping_string = explode('[/mp_ssv_loop_committees]', $looping_string)[0];
-            $replacingString = mp_ssv_loop_committees($looping_string);
+        while (strpos($content, '[ssv_loop_committees]', $index) !== false) {
+            $looping_string = explode('[ssv_loop_committees]', $content)[$counter + 1];
+            $looping_string = explode('[/ssv_loop_committees]', $looping_string)[0];
+            $replacingString = ssv_loop_committees($looping_string);
             $content = str_replace($looping_string, $replacingString, $content);
-            $index = strpos($content, '[mp_ssv_loop_committees]', $index) + 1;
+            $index = strpos($content, '[ssv_loop_committees]', $index) + 1;
             $counter++;
         }
     }
-    $content = str_replace('[mp_ssv_loop_committees]', "", $content);
-    $content = str_replace('[/mp_ssv_loop_committees]', "", $content);
+    $content = str_replace('[ssv_loop_committees]', "", $content);
+    $content = str_replace('[/ssv_loop_committees]', "", $content);
     if (is_user_logged_in()) {
-        $content = mp_ssv_members_filter($content);
+        $content = ssv_members_filter($content);
     }
     return $content;
 }
 
-function mp_ssv_members_filter($content)
+function ssv_members_filter($content)
 {
     $users = get_users();
     foreach ($users as $user) {
@@ -40,7 +40,7 @@ function mp_ssv_members_filter($content)
     return $content;
 }
 
-function mp_ssv_loop_committees($looping_string)
+function ssv_loop_committees($looping_string)
 {
     if (!function_exists('get_editable_roles')) {
         /** @noinspection PhpIncludeInspection */
@@ -58,7 +58,7 @@ function mp_ssv_loop_committees($looping_string)
                 $loop_instance = str_replace('$email', $role_name . "@allterrain.nl", $loop_instance);
             }
             if (strpos($looping_string, '$members_list') !== false) {
-                $loop_instance = str_replace('$members_list', mp_ssv_get_members_list($role_name), $loop_instance);
+                $loop_instance = str_replace('$members_list', ssv_get_members_list($role_name), $loop_instance);
             }
             $replacingString .= $loop_instance;
         }
@@ -66,7 +66,7 @@ function mp_ssv_loop_committees($looping_string)
     return $replacingString;
 }
 
-function mp_ssv_get_members_list($role_name)
+function ssv_get_members_list($role_name)
 {
     $members_list = "<ul>";
     $members = get_users('role=' . $role_name);
@@ -77,7 +77,7 @@ function mp_ssv_get_members_list($role_name)
     return $members_list;
 }
 
-function mp_ssv_profile_page_name($title)
+function ssv_profile_page_name($title)
 {
     if ($title == 'My Profile' && isset($_GET['user_id']) && is_page('My Profile')) {
         $member = FrontendMember::get_by_id($_GET['user_id']);
@@ -86,9 +86,9 @@ function mp_ssv_profile_page_name($title)
     return $title;
 }
 
-add_filter('the_title', 'mp_ssv_profile_page_name');
+add_filter('the_title', 'ssv_profile_page_name');
 
-function mp_ssv_fix_menu_title(
+function ssv_fix_menu_title(
     $items,
     /** @noinspection PhpUnusedParameterInspection */
     $args
@@ -100,4 +100,4 @@ function mp_ssv_fix_menu_title(
     return $items;
 }
 
-add_filter('wp_nav_menu_items', 'mp_ssv_fix_menu_title', 10, 2);
+add_filter('wp_nav_menu_items', 'ssv_fix_menu_title', 10, 2);

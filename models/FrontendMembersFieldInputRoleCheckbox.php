@@ -48,11 +48,11 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
 	public function getOptionRow()
 	{
 		ob_start();
-		echo mp_ssv_get_td(mp_ssv_get_role_select($this->id, "Role", $this->role));
-        echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
-		echo mp_ssv_get_td(mp_ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
-		if (get_option('mp_ssv_view_advanced_profile_page', false)) {
-			echo mp_ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+        echo ssv_get_td(ssv_get_role_select($this->id, "Role", $this->role));
+        echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+        echo ssv_get_td(ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
+        if (get_option('ssv_view_advanced_profile_page', false)) {
+            echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
 		}
 		$content = ob_get_clean();
 

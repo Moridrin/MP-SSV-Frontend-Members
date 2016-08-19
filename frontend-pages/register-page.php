@@ -10,18 +10,18 @@ if (!defined('ABSPATH')) {
  *
  * @return string the edited post content.
  */
-function mp_ssv_register_page_setup($content)
+function ssv_register_page_setup($content)
 {
     global $post;
     if ($post->post_name != 'register') {
         return $content;
     } else {
-        if (strpos($content, '[mp-ssv-frontend-members-register]') === false) {
+        if (strpos($content, '[ssv-frontend-members-register]') === false) {
             return $content;
         }
     }
-    if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('mp_ssv_create_members_profile')) {
-        mp_ssv_create_members_profile();
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_create_members_profile')) {
+        ssv_create_members_profile();
         ob_start();
         ?>
         <div class="mui-panel notification">
@@ -31,7 +31,7 @@ function mp_ssv_register_page_setup($content)
         <?php
         $content = ob_get_clean();
     } else {
-        $content = mp_ssv_register_page_content();
+        $content = ssv_register_page_content();
     }
 
     return $content;
@@ -40,7 +40,7 @@ function mp_ssv_register_page_setup($content)
 /**
  * @return string the content of the Profile Page.
  */
-function mp_ssv_register_page_content()
+function ssv_register_page_content()
 {
     ob_start();
     $items = FrontendMembersField::getAll();
@@ -64,25 +64,25 @@ function mp_ssv_register_page_content()
             <input id="password_confirm" type="password" name="password_confirm" class="mui--is-empty mui--is-dirty" required>
             <label for="password_confirm">Confirm Password</label>
         </div>
-        <?php $site_key = get_option('mp_ssv_recaptcha_site_key'); ?>
+        <?php $site_key = get_option('ssv_recaptcha_site_key'); ?>
         <div class="g-recaptcha" data-sitekey="<?php echo $site_key; ?>"></div>
         <input type="hidden" name="register" value="yes"/>
         <button class="mui-btn mui-btn--primary" type="submit" name="submit" id="submit">Register</button>
-        <?php wp_nonce_field('mp_ssv_create_members_profile'); ?>
+        <?php wp_nonce_field('ssv_create_members_profile'); ?>
     </form>
     <?php
 
     return ob_get_clean();
 }
 
-function mp_ssv_create_members_profile()
+function ssv_create_members_profile()
 {
     if ($_POST['password'] != $_POST['password_confirm']) {
         echo 'Password does not match';
 
         return;
     }
-    $secretKey = get_option('mp_ssv_recaptcha_secret_key');
+    $secretKey = get_option('ssv_recaptcha_secret_key');
     $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=" . $secretKey . "&response=" . $_POST['g-recaptcha-response']);
     $responseKeys = json_decode($response, true);
     if (intval($responseKeys["success"]) !== 1) {
@@ -110,8 +110,8 @@ function mp_ssv_create_members_profile()
         }
     }
     $user->remove_role('subscriber');
-    $user->add_role(get_option('mp_ssv_frontend_members_default_member_role'));
-    $to = get_option('mp_ssv_member_admin');
+    $user->add_role(get_option('ssv_frontend_members_default_member_role'));
+    $to = get_option('ssv_member_admin');
     $subject = "New Member Registration";
     $url = get_site_url() . '/profile/?user_id=' . $user->ID;
     $message = 'A new member has registered:<br/><br/><a href="' . esc_url($url) . '" target="_blank">' . $user->display_name . '</a><br/><br/>Greetings.';
@@ -119,11 +119,11 @@ function mp_ssv_create_members_profile()
     $headers = "From: $to" . "\r\n";
     add_filter('wp_mail_content_type', create_function('', 'return "text/html";'));
     wp_mail($to, $subject, $message, $headers);
-    if (is_plugin_active('mp-ssv-mailchimp/mp-ssv-mailchimp.php')) {
-        mp_ssv_update_mailchimp_member($user);
+    if (is_plugin_active('ssv-mailchimp/ssv-mailchimp.php')) {
+        ssv_update_mailchimp_member($user);
     }
     unset($_POST);
 }
 
-add_filter('the_content', 'mp_ssv_register_page_setup', 9);
+add_filter('the_content', 'ssv_register_page_setup', 9);
 ?>
