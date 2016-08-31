@@ -57,6 +57,8 @@ class FrontendMembersFieldInputText extends FrontendMembersFieldInput
         echo ssv_get_td(ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
         if (get_option('ssv_view_advanced_profile_page', false)) {
             echo ssv_get_td(ssv_get_text_input("Placeholder", $this->id, $this->placeholder));
+        } else {
+            echo ssv_get_hidden($this->id, "Placeholder", $this->placeholder);
 		}
 		$content = ob_get_clean();
 
