@@ -79,7 +79,10 @@ function ssv_create_members_profile()
 {
     if ($_POST['password'] != $_POST['password_confirm']) {
         echo 'Password does not match';
-
+        return;
+    }
+    if (isset($_POST['iban']) && !ssv_is_valid_iban($_POST['iban'])) {
+        echo 'Invalid IBAN';
         return;
     }
     $secretKey = get_option('ssv_recaptcha_secret_key');

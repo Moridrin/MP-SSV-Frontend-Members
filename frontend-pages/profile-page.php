@@ -197,6 +197,10 @@ function ssv_get_profile_page_tab_select($member)
 
 function ssv_save_members_profile()
 {
+    if (isset($_POST['iban']) && !ssv_is_valid_iban($_POST['iban'])) {
+        echo 'Invalid IBAN';
+        return;
+    }
     if (isset($_GET['user_id'])) {
         $user = get_user_by('id', $_GET['user_id']);
     } else {
