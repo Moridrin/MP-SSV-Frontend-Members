@@ -197,10 +197,6 @@ function ssv_get_profile_page_tab_select($member)
 
 function ssv_save_members_profile()
 {
-    if (isset($_POST['iban']) && !ssv_is_valid_iban($_POST['iban'])) {
-        echo 'Invalid IBAN';
-        return;
-    }
     if (isset($_GET['user_id'])) {
         $user = get_user_by('id', $_GET['user_id']);
     } else {
@@ -211,11 +207,12 @@ function ssv_save_members_profile()
         if (strpos($name, "_reset") !== false) {
             $name = str_replace("_reset", "", $name);
         }
-        $update_success = $user->updateMeta($name, $val);
-        if (!$update_success) {
+        $update_response = $user->updateMeta($name, $val);
+        if ($update_response !== true) {
+            $class = $update_response->type == Message::NOTIFICATION_MESSAGE ? '' : 'notification-error';
             ?>
-            <div class="mui-panel notification notification-error">
-                Cannot change the user-login. Please consider setting the field display to 'disabled'
+            <div class="mui-panel notification <?php echo $class; ?>">
+                <?php echo $update_response; ?>
             </div>
             <?php
         }
