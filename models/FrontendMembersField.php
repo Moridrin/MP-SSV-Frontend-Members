@@ -273,9 +273,9 @@ class FrontendMembersField
             sanitize_text_field($variables['field_index']),
             sanitize_text_field($variables["field_type"]),
             sanitize_text_field($variables["field_title"]),
-            sanitize_text_field(isset($variables["registration_page"]) ? $variables["registration_page"] : 'yes'),
-            sanitize_text_field(isset($variables["field_class"]) ? $variables["field_class"] : ''),
-            sanitize_text_field(isset($variables["field_style"]) ? $variables["field_style"] : '')
+            sanitize_text_field($variables["registration_page"]),
+            sanitize_text_field($variables['field_class']),
+            sanitize_text_field($variables['field_style'])
         );
         unset($variables["id"]);
         unset($variables["field_type"]);
@@ -442,7 +442,7 @@ class FrontendMembersField
         if (get_option('ssv_frontend_members_register_page', 'same_as_profile_page') == 'custom') {
             echo ssv_get_td(ssv_get_checkbox('Registration Page', $this->id, $this->registration_page, array(), true));
         }
-        if (get_option('ssv_view_advanced_profile_page', 'false')) {
+        if (get_option('ssv_view_advanced_profile_page', 'false') == 'true') {
             echo ssv_get_td(ssv_get_text_input('Field Class', $this->id, $this->class));
             echo ssv_get_td(ssv_get_text_input('Field Style', $this->id, $this->style));
         } else {

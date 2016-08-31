@@ -69,9 +69,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
     $new_field_content .= ssv_get_td(ssv_get_checkbox("Required", '\' + id + \'', "no", array(), false, false));
     $new_field_content .= ssv_get_td(ssv_get_select("Display", '\' + id + \'', "normal", array("Normal", "ReadOnly", "Disabled"), array(), false, null, true, false));
     $new_field_content .= ssv_get_td(ssv_get_text_input("Placeholder", '\' + id + \'', "", 'text', array(), false));
-    $new_field_content .= ssv_get_td(ssv_get_checkbox("Registration Page", '\' + id + \'', "yes", array(), true, false));
-    $new_field_content .= ssv_get_td(ssv_get_text_input("Field Class", '\' + id + \'', "", 'text', array(), false));
-    $new_field_content .= ssv_get_td(ssv_get_text_input("Field Style", '\' + id + \'', "", 'text', array(), false));
+    if (get_option('ssv_view_advanced_profile_page', 'false') == 'true') {
+        $new_field_content .= ssv_get_td(ssv_get_checkbox("Registration Page", '\' + id + \'', "yes", array(), true, false));
+        $new_field_content .= ssv_get_td(ssv_get_text_input("Field Class", '\' + id + \'', "", 'text', array(), false));
+        $new_field_content .= ssv_get_td(ssv_get_text_input("Field Style", '\' + id + \'', "", 'text', array(), false));
+    }
     $new_field = ssv_get_tr('\' + id + \'', $new_field_content);
     ?>
     function ssv_add_new_field() {
@@ -126,6 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
                 '<?php echo ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
             );
         }
+        <?php if (get_option('ssv_view_advanced_profile_page', 'false') == 'true'): ?>
         $(tr).append(
             '<?php echo ssv_get_td(ssv_get_checkbox("Registration Page", '\' + sender_id + \'', "yes", array(), true, false)); ?>'
         ).append(
@@ -133,6 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
         ).append(
             '<?php echo ssv_get_td(ssv_get_text_input("Field Style", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
         );
+        <?php endif; ?>
     }
 </script>
 <!-- Change Input Type -->
@@ -239,6 +243,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
                 );
                 break;
         }
+        <?php if (get_option('ssv_view_advanced_profile_page', 'false') == 'true'): ?>
         $(tr).append(
             '<?php echo ssv_get_td(ssv_get_checkbox("Registration Page", '\' + sender_id + \'', "yes", array(), true, false)); ?>'
         ).append(
@@ -246,6 +251,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
         ).append(
             '<?php echo ssv_get_td(ssv_get_text_input("Field Style", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
         );
+        <?php endif; ?>
     }
 </script>
 <!-- Add Text Option. -->

@@ -42,7 +42,7 @@ class FrontendMembersFieldHeader extends FrontendMembersField
         echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
         echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
         echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
-        if (get_option('ssv_view_advanced_profile_page', false)) {
+        if (get_option('ssv_view_advanced_profile_page', 'false') == 'true') {
             echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
         }
         $content = ob_get_clean();

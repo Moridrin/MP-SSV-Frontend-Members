@@ -50,7 +50,7 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
         echo ssv_get_td(ssv_get_text_input("Name", $this->id, $this->name, 'text', array('required')));
         echo ssv_get_td(ssv_get_checkbox("Required", $this->id, $this->required));
         echo ssv_get_td(ssv_get_checkbox("Preview", $this->id, $this->preview));
-        if (get_option('ssv_view_advanced_profile_page', false)) {
+        if (get_option('ssv_view_advanced_profile_page', 'false') == 'true') {
             echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
         }
         $content = ob_get_clean();
