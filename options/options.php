@@ -26,16 +26,23 @@ function ssv_frontend_members_settings_page()
             <a href="?page=<?php echo __FILE__; ?>&tab=users_page_columns" class="nav-tab <?php if ($active_tab == "users_page_columns") {
                 echo "nav-tab-active";
             } ?>">Users Page Columns</a>
+			<a href="?page=<?php echo __FILE__; ?>&tab=email" class="nav-tab <?php if ($active_tab == "email") {
+				echo "nav-tab-active";
+			} ?>">Email</a>
             <a href="http://studentensurvival.com/ssv/ssv-frontend-members/" target="_blank" class="nav-tab">Help <img src="<?php echo plugin_dir_url(__DIR__); ?>general/images/link-new-tab.png" width="14px"
                                                                                                                        style="vertical-align:middle"></a>
 		</h2>
 		<?php
 		if ($active_tab == "general") {
 			require_once "general-tab.php";
-		} else if ($active_tab == "profile_page") {
-			require_once "profile-page-tab.php";
-        } else if ($active_tab == "users_page_columns") {
-            require_once "users-page-columns.php";
+		} else {
+			if ($active_tab == "profile_page") {
+				require_once "profile-page-tab.php";
+			} elseif ($active_tab == "users_page_columns") {
+				require_once "users-page-columns.php";
+			} elseif ($active_tab == "email") {
+				require_once "email-tab.php";
+			}
 		}
 		?>
 	</div>

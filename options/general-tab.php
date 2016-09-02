@@ -19,14 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
     } else {
         update_option('ssv_view_advanced_profile_page', 'false');
     }
-    if (isset($_POST['ssv_frontend_members_show_admin_bar_front'])) {
-        update_option('ssv_frontend_members_show_admin_bar_front', 'true');
-    } else {
-        update_option('ssv_frontend_members_show_admin_bar_front', 'false');
-    }
     update_option('ssv_recaptcha_site_key', sanitize_text_field($_POST['ssv_recaptcha_site_key']));
     update_option('ssv_recaptcha_secret_key', sanitize_text_field($_POST['ssv_recaptcha_secret_key']));
-    update_option('ssv_member_admin', sanitize_text_field($_POST['ssv_member_admin']));
 }
 ?>
 <form method="post" action="#">
@@ -76,25 +70,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
                 </label>
             </td>
         </tr>
-        <tr>
-            <th scope="row">Show Admin Bar</th>
-            <td>
-                <?php
-                if (is_plugin_active('user-role-editor/user-role-editor.php')) { ?>
-                    <label>
-                        <input type="checkbox" name="ssv_frontend_members_show_admin_bar_front" value="true" checked disabled/>
-                        Show the wordpress admin bar for new members. Specify this in <a href="<?= get_site_url() ?>/wp-admin/users.php?page=users-user-role-editor.php">User Role Editor</a>
-                    </label>
-                <?php } else { ?>
-                    <label>
-                        <input type="checkbox" name="ssv_frontend_members_show_admin_bar_front" value="true" <?php if (get_option('ssv_frontend_members_show_admin_bar_front') == 'true') {
-                            echo "checked";
-                        } ?>/>
-                        Show the wordpress admin bar for new members.
-                    </label>
-                <?php } ?>
-            </td>
-        </tr>
+        <!--Removed because this feature is not tested.-->
+        <!--        <tr>-->
+        <!--            <th scope="row">Show Admin Bar</th>-->
+        <!--            <td>-->
+        <!--                --><?php
+        //                if (is_plugin_active('user-role-editor/user-role-editor.php')) { ?>
+        <!--                    <label>-->
+        <!--                        <input type="checkbox" name="ssv_frontend_members_show_admin_bar_front" value="true" checked disabled/>-->
+        <!--                        Show the wordpress admin bar for new members. Specify this in <a href="--><? //= get_site_url() ?><!--/wp-admin/users.php?page=users-user-role-editor.php">User Role Editor</a>-->
+        <!--                    </label>-->
+        <!--                --><?php //} else { ?>
+        <!--                    <label>-->
+        <!--                        <input type="checkbox" name="ssv_frontend_members_show_admin_bar_front" value="true" --><?php //if (get_option('ssv_frontend_members_show_admin_bar_front') == 'true') {
+        //                            echo "checked";
+        //                        } ?><!--/>-->
+        <!--                        Show the wordpress admin bar for new members.-->
+        <!--                    </label>-->
+        <!--                --><?php //} ?>
+        <!--            </td>-->
+        <!--        </tr>-->
         <tr>
             <th scope="row">reCAPTCHA Site Key</th>
             <td>
@@ -105,12 +100,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
             <th scope="row">reCAPTCHA Secret Key</th>
             <td>
                 <input type="text" name="ssv_recaptcha_secret_key" value="<?php echo get_option('ssv_recaptcha_secret_key'); ?>" title="reCAPTCHA Secret Key">
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">Members Admin (email)</th>
-            <td>
-                <input type="text" name="ssv_member_admin" value="<?php echo get_option('ssv_member_admin'); ?>" title="Members Admin (email)">
             </td>
         </tr>
     </table>
