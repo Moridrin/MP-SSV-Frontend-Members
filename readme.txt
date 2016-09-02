@@ -2,8 +2,8 @@
 Contributors: moridrin
 Tags: ssv, ssv, members, user management, moridrin, frontend members, sportvereniging, sports club,
 Requires at least: 3.0.1
-Tested up to: 4.5.3
-Stable tag: 4.5
+Tested up to: 4.6
+Stable tag: 4.6
 License: WTFPL
 License URI: http://www.wtfpl.net/txt/copying/
 
@@ -36,6 +36,9 @@ The best way is to add an issue on GitHub (https://github.com/Moridrin/ssv-front
 The best way is to add an issue on GitHub (https://github.com/Moridrin/ssv-frontend-members/issues). But you can also send an email to J.Berkvens@Moridrin.com (the lead developer).
 
 == Changelog ==
+
+= 1.2.3 =
+* Security improvements
 
 = 1.2.2 =
 * Fixed all bugs that came as result of 1.1.5 and 1.2.0

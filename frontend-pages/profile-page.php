@@ -36,8 +36,9 @@ function ssv_profile_page_setup($content)
     } elseif (strpos($content, '[ssv-frontend-members-profile]') === false) { //Not the Profile Page Tag
         return $content;
     }
+    $currentUserIsBoardMember = FrontendMember::get_current_user()->isBoard();
 
-    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['remove_image']) && check_admin_referer('ssv_remove_image_from_profile')) {
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['remove_image']) && check_admin_referer('ssv_remove_image_from_profile') && $currentUserIsBoardMember) {
         global $wpdb;
         $field_id = $_POST['remove_image'];
         $table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
@@ -48,10 +49,15 @@ function ssv_profile_page_setup($content)
         $frontendMember->updateMeta($image_name . '_path', '');
         echo 'image successfully removed success';
         return '';
-    } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_frontend_member_profile')) {
+    } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_frontend_member_profile') && $currentUserIsBoardMember) {
         ssv_save_members_profile();
     }
-    $content = ssv_profile_page_content();
+
+    if (!isset($_GET['user_id']) || $currentUserIsBoardMember) {
+        $content = ssv_profile_page_content();
+    } else {
+        $content = new Message('You have no access to view this profile', Message::ERROR_MESSAGE);
+    }
 
     return $content;
 }
@@ -207,13 +213,9 @@ function ssv_save_members_profile()
         if (strpos($name, "_reset") !== false) {
             $name = str_replace("_reset", "", $name);
         }
-        $update_success = $user->updateMeta($name, $val);
-        if (!$update_success) {
-            ?>
-            <div class="mui-panel notification notification-error">
-                Cannot change the user-login. Please consider setting the field display to 'disabled'
-            </div>
-            <?php
+        $update_response = $user->updateMeta($name, $val);
+        if ($update_response !== true) {
+            $update_response->htmlPrint();
         }
     }
     foreach ($_FILES as $name => $file) {

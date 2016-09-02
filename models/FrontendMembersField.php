@@ -445,6 +445,9 @@ class FrontendMembersField
         if (get_option('ssv_view_advanced_profile_page', 'false') == 'true') {
             echo ssv_get_td(ssv_get_text_input('Field Class', $this->id, $this->class));
             echo ssv_get_td(ssv_get_text_input('Field Style', $this->id, $this->style));
+        } else {
+            echo ssv_get_hidden($this->id, 'Field Class', $this->class);
+            echo ssv_get_hidden($this->id, 'Field Style', $this->style);
         }
 
         return ssv_get_tr($this->id, ob_get_clean(), $visible);
