@@ -442,7 +442,7 @@ class FrontendMembersField
         if (get_option('ssv_frontend_members_register_page', 'same_as_profile_page') == 'custom') {
             echo ssv_get_td(ssv_get_checkbox('Registration Page', $this->id, $this->registration_page, array(), true));
         }
-        if (get_option('ssv_view_advanced_profile_page', 'false') == 'true') {
+        if (get_option('ssv_frontend_members_view_advanced_profile_page', 'false') == 'true') {
             echo ssv_get_td(ssv_get_text_input('Field Class', $this->id, $this->class));
             echo ssv_get_td(ssv_get_text_input('Field Style', $this->id, $this->style));
         } else {

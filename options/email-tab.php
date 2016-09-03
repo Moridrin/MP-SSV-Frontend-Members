@@ -11,6 +11,7 @@ if (!current_user_can('manage_options')) {
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_frontend_members_general_options')) {
     global $options;
+    update_option('ssv_frontend_members_member_admin', sanitize_text_field($_POST['ssv_frontend_members_member_admin']));
     if (isset($_POST['ssv_frontend_members_new_member_registration_email'])) {
         update_option('ssv_frontend_members_new_member_registration_email', 'true');
     } else {
@@ -21,7 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
     } else {
         update_option('ssv_frontend_members_member_role_changed_email', 'false');
     }
-    update_option('ssv_member_admin', sanitize_text_field($_POST['ssv_member_admin']));
 }
 ?>
 <form method="post" action="#">
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
         <tr>
             <th scope="row">Members Admin (email)</th>
             <td>
-                <input type="email" name="ssv_member_admin" value="<?php echo get_option('ssv_member_admin'); ?>" title="Members Admin (email)">
+                <input type="email" name="ssv_frontend_members_member_admin" value="<?php echo get_option('ssv_frontend_members_member_admin'); ?>" title="Members Admin (email)">
             </td>
         </tr>
         <tr>

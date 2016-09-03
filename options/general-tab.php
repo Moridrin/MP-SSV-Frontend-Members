@@ -14,10 +14,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
     update_option('ssv_frontend_members_register_page', sanitize_text_field($_POST['ssv_frontend_members_register_page']));
     update_option('ssv_frontend_members_default_member_role', sanitize_text_field($_POST['ssv_frontend_members_default_member_role']));
     update_option('ssv_frontend_members_board_role', sanitize_text_field($_POST['ssv_frontend_members_board_role']));
-    if (isset($_POST['ssv_view_advanced_profile_page'])) {
-        update_option('ssv_view_advanced_profile_page', 'true');
+    if (isset($_POST['ssv_frontend_members_view_advanced_profile_page'])) {
+        update_option('ssv_frontend_members_view_advanced_profile_page', 'true');
     } else {
-        update_option('ssv_view_advanced_profile_page', 'false');
+        update_option('ssv_frontend_members_view_advanced_profile_page', 'false');
     }
     update_option('ssv_recaptcha_site_key', sanitize_text_field($_POST['ssv_recaptcha_site_key']));
     update_option('ssv_recaptcha_secret_key', sanitize_text_field($_POST['ssv_recaptcha_secret_key']));
@@ -64,32 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
             <th scope="row">Advanced Profile Page Tab</th>
             <td>
                 <label>
-                    <input type="checkbox" name="ssv_view_advanced_profile_page" value="true" <?php if (get_option('ssv_view_advanced_profile_page') == 'true') {
+                    <input type="checkbox" name="ssv_frontend_members_view_advanced_profile_page" value="true" <?php if (get_option('ssv_frontend_members_view_advanced_profile_page') == 'true') {
                         echo "checked";
                     } ?>/>
                 </label>
             </td>
         </tr>
-        <!--Removed because this feature is not tested.-->
-        <!--        <tr>-->
-        <!--            <th scope="row">Show Admin Bar</th>-->
-        <!--            <td>-->
-        <!--                --><?php
-        //                if (is_plugin_active('user-role-editor/user-role-editor.php')) { ?>
-        <!--                    <label>-->
-        <!--                        <input type="checkbox" name="ssv_frontend_members_show_admin_bar_front" value="true" checked disabled/>-->
-        <!--                        Show the wordpress admin bar for new members. Specify this in <a href="--><? //= get_site_url() ?><!--/wp-admin/users.php?page=users-user-role-editor.php">User Role Editor</a>-->
-        <!--                    </label>-->
-        <!--                --><?php //} else { ?>
-        <!--                    <label>-->
-        <!--                        <input type="checkbox" name="ssv_frontend_members_show_admin_bar_front" value="true" --><?php //if (get_option('ssv_frontend_members_show_admin_bar_front') == 'true') {
-        //                            echo "checked";
-        //                        } ?><!--/>-->
-        <!--                        Show the wordpress admin bar for new members.-->
-        <!--                    </label>-->
-        <!--                --><?php //} ?>
-        <!--            </td>-->
-        <!--        </tr>-->
         <tr>
             <th scope="row">reCAPTCHA Site Key</th>
             <td>
