@@ -25,6 +25,7 @@ define('FRONTEND_MEMBERS_FIELDS_TABLE_NAME', $wpdb->prefix . "ssv_frontend_membe
 define('FRONTEND_MEMBERS_FIELD_META_TABLE_NAME', $wpdb->prefix . "ssv_frontend_members_field_meta");
 
 require_once "models/FrontendMembersField.php";
+require_once "frontend-pages/change-password-page.php";
 require_once "frontend-pages/login-page.php";
 require_once "frontend-pages/profile-page.php";
 require_once "frontend-pages/register-page.php";
@@ -112,6 +113,17 @@ function ssv_register_ssv_frontend_members()
     );
     $profile_post_id = wp_insert_post($profile_post);
     update_option('profile_post_id', $profile_post_id);
+    $change_password_post = array(
+        'post_content' => '[ssv-frontend-members-change-password]',
+        'post_name'    => 'change-password',
+        'post_title'   => 'Change Password',
+        'post_status'  => 'publish',
+        'post_type'    => 'page'
+    );
+    $change_password_post_id = wp_insert_post($change_password_post);
+    update_option('change_password_post_id', $change_password_post_id);
+
+    /* Options */
     update_option('ssv_frontend_members_register_page', 'same_as_profile_page');
     update_option('ssv_frontend_members_default_member_role', 'subscriber');
     update_option('ssv_frontend_members_board_role', 'administrator');
@@ -135,6 +147,7 @@ function ssv_unregister_ssv_frontend_members()
     wp_delete_post(get_option('register_post_id'), true);
     wp_delete_post(get_option('login_post_id'), true);
     wp_delete_post(get_option('profile_post_id'), true);
+    wp_delete_post(get_option('change_password_post_id'), true);
     global $wpdb;
     /** @noinspection PhpIncludeInspection */
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
