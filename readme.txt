@@ -37,6 +37,9 @@ The best way is to add an issue on GitHub (https://github.com/Moridrin/ssv-front
 
 == Changelog ==
 
+= 1.3.1 =
+* Bugfix Advanced Page fields
+
 = 1.3.0 =
 * Change Password functionality added.
 * Bugfix Adding new fields
