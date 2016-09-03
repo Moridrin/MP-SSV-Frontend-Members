@@ -37,6 +37,12 @@ The best way is to add an issue on GitHub (https://github.com/Moridrin/ssv-front
 
 == Changelog ==
 
+= 1.3.0 =
+* Change Password functionality added.
+* Bugfix Adding new fields
+* Bugfix Advanced Page fields
+* Only Board members are allowed to view profiles
+
 = 1.2.3 =
 * Security improvements
 

@@ -9,7 +9,7 @@ if (!current_user_can('manage_options')) {
     return;
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_frontend_members_general_options')) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_frontend_members_email_options')) {
     global $options;
     update_option('ssv_frontend_members_member_admin', sanitize_text_field($_POST['ssv_frontend_members_member_admin']));
     if (isset($_POST['ssv_frontend_members_new_member_registration_email'])) {
@@ -53,6 +53,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
             </td>
         </tr>
     </table>
-    <?php wp_nonce_field('ssv_save_frontend_members_general_options'); ?>
+    <?php wp_nonce_field('ssv_save_frontend_members_email_options'); ?>
     <?php submit_button(); ?>
 </form>
