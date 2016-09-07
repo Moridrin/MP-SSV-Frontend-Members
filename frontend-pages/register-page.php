@@ -21,15 +21,7 @@ function ssv_register_page_setup($content)
         }
     }
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_create_members_profile')) {
-        ssv_create_members_profile();
-        ob_start();
-        ?>
-        <div class="mui-panel notification">
-            You've successfully registered.
-            Click <a href="/login">Here</a> to sign in.
-        </div>
-        <?php
-        $content = ob_get_clean();
+        $content = ssv_create_members_profile()->htmlPrint();
     } else {
         $content = ssv_register_page_content();
     }
@@ -45,6 +37,7 @@ function ssv_register_page_content()
     ob_start();
     $items = FrontendMembersField::getAll();
     ?>
+    <!--suppress HtmlUnknownTarget -->
     <form name="members_form" id="members_form" action="/register" method="post" enctype="multipart/form-data">
         <?php
         foreach ($items as $item) {
@@ -78,20 +71,16 @@ function ssv_register_page_content()
 function ssv_create_members_profile()
 {
     if ($_POST['password'] != $_POST['password_confirm']) {
-        echo 'Password does not match';
-        return;
+        return new Message('Password does not match', Message::ERROR_MESSAGE);
     }
     if (isset($_POST['iban']) && !ssv_is_valid_iban($_POST['iban'])) {
-        echo 'Invalid IBAN';
-        return;
+        return new Message('Invalid IBAN', Message::ERROR_MESSAGE);
     }
     $secretKey = get_option('ssv_recaptcha_secret_key');
     $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=" . $secretKey . "&response=" . $_POST['g-recaptcha-response']);
     $responseKeys = json_decode($response, true);
     if (intval($responseKeys["success"]) !== 1) {
-        echo '<h2>You failed the reCaptcha. Are you a robot?</h2>';
-
-        return;
+        return new Message('You failed the reCaptcha. Are you a robot?', Message::ERROR_MESSAGE);
     }
     $user = FrontendMember::registerFromPOST();
     foreach ($_POST as $name => $val) {
@@ -126,6 +115,8 @@ function ssv_create_members_profile()
         ssv_update_mailchimp_member($user);
     }
     unset($_POST);
+    $return_message = 'You\'ve successfully registered.<br/>Click <a href="/login">here</a> to sign in.';
+    return new Message($return_message, Message::NOTIFICATION_MESSAGE);
 }
 
 add_filter('the_content', 'ssv_register_page_setup', 9);

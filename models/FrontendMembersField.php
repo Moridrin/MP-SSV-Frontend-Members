@@ -312,7 +312,7 @@ class FrontendMembersField
                         $field = new FrontendMembersFieldInputText($field, $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('placeholder'));
                         break;
                     case "text_checkbox":
-                        $field = new FrontendMembersFieldInputTextCheckbox($field, $field->getMetaFromPOST('help_text'), $field->getMetaFromPOST('display'));
+                        $field = new FrontendMembersFieldInputTextCheckbox($field, $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'));
                         break;
                     case "text_select":
                         $field = new FrontendMembersFieldInputSelectText($field, $field->getMetaFromPOST('display'));
@@ -455,6 +455,7 @@ class FrontendMembersField
 
     protected function save($remove = false)
     {
+        ssv_print($this->id);
         global $wpdb;
         if (strlen($this->title) <= 0) {
             $remove = true;

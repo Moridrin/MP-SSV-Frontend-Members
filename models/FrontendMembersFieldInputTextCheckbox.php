@@ -75,7 +75,7 @@ class FrontendMembersFieldInputTextCheckbox extends FrontendMembersFieldInput
 			<input type="hidden" name="<?php echo $this->name; ?>" value="no"/>
 			<div class="mui-checkbox">
 				<label>
-                    <input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="yes" <?php if ($value == "yes") : echo "checked"; endif; ?>>
+                    <input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="yes" <?php if ($value == "yes") : echo "checked"; endif; ?> <?php echo $this->required == 'yes' ? 'required' : ''; ?>>
 					<?php echo $this->title; ?>
 				</label>
 			</div>
@@ -84,7 +84,7 @@ class FrontendMembersFieldInputTextCheckbox extends FrontendMembersFieldInput
 			?>
 			<input type="hidden" name="<?php echo $this->name; ?>" value="no"/>
 			<label>
-                <input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="yes" <?php if ($value == "yes") : echo "checked"; endif; ?>>
+                <input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="yes" <?php if ($value == "yes") : echo "checked"; endif; ?> <?php echo $this->required? 'required' : ''; ?>>
 				<?php echo $this->title; ?>
 			</label>
 			<br/>
@@ -101,12 +101,12 @@ class FrontendMembersFieldInputTextCheckbox extends FrontendMembersFieldInput
 		$table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
 		$wpdb->replace(
 			$table,
-			array("field_id" => $this->id, "meta_key" => "help_text", "meta_value" => $this->required),
+			array("field_id" => $this->id, "meta_key" => "display", "meta_value" => $this->display),
 			array('%d', '%s', '%s')
 		);
 		$wpdb->replace(
 			$table,
-			array("field_id" => $this->id, "meta_key" => "display", "meta_value" => $this->display),
+			array("field_id" => $this->id, "meta_key" => "required", "meta_value" => $this->required),
 			array('%d', '%s', '%s')
 		);
 	}
