@@ -112,7 +112,7 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
                     });
                     e.stopImmediatePropagation();
                     return false;
-                }
+                };
                 $('#<?php echo $this->id; ?>_remove').one('click', removeImageClickHandler);
             </script>
             <?php
