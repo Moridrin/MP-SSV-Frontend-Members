@@ -22,6 +22,7 @@ function ssv_register_page_setup($content)
     }
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_create_members_profile')) {
         $content = ssv_create_members_profile()->htmlPrint();
+        $content .= ssv_register_page_content();
     } else {
         $content = ssv_register_page_content();
     }
