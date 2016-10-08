@@ -36,9 +36,8 @@ function ssv_profile_page_setup($content)
     } elseif (strpos($content, '[ssv-frontend-members-profile]') === false) { //Not the Profile Page Tag
         return $content;
     }
-    $currentUserIsBoardMember = FrontendMember::get_current_user()->isBoard();
 
-    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['remove_image']) && check_admin_referer('ssv_remove_image_from_profile') && $currentUserIsBoardMember) {
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['remove_image']) && check_admin_referer('ssv_remove_image_from_profile')) {
         global $wpdb;
         $field_id = $_POST['remove_image'];
         $table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
@@ -49,10 +48,11 @@ function ssv_profile_page_setup($content)
         $frontendMember->updateMeta($image_name . '_path', '');
         echo 'image successfully removed success';
         return '';
-    } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_frontend_member_profile') && $currentUserIsBoardMember) {
+    } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_frontend_member_profile')) {
         ssv_save_members_profile();
     }
 
+    $currentUserIsBoardMember = FrontendMember::get_current_user()->isBoard();
     if (!isset($_GET['user_id']) || $currentUserIsBoardMember) {
         $content = ssv_profile_page_content();
     } else {
