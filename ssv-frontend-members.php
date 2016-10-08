@@ -55,7 +55,7 @@ function ssv_register_ssv_frontend_members()
     /** @noinspection PhpIncludeInspection */
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     $charset_collate = $wpdb->get_charset_collate();
-    $table_name = $wpdb->prefix . "ssv_frontend_members_fields";
+    $table_name      = $wpdb->prefix . "ssv_frontend_members_fields";
     $wpdb->show_errors();
     $sql
         = "CREATE TABLE IF NOT EXISTS $table_name (
@@ -70,7 +70,7 @@ function ssv_register_ssv_frontend_members()
     dbDelta($sql);
     $table_name = $wpdb->prefix . "ssv_frontend_members_field_meta";
     $sql
-        = "CREATE TABLE IF NOT EXISTS $table_name (
+                = "CREATE TABLE IF NOT EXISTS $table_name (
 			field_id bigint(20) NOT NULL,
 			meta_key varchar(50) NOT NULL,
 			meta_value varchar(255) NOT NULL,
@@ -86,39 +86,39 @@ function ssv_register_ssv_frontend_members()
     FrontendMembersFieldInputText::create(5, "Last Name", "last_name")->save();
 
     /* Pages */
-    $register_post = array(
+    $register_post    = array(
         'post_content' => '[ssv-frontend-members-register]',
         'post_name'    => 'register',
         'post_title'   => 'Register',
         'post_status'  => 'publish',
-        'post_type'    => 'page'
+        'post_type'    => 'page',
     );
     $register_post_id = wp_insert_post($register_post);
     update_option('register_post_id', $register_post_id);
-    $login_post = array(
+    $login_post    = array(
         'post_content' => '[ssv-frontend-members-login]',
         'post_name'    => 'login',
         'post_title'   => 'Login',
         'post_status'  => 'publish',
-        'post_type'    => 'page'
+        'post_type'    => 'page',
     );
     $login_post_id = wp_insert_post($login_post);
     update_option('login_post_id', $login_post_id);
-    $profile_post = array(
+    $profile_post    = array(
         'post_content' => '[ssv-frontend-members-profile]',
         'post_name'    => 'profile',
         'post_title'   => 'My Profile',
         'post_status'  => 'publish',
-        'post_type'    => 'page'
+        'post_type'    => 'page',
     );
     $profile_post_id = wp_insert_post($profile_post);
     update_option('profile_post_id', $profile_post_id);
-    $change_password_post = array(
+    $change_password_post    = array(
         'post_content' => '[ssv-frontend-members-change-password]',
         'post_name'    => 'change-password',
         'post_title'   => 'Change Password',
         'post_status'  => 'publish',
-        'post_type'    => 'page'
+        'post_type'    => 'page',
     );
     $change_password_post_id = wp_insert_post($change_password_post);
     update_option('change_password_post_id', $change_password_post_id);
@@ -152,10 +152,10 @@ function ssv_unregister_ssv_frontend_members()
     /** @noinspection PhpIncludeInspection */
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     $table_name = $wpdb->prefix . "ssv_frontend_members_fields";
-    $sql = "DROP TABLE $table_name;";
+    $sql        = "DROP TABLE $table_name;";
     $wpdb->query($sql);
     $table_name = $wpdb->prefix . "ssv_frontend_members_field_meta";
-    $sql = "DROP TABLE $table_name;";
+    $sql        = "DROP TABLE $table_name;";
     $wpdb->query($sql);
 }
 
@@ -177,11 +177,11 @@ function ssv_frontend_members_avatar($avatar, $id_or_email, $size = 150, $defaul
     $user = false;
 
     if (is_numeric($id_or_email)) {
-        $id = (int)$id_or_email;
+        $id   = (int)$id_or_email;
         $user = get_user_by('id', $id);
     } elseif (is_object($id_or_email)) {
         if (!empty($id_or_email->user_id)) {
-            $id = (int)$id_or_email->user_id;
+            $id   = (int)$id_or_email->user_id;
             $user = get_user_by('id', $id);
         }
     } else {
@@ -265,7 +265,7 @@ function ssv_custom_user_column_values($val, $column_name, $user_id)
         $username_block = '';
         $username_block .= '<img style="float: left; margin-right: 10px; margin-top: 1px;" class="avatar avatar-32 photo" src="' . esc_url($frontendMember->getMeta('profile_picture')) . '" height="32" width="32"/>';
         $username_block .= '<strong>' . $frontendMember->getProfileLink() . '</strong><br/>';
-        $editURL = 'user-edit.php?user_id=' . $frontendMember->ID . '&wp_http_referer=%2Fwp-admin%2Fusers.php';
+        $editURL         = 'user-edit.php?user_id=' . $frontendMember->ID . '&wp_http_referer=%2Fwp-admin%2Fusers.php';
         $capebilitiesURL = 'users.php?page=users-user-role-editor.php&object=user&user_id=' . $frontendMember->ID;
         $username_block .= '<div class="row-actions"><span class="edit"><a href="' . esc_url($editURL) . '">Edit</a> | </span><span class="capabilities"><a href="' . esc_url($capebilitiesURL) . '">Capabilities</a></span></div>';
         return $username_block;
@@ -285,16 +285,28 @@ function ssv_custom_user_columns($column_headers)
     if (get_option('ssv_frontend_members_main_column') == 'wordpress_default') {
         $column_headers['username'] = 'Username';
     } else {
-        $column_headers['ssv_member'] = 'Member';
+        $url = $_SERVER['REQUEST_URI'];
+        if (empty($_GET)) {
+            $url .= '?orderby=name';
+        } elseif (!isset($_GET['orderby'])) {
+            $url .= '&orderby=name';
+        } elseif (!isset($_GET['order'])) {
+            $url .= '&order=DESC';
+        } elseif ($_GET['order'] == 'DESC') {
+            $url .= '&order=ASC';
+        } else {
+            $url .= '&order=DESC';
+        }
+        $column_headers['ssv_member'] = '<a href="'.$url.'">Member</a>';
     }
     $selected_columns = json_decode(get_option('ssv_frontend_members_user_columns'));
     $selected_columns = $selected_columns ?: array();
     foreach ($selected_columns as $column) {
-        $sql = 'SELECT field_id FROM ' . FRONTEND_MEMBERS_FIELD_META_TABLE_NAME . ' WHERE meta_key = "name" AND meta_value = "' . $column . '"';
-        $sql = 'SELECT field_title FROM ' . FRONTEND_MEMBERS_FIELDS_TABLE_NAME . ' WHERE id = (' . $sql . ')';
+        $sql   = 'SELECT field_id FROM ' . FRONTEND_MEMBERS_FIELD_META_TABLE_NAME . ' WHERE meta_key = "name" AND meta_value = "' . $column . '"';
+        $sql   = 'SELECT field_title FROM ' . FRONTEND_MEMBERS_FIELDS_TABLE_NAME . ' WHERE id = (' . $sql . ')';
         $title = $wpdb->get_var($sql);
         if (ssv_starts_with($column, 'wp_')) {
-            $column = str_replace('wp_', '', $column);
+            $column                              = str_replace('wp_', '', $column);
             $column_headers[strtolower($column)] = $column;
         } else {
             $column_headers['ssv_' . $column] = $title;
@@ -304,34 +316,3 @@ function ssv_custom_user_columns($column_headers)
 }
 
 add_action('manage_users_columns', 'ssv_custom_user_columns');
-
-
-add_action(
-    'pre_user_query', function ($uqi) {
-    global $wpdb;
-
-    $search = '';
-    if (isset($uqi->query_vars['search'])) {
-        $search = trim($uqi->query_vars['search']);
-    }
-
-    if ($search) {
-        $search = trim($search, '*');
-        $the_search = '%' . $search . '%';
-
-        $search_meta = $wpdb->prepare(
-            "
-        ID IN ( SELECT user_id FROM {$wpdb->usermeta}
-        WHERE ( ( meta_key='first_name' OR meta_key='last_name' )
-            AND {$wpdb->usermeta}.meta_value LIKE '%s' )
-        )", $the_search
-        );
-
-        $uqi->query_where = str_replace(
-            'WHERE 1=1 AND (',
-            "WHERE 1=1 AND (" . $search_meta . " OR ",
-            $uqi->query_where
-        );
-    }
-}
-);

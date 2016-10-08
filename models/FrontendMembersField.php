@@ -273,7 +273,7 @@ class FrontendMembersField
             sanitize_text_field($variables['field_index']),
             sanitize_text_field($variables["field_type"]),
             sanitize_text_field($variables["field_title"]),
-            sanitize_text_field(isset($variables["registration_page"]) ? $variables["registration_page"] : 'yes'),
+            sanitize_text_field(isset($variables["registration_page"]) ? $variables["registration_page"] : 'no'),
             sanitize_text_field(isset($variables["field_class"]) ? $variables["field_class"] : ''),
             sanitize_text_field(isset($variables["field_style"]) ? $variables["field_style"] : '')
         );
@@ -455,7 +455,7 @@ class FrontendMembersField
 
     protected function save($remove = false)
     {
-        ssv_print($this->id);
+//        ssv_print($this->id);
         global $wpdb;
         if (strlen($this->title) <= 0) {
             $remove = true;

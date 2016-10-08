@@ -50,16 +50,20 @@ function ssv_register_page_content()
             }
         }
         ?>
-        <div class="mui-textfield mui-textfield--float-label">
-            <input id="password" type="password" name="password" class="mui--is-empty mui--is-dirty" required>
-            <label for="password">Password</label>
-        </div>
-        <div class="mui-textfield mui-textfield--float-label">
-            <input id="password_confirm" type="password" name="password_confirm" class="mui--is-empty mui--is-dirty" required>
-            <label for="password_confirm">Confirm Password</label>
-        </div>
-        <?php $site_key = get_option('ssv_recaptcha_site_key'); ?>
-        <div class="g-recaptcha" data-sitekey="<?php echo $site_key; ?>"></div>
+        <?php if (!is_user_logged_in() || (is_user_logged_in() && !FrontendMember::get_current_user()->isBoard())): ?>
+            <div class="mui-textfield mui-textfield--float-label">
+                <input id="password" type="password" name="password" class="mui--is-empty mui--is-dirty" required>
+                <label for="password">Password</label>
+            </div>
+            <div class="mui-textfield mui-textfield--float-label">
+                <input id="password_confirm" type="password" name="password_confirm" class="mui--is-empty mui--is-dirty" required>
+                <label for="password_confirm">Confirm Password</label>
+            </div>
+            <?php if (get_option('ssv_frontend_members_recaptcha') == 'yes'): ?>
+                <?php $site_key = get_option('ssv_recaptcha_site_key'); ?>
+                <div class="g-recaptcha" data-sitekey="<?php echo $site_key; ?>"></div>
+            <?php endif; ?>
+        <?php endif; ?>
         <input type="hidden" name="register" value="yes"/>
         <button class="mui-btn mui-btn--primary" type="submit" name="submit" id="submit">Register</button>
         <?php wp_nonce_field('ssv_create_members_profile'); ?>
@@ -71,17 +75,26 @@ function ssv_register_page_content()
 
 function ssv_create_members_profile()
 {
-    if ($_POST['password'] != $_POST['password_confirm']) {
-        return new Message('Password does not match', Message::ERROR_MESSAGE);
+    if (!is_user_logged_in() || (is_user_logged_in() && !FrontendMember::get_current_user()->isBoard())) {
+        $password = wp_generate_password();
+        $_POST['password'] = $password;
+        $email = $_POST['email'];
+        $display_name = $_POST['first_name'] . ' ' . $_POST['last_name'];
+    } else {
+        if ($_POST['password'] != $_POST['password_confirm']) {
+            return new Message('Password does not match', Message::ERROR_MESSAGE);
+        }
     }
     if (isset($_POST['iban']) && !ssv_is_valid_iban($_POST['iban'])) {
         return new Message('Invalid IBAN', Message::ERROR_MESSAGE);
     }
-    $secretKey = get_option('ssv_recaptcha_secret_key');
-    $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=" . $secretKey . "&response=" . $_POST['g-recaptcha-response']);
-    $responseKeys = json_decode($response, true);
-    if (intval($responseKeys["success"]) !== 1) {
-        return new Message('You failed the reCaptcha. Are you a robot?', Message::ERROR_MESSAGE);
+    if (get_option('ssv_frontend_members_recaptcha') == 'yes') {
+        $secretKey    = get_option('ssv_recaptcha_secret_key');
+        $response     = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=" . $secretKey . "&response=" . $_POST['g-recaptcha-response']);
+        $responseKeys = json_decode($response, true);
+        if (intval($responseKeys["success"]) !== 1) {
+            return new Message('You failed the reCaptcha. Are you a robot?', Message::ERROR_MESSAGE);
+        }
     }
     $user = FrontendMember::registerFromPOST();
     foreach ($_POST as $name => $val) {
@@ -104,9 +117,9 @@ function ssv_create_members_profile()
     }
     $user->remove_role('subscriber');
     $user->add_role(get_option('ssv_frontend_members_default_member_role'));
-    $to = get_option('ssv_frontend_members_member_admin');
+    $to      = get_option('ssv_frontend_members_member_admin');
     $subject = "New Member Registration";
-    $url = get_site_url() . '/profile/?user_id=' . $user->ID;
+    $url     = get_site_url() . '/profile/?user_id=' . $user->ID;
     $message = 'A new member has registered:<br/><br/><a href="' . esc_url($url) . '" target="_blank">' . $user->display_name . '</a><br/><br/>Greetings.';
 
     $headers = "From: $to" . "\r\n";
@@ -114,6 +127,17 @@ function ssv_create_members_profile()
     wp_mail($to, $subject, $message, $headers);
     if (is_plugin_active('ssv-mailchimp/ssv-mailchimp.php')) {
         ssv_update_mailchimp_member($user);
+    }
+    if (FrontendMember::get_current_user()->isBoard()) {
+        $to = $email;
+        $subject = 'Account registration';
+        $message = 'Hello ' . $display_name . ',<br/><br/>';
+        $message .= 'Your account for ' . get_bloginfo('name') . ' has been created.<br/>';
+        $url     = get_site_url() . '/login';
+        $message .= 'You can sign in <a href="' . $url . '">here</a> with username: ' . $email . '<br/>';
+        $message .= 'And password: ' . $password . '<br/>';
+        $message .= 'Please update your profile with the necessary information.';
+        wp_mail($to, $subject, $message);
     }
     unset($_POST);
     $return_message = 'You\'ve successfully registered.<br/>Click <a href="/login">here</a> to sign in.';

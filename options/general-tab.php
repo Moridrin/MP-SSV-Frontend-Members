@@ -19,6 +19,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
     } else {
         update_option('ssv_frontend_members_view_advanced_profile_page', 'false');
     }
+    if (isset($_POST['ssv_frontend_members_recaptcha'])) {
+        update_option('ssv_frontend_members_recaptcha', 'true');
+    } else {
+        update_option('ssv_frontend_members_recaptcha', 'false');
+    }
     update_option('ssv_recaptcha_site_key', sanitize_text_field($_POST['ssv_recaptcha_site_key']));
     update_option('ssv_recaptcha_secret_key', sanitize_text_field($_POST['ssv_recaptcha_secret_key']));
 }
@@ -65,6 +70,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
             <td>
                 <label>
                     <input type="checkbox" name="ssv_frontend_members_view_advanced_profile_page" value="true" <?php if (get_option('ssv_frontend_members_view_advanced_profile_page') == 'true') {
+                        echo "checked";
+                    } ?>/>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">Enable Recapthca</th>
+            <td>
+                <label>
+                    <input type="checkbox" name="ssv_frontend_members_recaptcha" value="true" <?php if (get_option('ssv_frontend_members_recaptcha') == 'true') {
                         echo "checked";
                     } ?>/>
                 </label>
