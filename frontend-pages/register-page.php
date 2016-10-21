@@ -114,7 +114,7 @@ function ssv_create_members_profile()
         }
     }
     $user->remove_role('subscriber');
-    $user->add_role(get_option('ssv_frontend_members_default_member_role'));
+    $user->set_role(get_option('ssv_frontend_members_default_member_role'));
     $to      = get_option('ssv_frontend_members_member_admin');
     $subject = "New Member Registration";
     $url     = get_site_url() . '/profile/?user_id=' . $user->ID;
