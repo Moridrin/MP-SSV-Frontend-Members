@@ -75,15 +75,13 @@ function ssv_register_page_content()
 
 function ssv_create_members_profile()
 {
-    if (!is_user_logged_in() || (is_user_logged_in() && !FrontendMember::get_current_user()->isBoard())) {
+    if (is_user_logged_in() && FrontendMember::get_current_user()->isBoard()) {
         $password = wp_generate_password();
         $_POST['password'] = $password;
         $email = $_POST['email'];
         $display_name = $_POST['first_name'] . ' ' . $_POST['last_name'];
-    } else {
-        if ($_POST['password'] != $_POST['password_confirm']) {
+    } elseif ($_POST['password'] != $_POST['password_confirm']) {
             return new Message('Password does not match', Message::ERROR_MESSAGE);
-        }
     }
     if (isset($_POST['iban']) && !ssv_is_valid_iban($_POST['iban'])) {
         return new Message('Invalid IBAN', Message::ERROR_MESSAGE);
