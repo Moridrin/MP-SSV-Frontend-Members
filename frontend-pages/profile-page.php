@@ -36,11 +36,14 @@ function ssv_profile_page_setup($content)
 
     if (isset($_GET['view']) && $_GET['view'] == 'pdf') {
         require_once(ABSPATH . 'wp-content/plugins/ssv-frontend-members/include/fpdf/SSV_FPDF.php');
+        if (isset($_GET['user_id'])) {
+            $frontendMember = FrontendMember::get_by_id($_GET['user_id']);
+        } else {
+            $frontendMember = FrontendMember::get_current_user();
+        }
         $pdf = new SSV_FPDF();
-        $pdf->AddPage();
-        $pdf->SetFont('Arial','B',16);
-        $pdf->Cell(40,10,'Hello World!');
-        $pdf->Output();
+        $pdf->build($frontendMember);
+        $pdf->Output('F', ABSPATH . 'wp-content/plugins/ssv-frontend-members/exported-profiles/' . str_replace(' ', '_', $frontendMember->display_name) . '.pdf');
     } else {
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['remove_image']) && check_admin_referer('ssv_remove_image_from_profile')) {
             global $wpdb;
@@ -136,7 +139,25 @@ function ssv_profile_page_content_tabs()
         <?php
     }
     ?>
-    <a href="?view=pdf" class="mui-btn mui-btn--primary button-primary">Print Profile</a>
+    <a id="pdf-profile-button" href="#" class="mui-btn mui-btn--primary button-primary">PDF Profile</a>
+    <script>
+        var button = $('#pdf-profile-button');
+        button.removeAttr("onclick");
+        button.click(function(){
+            <?php
+            $url = get_permalink();
+            $url .= '?view=pdf';
+            if (isset($_GET['user_id'])) {
+                $url .= '&user_id=';
+                $url .= $_GET['user_id'];
+            }
+            ?>
+            $.ajax({url: '<?php echo $url; ?>', success: function(data){
+                window.open('<?php echo get_site_url() . '/wp-content/plugins/ssv-frontend-members/exported-profiles/' . str_replace(' ', '_', $member->display_name . '.pdf'); ?>');
+            }});
+            return false;
+        });
+    </script>
     <?php
 
     return ob_get_clean();
