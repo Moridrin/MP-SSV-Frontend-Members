@@ -104,9 +104,9 @@ class SSV_FPDF extends FPDF
         $this->Write('Conditions', true, 8);
         parent::SetFont('Arial', '', 8);
         parent::SetTextColor(0, 0, 0);
-        $this->WriteCell(array(0,1,2,3), 'The Direct Debit arrangement makes it easier for both All Terrain and its members to handle payments of membership, but also payments of other activities. A payment therefore won’t require cash payments or manual bank transfers, but will automatically be cashed with your written or verbal permission.  The rules are listed below. These rules contain the rights of the payee and the obligations for All Terrain.', array(), false);
+        $this->WriteCell(array(0,1,2,3), 'The Direct Debit arrangement makes it easier for both All Terrain and its members to handle payments of membership, but also payments of other activities. A payment therefore won\'t require cash payments or manual bank transfers, but will automatically be cashed with your written or verbal permission.  The rules are listed below. These rules contain the rights of the payee and the obligations for All Terrain.', array(), false);
         $this->whitespace(6);
-        $this->WriteCell(array(0,1,2,3), 'ou could always retain your money without giving a reason, if you do not agree with the payment/depreciation. You have 56 days (8 weeks) to order your bank office to refund the money.', array('bullet' => chr(149)), false);
+        $this->WriteCell(array(0,1,2,3), 'You could always retain your money without giving a reason, if you do not agree with the payment/depreciation. You have 56 days (8 weeks) to order your bank office to refund the money.', array('bullet' => chr(149)), false);
         $this->WriteCell(array(0,1,2,3), 'The treasurer will announce the transaction/payment at least two weeks and up to two months before the fee is deducted.', array('bullet' => chr(149)), false);
         $this->WriteCell(array(0,1,2,3), 'All Terrain may only deduct an amount other than the annual membership fee after you have given written or oral permission.', array('bullet' => chr(149)), false);
         $this->WriteCell(array(0,1,2,3), 'No money will be deducted if the funds in your account are not sufficient.', array('bullet' => chr(149)), false);
