@@ -289,7 +289,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
         id++;
         var li = document.getElementById(sender_id + "_add_option").parentElement;
         $(li).before(
-            '<li><?php echo ssv_get_option('\' + sender_id + \'', array('id' => '\' + id + \'', 'type' => 'text', 'value' => "")); ?></li>'
+            '<li><?php echo ssv_get_option('\' + sender_id + \'', array('id' => '\' + id + \'', 'type' => 'text', 'value' => ""), array(), false); ?></li>'
         );
     }
 </script>
@@ -302,7 +302,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
         id++;
         <?php $object_name = '\' + sender_id + \'' . "_" . '\' + id + \''; ?>
         $(li).before(
-            '<li><?php echo ssv_get_role_select($object_name, "option", "", false); ?></li>'
+            '<li><?php echo ssv_get_role_select($object_name, "option", "", false, array(), false); ?></li>'
         );
     }
 </script>

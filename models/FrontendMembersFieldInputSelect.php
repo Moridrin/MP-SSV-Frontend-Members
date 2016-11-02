@@ -33,17 +33,21 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
         );
         $option_ids = json_decode(json_encode($option_ids), true);
 
-        //Get Option Fields
-        $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
-        $sql = "SELECT * FROM $table WHERE field_type = 'group_option' AND (";
-        for ($i = 0; $i < count($option_ids); $i++) {
-            if ($i != 0) {
-                $sql .= " OR ";
+        if (count($option_ids) > 0) {
+            //Get Option Fields
+            $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
+            $sql   = "SELECT * FROM $table WHERE field_type = 'group_option' AND (";
+            for ($i = 0; $i < count($option_ids); $i++) {
+                if ($i != 0) {
+                    $sql .= " OR ";
+                }
+                $sql .= "id = " . $option_ids[$i]["field_id"];
             }
-            $sql .= "id = " . $option_ids[$i]["field_id"];
+            $sql .= ") ORDER BY id ASC;";
+            $option_fields = $wpdb->get_results($sql);
+        } else {
+            $option_fields = array();
         }
-        $sql .= ") ORDER BY id ASC;";
-        $option_fields = $wpdb->get_results($sql);
 
         //Create Options and Get Value
         $options = array();
