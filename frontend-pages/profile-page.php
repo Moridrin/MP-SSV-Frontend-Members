@@ -65,27 +65,6 @@ function ssv_profile_page_setup($content)
  */
 function ssv_profile_page_content()
 {
-    $tabs = FrontendMembersField::getTabs();
-    if (current_theme_supports('mui')) {
-        if (count($tabs) > 0) {
-            $content = '<div class="mui--hidden-xs">';
-            $content .= ssv_profile_page_content_tabs();
-            $content .= '</div>';
-            $content .= '<div class="mui--visible-xs-block">';
-            $content .= ssv_profile_page_content_single_page();
-            $content .= '</div>';
-        } else {
-            $content = ssv_profile_page_content_single_page();
-        }
-    } else {
-        $content = ssv_profile_page_content_single_page();
-    }
-
-    return $content;
-}
-
-function ssv_profile_page_content_tabs()
-{
     if (isset($_GET['user_id'])) {
         $member     = get_user_by('id', $_GET['user_id']);
         $action_url = '/profile/?user_id=' . $member->ID;
@@ -96,6 +75,49 @@ function ssv_profile_page_content_tabs()
     $can_edit = ($member == wp_get_current_user() || current_user_can('edit_user'));
 
     $member = new FrontendMember($member);
+
+    $_SESSION["ABSPATH"]         = ABSPATH;
+    $_SESSION["first_name"]      = $member->first_name;
+    $_SESSION["initials"]        = $member->getMeta('initials');
+    $_SESSION["last_name"]       = $member->last_name;
+    $_SESSION["gender"]          = $member->getMeta('gender');
+    $_SESSION["iban"]            = $member->getMeta('iban');
+    $_SESSION["date_of_birth"]   = $member->getMeta('date_of_birth');
+    $_SESSION["street"]          = $member->getMeta('street');
+    $_SESSION["email"]           = $member->getMeta('email');
+    $_SESSION["postal_code"]     = $member->getMeta('postal_code');
+    $_SESSION["city"]            = $member->getMeta('city');
+    $_SESSION["phone_number"]    = $member->getMeta('phone_number');
+    $_SESSION["emergency_phone"] = $member->getMeta('emergency_phone');
+
+    if (current_theme_supports('mui')) {
+        $tabs = FrontendMembersField::getTabs();
+        if (count($tabs) > 0) {
+            $content = '<div class="mui--hidden-xs">';
+            $content .= ssv_profile_page_content_tabs($member, $can_edit, $action_url);
+            $content .= '</div>';
+            $content .= '<div class="mui--visible-xs-block">';
+            $content .= ssv_profile_page_content_single_page($member, $can_edit);
+            $content .= '</div>';
+        } else {
+            $content = ssv_profile_page_content_single_page($member, $can_edit);
+        }
+    } else {
+        $content = ssv_profile_page_content_single_page($member, $can_edit);
+    }
+
+    return $content;
+}
+
+/**
+ * @param FrontendMember $member
+ * @param string         $action_url
+ * @param bool           $can_edit
+ *
+ * @return string
+ */
+function ssv_profile_page_content_tabs($member, $can_edit = false, $action_url = '/profile/')
+{
     ob_start();
     echo ssv_get_profile_page_tab_select($member);
     $tabs = FrontendMembersField::getTabs();
@@ -127,19 +149,6 @@ function ssv_profile_page_content_tabs()
         </div>
         <?php
     }
-    $_SESSION["ABSPATH"] = ABSPATH;
-    $_SESSION["first_name"] = $member->first_name;
-    $_SESSION["initials"] = $member->getMeta('initials');
-    $_SESSION["last_name"] = $member->last_name;
-    $_SESSION["gender"] = $member->getMeta('gender');
-    $_SESSION["iban"] = $member->getMeta('iban');
-    $_SESSION["date_of_birth"] = $member->getMeta('date_of_birth');
-    $_SESSION["street"] = $member->getMeta('street');
-    $_SESSION["email"] = $member->getMeta('email');
-    $_SESSION["postal_code"] = $member->getMeta('postal_code');
-    $_SESSION["city"] = $member->getMeta('city');
-    $_SESSION["phone_number"] = $member->getMeta('phone_number');
-    $_SESSION["emergency_phone"] = $member->getMeta('emergency_phone');
     ?>
     <a href="<?php echo get_site_url() . '/wp-content/plugins/ssv-frontend-members/frontend-pages/direct-debit-pdf.php'; ?>" target="_blank" class="mui-btn mui-btn--primary button-primary">Direct Debit PDF</a>
     <?php
@@ -147,18 +156,14 @@ function ssv_profile_page_content_tabs()
     return ob_get_clean();
 }
 
-function ssv_profile_page_content_single_page()
+/**
+ * @param FrontendMember $member
+ * @param bool           $can_edit
+ *
+ * @return string
+ */
+function ssv_profile_page_content_single_page($member, $can_edit = false)
 {
-    $can_edit = false;
-    if (isset($_GET['user_id'])) {
-        $member = get_user_by('id', $_GET['user_id']);
-    } else {
-        $member = wp_get_current_user();
-    }
-    if ($member == wp_get_current_user() || current_user_can('edit_user')) {
-        $can_edit = true;
-    }
-    $member = new FrontendMember($member);
     ob_start();
     $items = FrontendMembersField::getAll();
     ?>
@@ -177,6 +182,7 @@ function ssv_profile_page_content_single_page()
         }
         ?>
     </form>
+    <a href="<?php echo get_site_url() . '/wp-content/plugins/ssv-frontend-members/frontend-pages/direct-debit-pdf.php'; ?>" target="_blank" class="mui-btn mui-btn--primary button-primary">Direct Debit PDF</a><br/>
     <?php
     if ($member->isCurrentUser()) {
         $url = (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '?logout=success';
