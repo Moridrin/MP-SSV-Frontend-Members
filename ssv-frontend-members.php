@@ -297,7 +297,7 @@ function ssv_custom_user_columns($column_headers)
         } else {
             $url .= '&order=DESC';
         }
-        $column_headers['ssv_member'] = '<a href="'.$url.'">Member</a>';
+        $column_headers['ssv_member'] = '<a href="' . $url . '">Member</a>';
     }
     $selected_columns = json_decode(get_option('ssv_frontend_members_user_columns'));
     $selected_columns = $selected_columns ?: array();

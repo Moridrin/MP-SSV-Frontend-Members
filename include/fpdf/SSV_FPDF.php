@@ -48,10 +48,22 @@ class SSV_FPDF extends FPDF
      *
      * @return $this
      */
-    public function build($frontendMember)
+    public function build($ABSPATH,
+                          $first_name,
+                          $initials,
+                          $last_name,
+                          $gender,
+                          $iban,
+                          $date_of_birth,
+                          $street,
+                          $email,
+                          $postal_code,
+                          $city,
+                          $phone_number,
+                          $emergency_phone)
     {
         //Start
-        $this->AddPageWithFormat();
+        $this->AddPageWithFormat($ABSPATH);
         parent::SetFont('Arial', '', 26);
         $this->Write('Agreement Direct Debit SEPA (Automatische Incasso)', true, 12);
         $this->whitespace(4);
@@ -74,29 +86,29 @@ class SSV_FPDF extends FPDF
         parent::SetTextColor(0, 0, 0);
 
         $this->WriteCell(0, 'First Name: ');
-        $this->WriteCell(1, $frontendMember->first_name);
+        $this->WriteCell(1, $first_name);
         $this->WriteCell(2, 'Initials: ');
-        $this->WriteCell(3, $frontendMember->getMeta('initials'), array(), false);
+        $this->WriteCell(3, $initials, array(), false);
         $this->WriteCell(0, 'Last Name: ');
-        $this->WriteCell(1, $frontendMember->last_name);
+        $this->WriteCell(1, $last_name);
         $this->WriteCell(2, 'Gender: ');
-        $this->WriteCell(3, $frontendMember->getMeta('gender'), array(), false);
+        $this->WriteCell(3, $gender, array(), false);
         $this->WriteCell(0, 'Bank Account (IBAN): ');
-        $this->WriteCell(1, $frontendMember->getMeta('iban'));
+        $this->WriteCell(1, $iban);
         $this->WriteCell(2, 'Date of Birth: ');
-        $this->WriteCell(3, $frontendMember->getMeta('date_of_birth'), array(), false);
+        $this->WriteCell(3, $date_of_birth, array(), false);
         $this->WriteCell(0, 'Street + Number: ');
-        $this->WriteCell(1, $frontendMember->getMeta('street'));
+        $this->WriteCell(1, $street);
         $this->WriteCell(2, 'Email: ');
-        $this->WriteCell(3, $frontendMember->getMeta('email'), array(), false);
+        $this->WriteCell(3, $email, array(), false);
         $this->WriteCell(0, 'Postal Code: ');
-        $this->WriteCell(1, $frontendMember->getMeta('postal_code'));
+        $this->WriteCell(1, $postal_code);
         $this->WriteCell(2, 'City and Country: ');
-        $this->WriteCell(3, $frontendMember->getMeta('city') . ' The Netherlands', array(), false);
+        $this->WriteCell(3, $city . ' The Netherlands', array(), false);
         $this->WriteCell(0, 'Phone: ');
-        $this->WriteCell(1, $frontendMember->getMeta('phone_number'));
-        $this->WriteCell(2, 'Phone Emergency Contact: ');
-        $this->WriteCell(3, $frontendMember->getMeta('emergency_phone'), array(), false);
+        $this->WriteCell(1, $phone_number);
+        $this->WriteCell(2, 'Emergency Contact: ');
+        $this->WriteCell(3, $emergency_phone, array(), false);
 
         parent::SetFont('Arial', '', 18);
         parent::SetTextColor(62, 118, 42);
@@ -167,11 +179,11 @@ class SSV_FPDF extends FPDF
         return $height;
     }
 
-    public function AddPageWithFormat($orientation = '', $size = '')
+    public function AddPageWithFormat($ABSPATH, $orientation = '', $size = '')
     {
         parent::AddPage($orientation, $size);
-        $this->Image(ABSPATH . 'wp-content/plugins/ssv-frontend-members/images/Document Header.png', $this->w - $this->pageRMargin - 75, $this->pageTMargin, 75, 37, 'PNG');
-        $this->Image(ABSPATH . 'wp-content/plugins/ssv-frontend-members/images/Vertical Banner.png', $this->pageLMargin, $this->pageTMargin, 25, null, 'PNG');
+        $this->Image($ABSPATH . '/wp-content/plugins/ssv-frontend-members/images/Document Header.png', $this->w - $this->pageRMargin - 75, $this->pageTMargin, 75, 37, 'PNG');
+        $this->Image($ABSPATH . '/wp-content/plugins/ssv-frontend-members/images/Vertical Banner.png', $this->pageLMargin, $this->pageTMargin, 25, null, 'PNG');
         $this->SetXY($this->lMargin, $this->pageTMargin);
 
         // <editor-fold desc="Company Information">
