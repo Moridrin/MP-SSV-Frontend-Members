@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
  * - Easy manage, view and edit member profiles.
  * - Etc.
  * This plugin is fully compatible with the SSV library which can add functionality like: MailChimp, Events, etc.
- * Version: 1.3.2
+ * Version: 1.3.4
  * Author: Jeroen Berkvens
  * Author URI: http://nl.linkedin.com/in/jberkvens/
  * License: WTFPL
@@ -297,7 +297,7 @@ function ssv_custom_user_columns($column_headers)
         } else {
             $url .= '&order=DESC';
         }
-        $column_headers['ssv_member'] = '<a href="'.$url.'">Member</a>';
+        $column_headers['ssv_member'] = '<a href="' . $url . '">Member</a>';
     }
     $selected_columns = json_decode(get_option('ssv_frontend_members_user_columns'));
     $selected_columns = $selected_columns ?: array();

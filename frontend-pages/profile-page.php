@@ -34,35 +34,26 @@ function ssv_profile_page_setup($content)
         return $content;
     }
 
-    if (isset($_GET['view']) && $_GET['view'] == 'pdf') {
-        require_once(ABSPATH . 'wp-content/plugins/ssv-frontend-members/include/fpdf/SSV_FPDF.php');
-        $pdf = new SSV_FPDF();
-        $pdf->AddPage();
-        $pdf->SetFont('Arial','B',16);
-        $pdf->Cell(40,10,'Hello World!');
-        $pdf->Output();
-    } else {
-        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['remove_image']) && check_admin_referer('ssv_remove_image_from_profile')) {
-            global $wpdb;
-            $field_id       = $_POST['remove_image'];
-            $table          = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
-            $image_name     = $wpdb->get_var("SELECT meta_value FROM $table WHERE field_id = $field_id AND meta_key = 'name'");
-            $frontendMember = FrontendMember::get_by_id($_POST['user_id']);
-            unlink($frontendMember->getMeta($image_name . '_path'));
-            $frontendMember->updateMeta($image_name, '');
-            $frontendMember->updateMeta($image_name . '_path', '');
-            echo 'image successfully removed success';
-            return '';
-        } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_frontend_member_profile')) {
-            ssv_save_members_profile();
-        }
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['remove_image']) && check_admin_referer('ssv_remove_image_from_profile')) {
+        global $wpdb;
+        $field_id       = $_POST['remove_image'];
+        $table          = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
+        $image_name     = $wpdb->get_var("SELECT meta_value FROM $table WHERE field_id = $field_id AND meta_key = 'name'");
+        $frontendMember = FrontendMember::get_by_id($_POST['user_id']);
+        unlink($frontendMember->getMeta($image_name . '_path'));
+        $frontendMember->updateMeta($image_name, '');
+        $frontendMember->updateMeta($image_name . '_path', '');
+        echo 'image successfully removed success';
+        return '';
+    } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_frontend_member_profile')) {
+        ssv_save_members_profile();
+    }
 
-        $currentUserIsBoardMember = FrontendMember::get_current_user()->isBoard();
-        if (!isset($_GET['user_id']) || $currentUserIsBoardMember) {
-            $content = ssv_profile_page_content();
-        } else {
-            $content = new Message('You have no access to view this profile', Message::ERROR_MESSAGE);
-        }
+    $currentUserIsBoardMember = FrontendMember::get_current_user()->isBoard();
+    if (!isset($_GET['user_id']) || $currentUserIsBoardMember) {
+        $content = ssv_profile_page_content();
+    } else {
+        $content = new Message('You have no access to view this profile', Message::ERROR_MESSAGE);
     }
 
     return $content;
@@ -95,10 +86,10 @@ function ssv_profile_page_content()
 function ssv_profile_page_content_tabs()
 {
     if (isset($_GET['user_id'])) {
-        $member = get_user_by('id', $_GET['user_id']);
+        $member     = get_user_by('id', $_GET['user_id']);
         $action_url = '/profile/?user_id=' . $member->ID;
     } else {
-        $member = wp_get_current_user();
+        $member     = wp_get_current_user();
         $action_url = '/profile/';
     }
     $can_edit = ($member == wp_get_current_user() || current_user_can('edit_user'));
@@ -135,8 +126,22 @@ function ssv_profile_page_content_tabs()
         </div>
         <?php
     }
+    session_start();
+    $_SESSION["ABSPATH"] = ABSPATH;
+    $_SESSION["first_name"] = $member->first_name;
+    $_SESSION["initials"] = $member->getMeta('initials');
+    $_SESSION["last_name"] = $member->last_name;
+    $_SESSION["gender"] = $member->getMeta('gender');
+    $_SESSION["iban"] = $member->getMeta('iban');
+    $_SESSION["date_of_birth"] = $member->getMeta('date_of_birth');
+    $_SESSION["street"] = $member->getMeta('street');
+    $_SESSION["email"] = $member->getMeta('email');
+    $_SESSION["postal_code"] = $member->getMeta('postal_code');
+    $_SESSION["city"] = $member->getMeta('city');
+    $_SESSION["phone_number"] = $member->getMeta('phone_number');
+    $_SESSION["emergency_phone"] = $member->getMeta('emergency_phone');
     ?>
-    <a href="?view=pdf" class="mui-btn mui-btn--primary button-primary">Print Profile</a>
+    <a href="<?php echo get_site_url() . '/wp-content/plugins/ssv-frontend-members/frontend-pages/direct-debit-pdf.php'; ?>" target="_blank" class="mui-btn mui-btn--primary button-primary">Direct Debit PDF</a>
     <?php
 
     return ob_get_clean();
