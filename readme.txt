@@ -37,6 +37,9 @@ The best way is to add an issue on GitHub (https://github.com/Moridrin/ssv-front
 
 == Changelog ==
 
+= 1.3.4 =
+* Profile to PDF support replaced with Direct Debit PDF.
+
 = 1.3.3 =
 * Profile to PDF support (not dynamic yet).
 * Bugfixes
