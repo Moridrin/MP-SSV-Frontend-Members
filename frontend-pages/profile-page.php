@@ -2,6 +2,7 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+session_start();
 
 /**
  * This function redirects the user to the login page if he/she is not signed in.
@@ -126,7 +127,6 @@ function ssv_profile_page_content_tabs()
         </div>
         <?php
     }
-    session_start();
     $_SESSION["ABSPATH"] = ABSPATH;
     $_SESSION["first_name"] = $member->first_name;
     $_SESSION["initials"] = $member->getMeta('initials');

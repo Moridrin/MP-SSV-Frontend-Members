@@ -1,6 +1,6 @@
 <?php
-require_once('../include/fpdf/SSV_FPDF.php');
 session_start();
+require_once('../include/fpdf/SSV_FPDF.php');
 if (
     !isset($_SESSION['ABSPATH'])
     || !isset($_SESSION['first_name'])
