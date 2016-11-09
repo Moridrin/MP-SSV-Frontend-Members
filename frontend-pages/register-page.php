@@ -75,7 +75,7 @@ function ssv_register_page_content()
 
 function ssv_create_members_profile()
 {
-    if (is_user_logged_in() && FrontendMember::get_current_user() != null && FrontendMember::get_current_user()->isBoard()) {
+    if (is_user_logged_in() && FrontendMember::get_current_user()->isBoard()) {
         $password          = wp_generate_password();
         $_POST['password'] = $password;
         $email             = $_POST['email'];
@@ -126,7 +126,7 @@ function ssv_create_members_profile()
     if (is_plugin_active('ssv-mailchimp/ssv-mailchimp.php')) {
         ssv_update_mailchimp_member($user);
     }
-    if (FrontendMember::get_current_user()->isBoard()) {
+    if (is_user_logged_in() && FrontendMember::get_current_user()->isBoard()) {
         $to      = $email;
         $subject = 'Account registration';
         $message = 'Hello ' . $display_name . ',<br/><br/>';
