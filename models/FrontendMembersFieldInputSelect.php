@@ -90,6 +90,50 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
         return $remove;
     }
 
+    /**
+     * @param FrontendMember $frontend_member
+     *
+     * @return string the HTML element
+     */
+    public function getHTML($frontend_member = null)
+    {
+        ob_start();
+        if ($frontend_member == null) {
+            $value = "";
+            $this->display = 'normal';
+        } else {
+            $value = $frontend_member->getMeta($this->name);
+        }
+        if (current_theme_supports('mui')) {
+            ?>
+            <div class="mui-select mui-textfield">
+                <label for="<?php echo esc_html($this->id); ?>"><?php echo esc_html($this->title); ?></label>
+                <select id="<?php echo esc_html($this->id); ?>" name="<?php echo esc_html($this->name); ?>" class="<?php echo esc_html($this->class); ?>" style="<?php echo $this->style; ?>">
+                    <?php foreach ($this->options as $option) {
+                        /* @var $option FrontendMembersFieldInputSelectRoleOption|FrontendMembersFieldInputSelectTextOption */
+                        echo $option->getHTML($value);
+                    }
+                    ?>
+                </select>
+            </div>
+            <?php
+        } else {
+            ?>
+            <label for="<?php echo esc_html($this->id); ?>"><?php echo esc_html($this->title); ?></label>
+            <select id="<?php echo esc_html($this->id); ?>" name="<?php echo esc_html($this->name); ?>" class="<?php echo esc_html($this->class); ?>" style="<?php echo $this->style; ?>">
+                <?php foreach ($this->options as $option) {
+                    /* @var $option FrontendMembersFieldInputSelectRoleOption|FrontendMembersFieldInputSelectTextOption */
+                    echo $option->getHTML($value);
+                }
+                ?>
+            </select>
+            <br/>
+            <?php
+        }
+
+        return ob_get_clean();
+    }
+
     public function getOptionRow()
     {
         ob_start();
