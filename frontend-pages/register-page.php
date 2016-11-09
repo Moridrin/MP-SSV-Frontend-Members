@@ -75,13 +75,13 @@ function ssv_register_page_content()
 
 function ssv_create_members_profile()
 {
-    if (is_user_logged_in() && FrontendMember::get_current_user()->isBoard()) {
-        $password = wp_generate_password();
+    if (is_user_logged_in() && FrontendMember::get_current_user() != null && FrontendMember::get_current_user()->isBoard()) {
+        $password          = wp_generate_password();
         $_POST['password'] = $password;
-        $email = $_POST['email'];
-        $display_name = $_POST['first_name'] . ' ' . $_POST['last_name'];
+        $email             = $_POST['email'];
+        $display_name      = $_POST['first_name'] . ' ' . $_POST['last_name'];
     } elseif ($_POST['password'] != $_POST['password_confirm']) {
-            return new Message('Password does not match', Message::ERROR_MESSAGE);
+        return new Message('Password does not match', Message::ERROR_MESSAGE);
     }
     if (isset($_POST['iban']) && !ssv_is_valid_iban($_POST['iban'])) {
         return new Message('Invalid IBAN', Message::ERROR_MESSAGE);
@@ -127,11 +127,11 @@ function ssv_create_members_profile()
         ssv_update_mailchimp_member($user);
     }
     if (FrontendMember::get_current_user()->isBoard()) {
-        $to = $email;
+        $to      = $email;
         $subject = 'Account registration';
         $message = 'Hello ' . $display_name . ',<br/><br/>';
         $message .= 'Your account for ' . get_bloginfo('name') . ' has been created.<br/>';
-        $url     = get_site_url() . '/login';
+        $url = get_site_url() . '/login';
         $message .= 'You can sign in <a href="' . $url . '">here</a> with username: ' . $email . '<br/>';
         $message .= 'And password: ' . $password . '<br/>';
         $message .= 'Please update your profile with the necessary information.';
