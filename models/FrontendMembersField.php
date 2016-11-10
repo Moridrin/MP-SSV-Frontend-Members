@@ -456,7 +456,6 @@ class FrontendMembersField
 
     protected function save($remove = false)
     {
-//        ssv_print($this->id);
         global $wpdb;
         if (strlen($this->title) <= 0) {
             $remove = true;

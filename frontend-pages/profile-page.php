@@ -141,6 +141,10 @@ function ssv_profile_page_content_tabs($member, $can_edit = false, $action_url =
                 <?php
                 $items_in_tab = FrontendMembersField::getItemsInTab($tab);
                 foreach ($items_in_tab as $item) {
+                    if (isset($item->name) && isset($_SESSION['field_errors'][$item->name])) {
+                        /** @noinspection PhpUndefinedMethodInspection */
+                        echo $_SESSION['field_errors'][$item->name]->htmlPrint();
+                    }
                     /** @noinspection PhpUndefinedMethodInspection */
                     echo $item->getHTML($member);
                 }
@@ -228,18 +232,25 @@ function ssv_get_profile_page_tab_select($member)
 function ssv_save_members_profile()
 {
     if (isset($_GET['user_id'])) {
-        $user = get_user_by('id', $_GET['user_id']);
+        $user = FrontendMember::get_by_id($_GET['user_id']);
     } else {
-        $user = wp_get_current_user();
+        $user = FrontendMember::get_current_user();
     }
-    $user = new FrontendMember($user);
-    foreach ($_POST as $name => $val) {
-        if (strpos($name, "_reset") !== false) {
-            $name = str_replace("_reset", "", $name);
-        }
-        $update_response = $user->updateMeta($name, $val);
-        if ($update_response !== true) {
-            $update_response->htmlPrint();
+    $_SESSION['field_errors'] = array();
+    $items = FrontendMembersField::getAll(array('field_type' => 'input'));
+    /** @var FrontendMembersFieldInput $item */
+    foreach ($items as $item) {
+        ssv_print($item->title);
+        ssv_print($item->isValueRequired() && !isset($_POST[$item->name]) && !isset($_POST[$item->name . '_reset']));
+        if ($item->isValueRequired() && !isset($_POST[$item->name]) && !isset($_POST[$item->name . '_reset'])) {
+            $error = new Message($item->title . ' is required but there was no value given.', Message::ERROR_MESSAGE);
+            $_SESSION['field_errors'][$item->name] = $error;
+        } else {
+            $value           = isset($_POST[$item->name]) ? $_POST[$item->name] : $_POST[$item->name . '_reset'];
+            $update_response = $user->updateMeta($item->name, sanitize_text_field($value));
+            if ($update_response !== true) {
+                echo $update_response->htmlPrint();
+            }
         }
     }
     foreach ($_FILES as $name => $file) {

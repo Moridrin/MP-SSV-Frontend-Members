@@ -15,6 +15,16 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
     public $display;
 
     /**
+     * A checkbox always has a value ('no' or 'yes')
+     *
+     * @return bool required
+     */
+    public function isValueRequired()
+    {
+        return true;
+    }
+
+    /**
      * This function returns all the group options for this field.
      *
      * @return array|null with all options linked to this FrontendMembersField or null if this is not a group field.

@@ -37,6 +37,14 @@ class FrontendMembersFieldInput extends FrontendMembersField
     }
 
     /**
+     * This is a function that is handled in the sub classes.
+     */
+    public function isValueRequired()
+    {
+        throw new BadMethodCallException();
+    }
+
+    /**
      * @param int    $index      is an index that specifies the display (/tab) order for the field.
      * @param string $title      is the title of this component.
      * @param string $input_type is the input type of the input field.

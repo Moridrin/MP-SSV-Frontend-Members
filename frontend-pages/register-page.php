@@ -95,11 +95,14 @@ function ssv_create_members_profile()
         }
     }
     $user = FrontendMember::registerFromPOST();
-    foreach ($_POST as $name => $val) {
-        if (strpos($name, "_reset") !== false) {
-            $name = str_replace("_reset", "", $name);
+    $items = FrontendMembersField::getAll(array('field_type' => 'input'));
+    /** @var FrontendMembersFieldInput $item */
+    foreach ($items as $item) {
+        if ($item->isValueRequired() && !isset($_POST[$item->name]) && !isset($_POST[$item->name . '_reset'])) {
+            return new Message($item->title . ' is required but there was no value given.', Message::ERROR_MESSAGE);
         }
-        $user->updateMeta($name, sanitize_text_field($val));
+        $value = isset($_POST[$item->name]) ? $_POST[$item->name] : $_POST[$item->name . '_reset'];
+        $user->updateMeta($item->name, sanitize_text_field($value));
     }
     $user->updateMeta("display_name", $user->getMeta('first_name') . ' ' . $user->getMeta('last_name'));
     foreach ($_FILES as $name => $file) {
@@ -127,12 +130,15 @@ function ssv_create_members_profile()
         ssv_update_mailchimp_member($user);
     }
     if (is_user_logged_in() && FrontendMember::get_current_user()->isBoard()) {
+        /** @noinspection PhpUndefinedVariableInspection */
         $to      = $email;
         $subject = 'Account registration';
+        /** @noinspection PhpUndefinedVariableInspection */
         $message = 'Hello ' . $display_name . ',<br/><br/>';
         $message .= 'Your account for ' . get_bloginfo('name') . ' has been created.<br/>';
         $url = get_site_url() . '/login';
         $message .= 'You can sign in <a href="' . $url . '">here</a> with username: ' . $email . '<br/>';
+        /** @noinspection PhpUndefinedVariableInspection */
         $message .= 'And password: ' . $password . '<br/>';
         $message .= 'Please update your profile with the necessary information.';
         wp_mail($to, $subject, $message);

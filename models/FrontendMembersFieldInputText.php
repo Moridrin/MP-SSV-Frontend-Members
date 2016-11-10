@@ -35,6 +35,16 @@ class FrontendMembersFieldInputText extends FrontendMembersFieldInput
     }
 
     /**
+     * If the field is required than this field does need a value.
+     *
+     * @return bool returns if the field is required.
+     */
+    public function isValueRequired()
+    {
+        return $this->required;
+    }
+
+    /**
      * @param int    $index       is an index that specifies the display (/tab) order for the field.
      * @param string $title       is the title of this component.
      * @param string $name        is the name of the input field.

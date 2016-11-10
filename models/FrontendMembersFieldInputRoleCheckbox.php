@@ -32,6 +32,16 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
     }
 
     /**
+     * A checkbox always has a value ('no' or 'yes')
+     *
+     * @return bool required
+     */
+    public function isValueRequired()
+    {
+        return true;
+    }
+
+    /**
      * @param int             $index        is an index that specifies the display (/tab) order for the field.
      * @param string          $title        is the title of this component.
      * @param string          $name         is the name of the input field.
