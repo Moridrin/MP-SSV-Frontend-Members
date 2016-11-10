@@ -149,25 +149,26 @@ class FrontendMembersField
             case "input":
                 $input_type = $field->getMeta("input_type");
                 $name = $field->getMeta("name");
-                $field = new FrontendMembersFieldInput($field, $input_type, $name);
+                $defaultValue = $field->getMeta("default_value");
+                $field = new FrontendMembersFieldInput($field, $input_type, $name, $defaultValue);
                 switch ($input_type) {
                     case "custom":
-                        $field = new FrontendMembersFieldInputCustom($field, $field->getMeta('input_type_custom'), $field->getMeta('required'), $field->getMeta('display'), $field->getMeta('placeholder'));
+                        $field = new FrontendMembersFieldInputCustom($field, $field->getMeta('input_type_custom'), $field->getMeta('required'), $field->getMeta('display'), $field->getMeta('placeholder'), $field->getMeta('default_value'));
                         break;
                     case "image":
                         $field = new FrontendMembersFieldInputImage($field, $field->getMeta('required'), $field->getMeta('preview'));
                         break;
                     case "role_checkbox":
-                        $field = new FrontendMembersFieldInputRoleCheckbox($field, $field->getMeta('role'), $field->getMeta('display'));
+                        $field = new FrontendMembersFieldInputRoleCheckbox($field, $field->getMeta('role'), $field->getMeta('display'), $field->getMeta('default_value'));
                         break;
                     case "role_select":
                         $field = new FrontendMembersFieldInputSelectRole($field, $field->getMeta('display'));
                         break;
                     case "text":
-                        $field = new FrontendMembersFieldInputText($field, $field->getMeta('required'), $field->getMeta('display'), $field->getMeta('placeholder'));
+                        $field = new FrontendMembersFieldInputText($field, $field->getMeta('required'), $field->getMeta('display'), $field->getMeta('placeholder'), $field->getMeta('default_value'));
                         break;
                     case "text_checkbox":
-                        $field = new FrontendMembersFieldInputTextCheckbox($field, $field->getMeta('help_text'), $field->getMeta('display'));
+                        $field = new FrontendMembersFieldInputTextCheckbox($field, $field->getMeta('help_text'), $field->getMeta('display'), $field->getMeta('default_value'));
                         break;
                     case "text_select":
                         $field = new FrontendMembersFieldInputSelectText($field, $field->getMeta('display'));
@@ -296,23 +297,23 @@ class FrontendMembersField
                 $field = new FrontendMembersFieldInput($field, $input_type, $name);
                 switch ($input_type) {
                     case "custom":
-                        $field = new FrontendMembersFieldInputCustom($field, $field->getMetaFromPOST('input_type_custom'), $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('placeholder'));
+                        $field = new FrontendMembersFieldInputCustom($field, $field->getMetaFromPOST('input_type_custom'), $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('placeholder'), $field->getMetaFromPOST('default_value'));
                         break;
                     case "image":
                         $field = new FrontendMembersFieldInputImage($field, $field->getMetaFromPOST('required'), $field->getMetaFromPOST('preview'));
                         break;
                     case "role_checkbox":
-                        $field = new FrontendMembersFieldInputRoleCheckbox($field, $field->getMetaFromPOST('role'), $field->getMetaFromPOST('display'));
+                        $field = new FrontendMembersFieldInputRoleCheckbox($field, $field->getMetaFromPOST('role'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('checked_by_default'));
                         break;
                     case "role_select":
                         $field = new FrontendMembersFieldInputSelectRole($field, $field->getMetaFromPOST('display'));
                         $field->options = $field->getOptionsFromPOST($variables);
                         break;
                     case "text":
-                        $field = new FrontendMembersFieldInputText($field, $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('placeholder'));
+                        $field = new FrontendMembersFieldInputText($field, $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('placeholder'), $field->getMetaFromPOST('default_value'));
                         break;
                     case "text_checkbox":
-                        $field = new FrontendMembersFieldInputTextCheckbox($field, $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'));
+                        $field = new FrontendMembersFieldInputTextCheckbox($field, $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('checked_by_default'));
                         break;
                     case "text_select":
                         $field = new FrontendMembersFieldInputSelectText($field, $field->getMetaFromPOST('display'));

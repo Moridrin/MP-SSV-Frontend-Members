@@ -37,6 +37,15 @@ The best way is to add an issue on GitHub (https://github.com/Moridrin/ssv-front
 
 == Changelog ==
 
+= 1.4.0 =
+* Profile to PDF support improved.
+** Works now with a redirect through profile page ensuring the correct session data.
+** Moved to backend users overview.
+* Improvements to Fields
+** Default values
+** Verification of mandatory fields
+** Label fields
+
 = 1.3.4 =
 * Profile to PDF support replaced with Direct Debit PDF.
 

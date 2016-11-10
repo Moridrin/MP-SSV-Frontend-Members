@@ -62,6 +62,7 @@ class FrontendMembersFieldInputSelectText extends FrontendMembersFieldInputSelec
         echo parent::getOptionRow();
         echo ssv_get_td(ssv_get_options($this->id, self::getOptionsAsArray(), "text"));
         echo ssv_get_td(ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
+        echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
         if (get_option('ssv_frontend_members_view_advanced_profile_page', 'false') == 'true') {
             echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
         }

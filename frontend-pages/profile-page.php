@@ -35,6 +35,28 @@ function ssv_profile_page_setup($content)
         return $content;
     }
 
+    if (isset($_GET['view']) && $_GET['view'] == 'directDebitPDF') {
+        if (isset($_GET['user_id'])) {
+            $member = FrontendMember::get_by_id($_GET['user_id']);
+        } else {
+            $member = FrontendMember::get_current_user();
+        }
+        $_SESSION["ABSPATH"]         = ABSPATH;
+        $_SESSION["first_name"]      = $member->first_name;
+        $_SESSION["initials"]        = $member->getMeta('initials');
+        $_SESSION["last_name"]       = $member->last_name;
+        $_SESSION["gender"]          = $member->getMeta('gender');
+        $_SESSION["iban"]            = $member->getMeta('iban');
+        $_SESSION["date_of_birth"]   = $member->getMeta('date_of_birth');
+        $_SESSION["street"]          = $member->getMeta('street');
+        $_SESSION["email"]           = $member->getMeta('email');
+        $_SESSION["postal_code"]     = $member->getMeta('postal_code');
+        $_SESSION["city"]            = $member->getMeta('city');
+        $_SESSION["phone_number"]    = $member->getMeta('phone_number');
+        $_SESSION["emergency_phone"] = $member->getMeta('emergency_phone');
+        ssv_redirect(get_site_url() . '/wp-content/plugins/ssv-frontend-members/frontend-pages/direct-debit-pdf.php');
+    }
+
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['remove_image']) && check_admin_referer('ssv_remove_image_from_profile')) {
         global $wpdb;
         $field_id       = $_POST['remove_image'];
@@ -66,29 +88,15 @@ function ssv_profile_page_setup($content)
 function ssv_profile_page_content()
 {
     if (isset($_GET['user_id'])) {
-        $member     = get_user_by('id', $_GET['user_id']);
+        $member     = FrontendMember::get_by_id($_GET['user_id']);
         $action_url = '/profile/?user_id=' . $member->ID;
     } else {
-        $member     = wp_get_current_user();
+        $member     = FrontendMember::get_current_user();
         $action_url = '/profile/';
     }
     $can_edit = ($member == wp_get_current_user() || current_user_can('edit_user'));
 
     $member = new FrontendMember($member);
-
-    $_SESSION["ABSPATH"]         = ABSPATH;
-    $_SESSION["first_name"]      = $member->first_name;
-    $_SESSION["initials"]        = $member->getMeta('initials');
-    $_SESSION["last_name"]       = $member->last_name;
-    $_SESSION["gender"]          = $member->getMeta('gender');
-    $_SESSION["iban"]            = $member->getMeta('iban');
-    $_SESSION["date_of_birth"]   = $member->getMeta('date_of_birth');
-    $_SESSION["street"]          = $member->getMeta('street');
-    $_SESSION["email"]           = $member->getMeta('email');
-    $_SESSION["postal_code"]     = $member->getMeta('postal_code');
-    $_SESSION["city"]            = $member->getMeta('city');
-    $_SESSION["phone_number"]    = $member->getMeta('phone_number');
-    $_SESSION["emergency_phone"] = $member->getMeta('emergency_phone');
 
     if (current_theme_supports('mui')) {
         $tabs = FrontendMembersField::getTabs();
@@ -149,9 +157,6 @@ function ssv_profile_page_content_tabs($member, $can_edit = false, $action_url =
         </div>
         <?php
     }
-    ?>
-    <a href="<?php echo get_site_url() . '/wp-content/plugins/ssv-frontend-members/frontend-pages/direct-debit-pdf.php'; ?>" target="_blank" class="mui-btn mui-btn--primary button-primary">Direct Debit PDF</a>
-    <?php
 
     return ob_get_clean();
 }
@@ -182,7 +187,6 @@ function ssv_profile_page_content_single_page($member, $can_edit = false)
         }
         ?>
     </form>
-    <a href="<?php echo get_site_url() . '/wp-content/plugins/ssv-frontend-members/frontend-pages/direct-debit-pdf.php'; ?>" target="_blank" class="mui-btn mui-btn--primary button-primary">Direct Debit PDF</a><br/>
     <?php
     if ($member->isCurrentUser()) {
         $url = (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '?logout=success';
