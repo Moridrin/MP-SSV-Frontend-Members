@@ -24,17 +24,40 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
     {
         parent::__construct($field, $field->input_type, $field->name);
         $this->required = $required;
-        $this->preview = $preview;
+        $this->preview  = $preview;
     }
 
     /**
      * If the field is required than this field does need a value.
      *
+     * @param FrontendMember|null $frontend_member is the member to check if this member already has the required value.
+     *
      * @return bool returns if the field is required.
      */
-    public function isValueRequired()
+    public function isValueRequiredForMember($frontend_member = null)
     {
-        return $this->required;
+        if (!$this->isEditable()) {
+            return false;
+        }
+        if (FrontendMember::get_current_user() != null && FrontendMember::get_current_user()->isBoard()) {
+            return false;
+        }
+        if ($frontend_member == null) {
+            return $this->required == "yes";
+        } else {
+            $location = $frontend_member->getMeta($this->name);
+            return $this->required == "yes" && $location == "";
+        }
+    }
+
+    /**
+     * This field is always editable.
+     *
+     * @return bool returns true.
+     */
+    public function isEditable()
+    {
+        return true;
     }
 
     /**
@@ -79,7 +102,7 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
     {
         ob_start();
         if ($frontend_member == null) {
-            $location = "";
+            $location      = "";
             $this->preview = "no";
         } else {
             $location = $frontend_member->getMeta($this->name);

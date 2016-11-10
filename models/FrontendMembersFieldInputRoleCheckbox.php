@@ -34,11 +34,33 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
     /**
      * A checkbox always has a value ('no' or 'yes')
      *
+     * @param FrontendMember|null $frontend_member is the member to check if this member already has the required value.
+     *
      * @return bool required
      */
-    public function isValueRequired()
+    public function isValueRequiredForMember($frontend_member = null)
     {
-        return true;
+        if (!$this->isEditable()) {
+            return false;
+        }
+        if (FrontendMember::get_current_user() != null && FrontendMember::get_current_user()->isBoard()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * If the field is displayed normally than this field is editable.
+     *
+     * @return bool returns if the field is displayed normally.
+     */
+    public function isEditable()
+    {
+        if (FrontendMember::get_current_user() != null && FrontendMember::get_current_user()->isBoard()) {
+            return true;
+        }
+        return $this->display == 'normal';
     }
 
     /**

@@ -37,20 +37,42 @@ class FrontendMembersFieldInputText extends FrontendMembersFieldInput
     /**
      * If the field is required than this field does need a value.
      *
+     * @param FrontendMember|null $frontend_member is the member to check if this member already has the required value.
+     *
      * @return bool returns if the field is required.
      */
-    public function isValueRequired()
+    public function isValueRequiredForMember($frontend_member = null)
     {
-        return $this->required;
+        if (!$this->isEditable()) {
+            return false;
+        }
+        if (FrontendMember::get_current_user() != null && FrontendMember::get_current_user()->isBoard()) {
+            return false;
+        } else {
+            return $this->required == 'yes';
+        }
     }
 
     /**
-     * @param int    $index       is an index that specifies the display (/tab) order for the field.
-     * @param string $title       is the title of this component.
-     * @param string $name        is the name of the input field.
-     * @param bool   $required    is true if this is a required input field.
-     * @param string $display     is the way the input field is displayed (readonly, disabled or normal) default is normal.
-     * @param string $placeholder is the placeholder text that gives an example of what to enter.
+     * If the field is displayed normally than this field is editable.
+     *
+     * @return bool returns if the field is displayed normally.
+     */
+    public function isEditable()
+    {
+        if (FrontendMember::get_current_user() != null && FrontendMember::get_current_user()->isBoard()) {
+            return true;
+        }
+        return $this->display == 'normal';
+    }
+
+    /**
+     * @param int    $index        is an index that specifies the display (/tab) order for the field.
+     * @param string $title        is the title of this component.
+     * @param string $name         is the name of the input field.
+     * @param bool   $required     is true if this is a required input field.
+     * @param string $display      is the way the input field is displayed (readonly, disabled or normal) default is normal.
+     * @param string $placeholder  is the placeholder text that gives an example of what to enter.
      * @param string $defaultValue is whether the checkbox is checked or not when filling in the form.
      *
      * @return FrontendMembersFieldInputText

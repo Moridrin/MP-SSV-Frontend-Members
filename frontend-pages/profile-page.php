@@ -35,6 +35,8 @@ function ssv_profile_page_setup($content)
         return $content;
     }
 
+    $_SESSION['field_errors'] = array();
+
     if (isset($_GET['view']) && $_GET['view'] == 'directDebitPDF') {
         if (isset($_GET['user_id'])) {
             $member = FrontendMember::get_by_id($_GET['user_id']);
@@ -130,15 +132,19 @@ function ssv_profile_page_content_tabs($member, $can_edit = false, $action_url =
     echo ssv_get_profile_page_tab_select($member);
     $tabs = FrontendMembersField::getTabs();
     foreach ($tabs as $tab) {
-        if ($tabs[0] == $tab) {
+        $active_class = "";
+        if (isset($_POST['tab'])) {
+            if ($tab->id == $_POST['tab']) {
+                $active_class = "mui--is-active";
+            }
+        } elseif ($tabs[0] == $tab) {
             $active_class = "mui--is-active";
-        } else {
-            $active_class = "";
         }
         ?>
         <div class="mui-tabs__pane <?php echo esc_html($active_class); ?>" id="pane-<?php echo esc_html($tab->id); ?>">
             <form name="members_<?php echo esc_html($tab->title); ?>_form" id="member_<?php echo esc_html($tab->title); ?>_form" action="<?php echo esc_html($action_url) ?>" method="post" enctype="multipart/form-data">
                 <?php
+                echo ssv_get_hidden($tab->id, 'tab', $tab->id);
                 $items_in_tab = FrontendMembersField::getItemsInTab($tab);
                 foreach ($items_in_tab as $item) {
                     if (isset($item->name) && isset($_SESSION['field_errors'][$item->name])) {
@@ -213,7 +219,9 @@ function ssv_get_profile_page_tab_select($member)
     for ($i = 0; $i < count($tabs); $i++) {
         $tab = $tabs[$i];
         if ($tab instanceof FrontendMembersFieldTab) {
-            if ($i == 0) {
+            if (isset($_POST['tab']) && $tab->id == $_POST['tab']) {
+                    echo $tab->getTabButton(true);
+            } elseif (!isset($_POST['tab']) && $i == 0) {
                 echo $tab->getTabButton(true);
             } else {
                 echo $tab->getTabButton();
@@ -236,20 +244,30 @@ function ssv_save_members_profile()
     } else {
         $user = FrontendMember::get_current_user();
     }
-    $_SESSION['field_errors'] = array();
-    $items = FrontendMembersField::getAll(array('field_type' => 'input'));
+    $filters = array('field_type' => 'input');
+    if (current_theme_supports('mui')) {
+        $items = FrontendMembersField::getItemsInTab($_POST['tab'], $filters);
+    } else {
+        $items = FrontendMembersField::getAll($filters);
+    }
     /** @var FrontendMembersFieldInput $item */
     foreach ($items as $item) {
-        ssv_print($item->title);
-        ssv_print($item->isValueRequired() && !isset($_POST[$item->name]) && !isset($_POST[$item->name . '_reset']));
-        if ($item->isValueRequired() && !isset($_POST[$item->name]) && !isset($_POST[$item->name . '_reset'])) {
-            $error = new Message($item->title . ' is required but there was no value given.', Message::ERROR_MESSAGE);
+        $value = null;
+        if (isset($_POST[$item->name]) || isset($_POST[$item->name . '_reset'])) {
+            $value = isset($_POST[$item->name]) ? $_POST[$item->name] : $_POST[$item->name . '_reset'];
+        }
+        if ($item->isValueRequiredForMember($user) && $value == null) {
+            $error                                 = new Message($item->title . ' is required but there was no value given.', Message::ERROR_MESSAGE);
             $_SESSION['field_errors'][$item->name] = $error;
-        } else {
-            $value           = isset($_POST[$item->name]) ? $_POST[$item->name] : $_POST[$item->name . '_reset'];
-            $update_response = $user->updateMeta($item->name, sanitize_text_field($value));
-            if ($update_response !== true) {
-                echo $update_response->htmlPrint();
+        } elseif (!$item->isEditable() && $value != null && $user->getMeta($item->name) != $value) {
+            $error                                 = new Message('You are not allowed to edit ' . $item->title . '.', Message::NOTIFICATION_MESSAGE);
+            $_SESSION['field_errors'][$item->name] = $error;
+        } elseif ($user->getMeta($item->name) != $value && $item->isEditable()) {
+            if (!($item instanceof FrontendMembersFieldInputImage && $item->required && $value == null)) {
+                $update_response = $user->updateMeta($item->name, sanitize_text_field($value));
+                if ($update_response !== true) {
+                    echo $update_response->htmlPrint();
+                }
             }
         }
     }
@@ -277,7 +295,6 @@ function ssv_save_members_profile()
     if (is_plugin_active('ssv-mailchimp/ssv-mailchimp.php')) {
         ssv_update_mailchimp_member($user);
     }
-    unset($_POST);
 }
 
 add_filter('the_content', 'ssv_profile_page_setup');

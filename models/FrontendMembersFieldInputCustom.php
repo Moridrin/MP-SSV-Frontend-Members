@@ -40,11 +40,33 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
     /**
      * If the field is required than this field does need a value.
      *
+     * @param FrontendMember|null $frontend_member is the member to check if this member already has the required value.
+     *
      * @return bool returns if the field is required.
      */
-    public function isValueRequired()
+    public function isValueRequiredForMember($frontend_member = null)
     {
-        return $this->required;
+        if (!$this->isEditable()) {
+            return false;
+        }
+        if (FrontendMember::get_current_user() != null && FrontendMember::get_current_user()->isBoard()) {
+            return false;
+        } else {
+            return $this->required == 'yes';
+        }
+    }
+
+    /**
+     * If the field is displayed normally than this field is editable.
+     *
+     * @return bool returns if the field is displayed normally.
+     */
+    public function isEditable()
+    {
+        if (FrontendMember::get_current_user() != null && FrontendMember::get_current_user()->isBoard()) {
+            return true;
+        }
+        return $this->display == 'normal';
     }
 
     /**

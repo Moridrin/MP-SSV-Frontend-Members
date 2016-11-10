@@ -33,13 +33,23 @@ class FrontendMembersFieldInput extends FrontendMembersField
     {
         parent::__construct($field->id, $field->index, $field->type, $field->title, $field->registration_page, $field->class, $field->style);
         $this->input_type = $input_type;
-        $this->name = $name;
+        $this->name       = $name;
+    }
+
+    /**
+     * This is a function that is handled in the sub classes.
+     *
+     * @param FrontendMember|null $frontend_member is the member to check if this member already has the required value.
+     */
+    public function isValueRequiredForMember($frontend_member = null)
+    {
+        throw new BadMethodCallException();
     }
 
     /**
      * This is a function that is handled in the sub classes.
      */
-    public function isValueRequired()
+    public function isEditable()
     {
         throw new BadMethodCallException();
     }

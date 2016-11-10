@@ -35,13 +35,13 @@ class FrontendMembersField
      */
     protected function __construct($id, $index, $type, $title, $registration_page, $class, $style)
     {
-        $this->id = $id;
-        $this->index = $index;
-        $this->type = $type;
-        $this->title = $title;
+        $this->id                = $id;
+        $this->index             = $index;
+        $this->type              = $type;
+        $this->title             = $title;
         $this->registration_page = $registration_page;
-        $this->class = $class;
-        $this->style = $style;
+        $this->class             = $class;
+        $this->style             = $style;
     }
 
     /**
@@ -52,8 +52,8 @@ class FrontendMembersField
     public static function getTabs()
     {
         global $wpdb;
-        $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
-        $tabs = array();
+        $table         = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
+        $tabs          = array();
         $database_rows = json_decode(json_encode($wpdb->get_results("SELECT * FROM $table WHERE field_type = 'tab' ORDER BY field_index ASC;")), true);
         foreach ($database_rows as $database_row) {
             $tabs[] = FrontendMembersFieldTab::fromDatabaseFields($database_row);
@@ -65,24 +65,29 @@ class FrontendMembersField
     /**
      * This function returns all the items in the given Tab.
      *
-     * @param FrontendMembersFieldTab $tab is the tab where you want the fields from.
+     * @param FrontendMembersFieldTab|int $tab     is the tab (or its ID) where you want the fields from.
+     * @param array                       $filters is the filter set for the getAll function.
      *
      * @return array
      */
-    public static function getItemsInTab($tab)
+    public static function getItemsInTab($tab, $filters = array("field_type" => '!group_option'))
     {
-        $all_fields = self::getAll();
-        $is_in_tab = false;
-        $fields_in_tab = array();
+        if ($tab instanceof FrontendMembersFieldTab) {
+            $tab = $tab->id;
+        }
+        $all_fields      = self::getAll();
+        $filtered_fields = self::getAll($filters);
+        $is_in_tab       = false;
+        $fields_in_tab   = array();
         foreach ($all_fields as $field) {
             if ($field instanceof FrontendMembersFieldTab) {
-                if ($field == $tab) {
+                if ($field->id == $tab) {
                     $is_in_tab = true;
                 } else {
                     $is_in_tab = false;
                 }
             } else {
-                if ($is_in_tab) {
+                if ($is_in_tab && in_array($field, $filtered_fields)) {
                     $fields_in_tab[] = $field;
                 }
             }
@@ -100,7 +105,7 @@ class FrontendMembersField
     {
         global $wpdb;
         $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
-        $sql = "SELECT id FROM $table";
+        $sql   = "SELECT id FROM $table";
         foreach ($filters as $filter => $value) {
             if (substr($value, 0, 1) == "!") {
                 $sql .= " WHERE " . $filter . " != '" . str_replace("!", "", $value) . "'";
@@ -111,9 +116,9 @@ class FrontendMembersField
         $sql .= " ORDER BY field_index ASC;";
 
         $database_fields = json_decode(json_encode($wpdb->get_results($sql)), true);
-        $fields = array();
+        $fields          = array();
         foreach ($database_fields as $database_field) {
-            $field = self::fromID($database_field['id']);
+            $field    = self::fromID($database_field['id']);
             $fields[] = $field;
         }
 
@@ -128,7 +133,7 @@ class FrontendMembersField
     protected static function fromID($id)
     {
         global $wpdb;
-        $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
+        $table           = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
         $database_fields = json_decode(
             json_encode(
                 $wpdb->get_row(
@@ -136,9 +141,10 @@ class FrontendMembersField
 					FROM $table
 					WHERE id = $id;"
                 )
-            ), true
+            ),
+            true
         );
-        $field = self::fromDatabaseFields($database_fields);
+        $field           = self::fromDatabaseFields($database_fields);
         switch ($field->type) {
             case "tab":
                 $field = new FrontendMembersFieldTab($field);
@@ -147,10 +153,10 @@ class FrontendMembersField
                 $field = new FrontendMembersFieldHeader($field);
                 break;
             case "input":
-                $input_type = $field->getMeta("input_type");
-                $name = $field->getMeta("name");
+                $input_type   = $field->getMeta("input_type");
+                $name         = $field->getMeta("name");
                 $defaultValue = $field->getMeta("default_value");
-                $field = new FrontendMembersFieldInput($field, $input_type, $name, $defaultValue);
+                $field        = new FrontendMembersFieldInput($field, $input_type, $name, $defaultValue);
                 switch ($input_type) {
                     case "custom":
                         $field = new FrontendMembersFieldInputCustom($field, $field->getMeta('input_type_custom'), $field->getMeta('required'), $field->getMeta('display'), $field->getMeta('placeholder'), $field->getMeta('default_value'));
@@ -171,7 +177,7 @@ class FrontendMembersField
                         $field = new FrontendMembersFieldInputTextCheckbox($field, $field->getMeta('help_text'), $field->getMeta('display'), $field->getMeta('default_value'));
                         break;
                     case "text_select":
-                        $field = new FrontendMembersFieldInputSelectText($field, $field->getMeta('display'));
+                        $field          = new FrontendMembersFieldInputSelectText($field, $field->getMeta('display'));
                         $field->options = $field->getOptions();
                         break;
                 }
@@ -221,20 +227,19 @@ class FrontendMembersField
     }
 
     /**
-     *
      * @return array of all the FrontendMembersFields.
      */
     public static function getAllFieldNames()
     {
         global $wpdb;
         $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
-        $sql = "SELECT id FROM $table WHERE field_type = 'input' ORDER BY field_index ASC;";
-        $ids = json_decode(json_encode($wpdb->get_results($sql)), true);
+        $sql   = "SELECT id FROM $table WHERE field_type = 'input' ORDER BY field_index ASC;";
+        $ids   = json_decode(json_encode($wpdb->get_results($sql)), true);
 
         $table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
         $names = array();
         foreach ($ids as $id) {
-            $sql = "SELECT meta_value FROM $table WHERE meta_key = 'name' AND field_id = " . $id['id'];
+            $sql     = "SELECT meta_value FROM $table WHERE meta_key = 'name' AND field_id = " . $id['id'];
             $names[] = json_decode(json_encode($wpdb->get_var($sql)), true);
         }
 
@@ -248,7 +253,7 @@ class FrontendMembersField
             if (strpos($name, "_field_title") !== false) {
                 $id++;
                 $_POST[str_replace("_field_title", "", $name) . "_field_index"] = $id; //Set field_index
-                $field = self::fromPOST(str_replace("_field_title", "", $name));
+                $field                                                          = self::fromPOST(str_replace("_field_title", "", $name));
                 $field->save();
             }
         }
@@ -293,8 +298,8 @@ class FrontendMembersField
                 break;
             case "input":
                 $input_type = $field->getMetaFromPOST("input_type");
-                $name = $field->getMetaFromPOST("name");
-                $field = new FrontendMembersFieldInput($field, $input_type, $name);
+                $name       = $field->getMetaFromPOST("name");
+                $field      = new FrontendMembersFieldInput($field, $input_type, $name);
                 switch ($input_type) {
                     case "custom":
                         $field = new FrontendMembersFieldInputCustom($field, $field->getMetaFromPOST('input_type_custom'), $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('placeholder'), $field->getMetaFromPOST('default_value'));
@@ -306,7 +311,7 @@ class FrontendMembersField
                         $field = new FrontendMembersFieldInputRoleCheckbox($field, $field->getMetaFromPOST('role'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('checked_by_default'));
                         break;
                     case "role_select":
-                        $field = new FrontendMembersFieldInputSelectRole($field, $field->getMetaFromPOST('display'));
+                        $field          = new FrontendMembersFieldInputSelectRole($field, $field->getMetaFromPOST('display'));
                         $field->options = $field->getOptionsFromPOST($variables);
                         break;
                     case "text":
@@ -316,7 +321,7 @@ class FrontendMembersField
                         $field = new FrontendMembersFieldInputTextCheckbox($field, $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('checked_by_default'));
                         break;
                     case "text_select":
-                        $field = new FrontendMembersFieldInputSelectText($field, $field->getMetaFromPOST('display'));
+                        $field          = new FrontendMembersFieldInputSelectText($field, $field->getMetaFromPOST('display'));
                         $field->options = $field->getOptionsFromPOST($variables);
                         break;
                 }
@@ -357,7 +362,7 @@ class FrontendMembersField
     protected static function createField($index, $title, $type, $registration_page = 'true', $class = '', $style = '')
     {
         global $wpdb;
-        $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
+        $table           = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
         $max_in_database = $wpdb->get_var('SELECT MAX(id) FROM ' . $table . ';');
         if ($max_in_database == null) {
             $id = 0;
@@ -373,13 +378,13 @@ class FrontendMembersField
                 'field_title'       => $title,
                 'registration_page' => $registration_page,
                 'field_class'       => $class,
-                'field_style'       => $style
+                'field_style'       => $style,
             ),
             array(
                 '%d',
                 '%d',
                 '%s',
-                '%s'
+                '%s',
             )
         );
 
@@ -403,12 +408,12 @@ class FrontendMembersField
             array(
                 'id'         => $this->id,
                 'meta_key'   => $key,
-                'meta_value' => $value
+                'meta_value' => $value,
             ),
             array(
                 '%d',
                 '%s',
-                '%s'
+                '%s',
             )
         );
     }
@@ -460,7 +465,7 @@ class FrontendMembersField
         if (strlen($this->title) <= 0) {
             $remove = true;
         }
-        $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
+        $table  = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
         $update = $wpdb->get_results(
             "SELECT id
 					FROM $table

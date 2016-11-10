@@ -98,7 +98,7 @@ function ssv_create_members_profile()
     $items = FrontendMembersField::getAll(array('field_type' => 'input'));
     /** @var FrontendMembersFieldInput $item */
     foreach ($items as $item) {
-        if ($item->isValueRequired() && !isset($_POST[$item->name]) && !isset($_POST[$item->name . '_reset'])) {
+        if ($item->isValueRequiredForMember() && !isset($_POST[$item->name]) && !isset($_POST[$item->name . '_reset'])) {
             return new Message($item->title . ' is required but there was no value given.', Message::ERROR_MESSAGE);
         }
         $value = isset($_POST[$item->name]) ? $_POST[$item->name] : $_POST[$item->name . '_reset'];
