@@ -268,11 +268,11 @@ class FrontendMembersField
 
     public static function saveAllFromPost()
     {
-        $id = 0;
+        $index = 0;
         foreach ($_POST as $name => $val) {
             if (strpos($name, "_field_title") !== false) {
-                $id++;
-                $_POST[str_replace("_field_title", "", $name) . "_field_index"] = $id; //Set field_index
+                $index++;
+                $_POST[str_replace("_field_title", "", $name) . "_field_index"] = $index; //Set field_index
                 $field                                                          = self::fromPOST(str_replace("_field_title", "", $name));
                 $field->save();
             }
@@ -462,6 +462,7 @@ class FrontendMembersField
     {
         ob_start();
         echo ssv_get_td(ssv_get_draggable_icon());
+        echo ssv_get_hidden($this->id, 'registration_page', $this->registration_page);
         echo ssv_get_td(ssv_get_text_input("Field Title", $this->id, $this->title));
         if (get_theme_support('mui')) {
             echo ssv_get_td(ssv_get_select("Field Type", $this->id, $this->type, array("Tab", "Header", "Input", "Label"), array('onchange="ssv_type_changed(\'' . $this->id . '\')"')));

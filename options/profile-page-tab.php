@@ -24,6 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
             update_option('ssv_frontend_members_view_' . $column . '_column', 'false');
         }
     }
+} elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'import_options' && check_admin_referer('ssv_save_frontend_members_profile_page_import_options')) {
+    FrontendMembersField::importFieldsToRegister();
 }
 ?>
 <!--suppress JSUnusedLocalSymbols -->
@@ -52,8 +54,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
     ?>
 </form>
 <h1>Fields</h1>
+<?php if ($_GET['tab'] == 'register_page'): ?>
+    <form id="ssv-frontend-members-import-options" name="ssv-frontend-members-import-options" method="post" action="#">
+        <input type="hidden" name="form" value="import_options"/>
+        <?php wp_nonce_field('ssv_save_frontend_members_profile_page_import_options'); ?>
+        <input type="submit" name="submit" id="submit" value="Import From Profile">
+    </form>
+<?php endif; ?>
 <form id="ssv-frontend-members-options" name="ssv-frontend-members-options" method="post" action="#">
-    <input type="hidden" name="form" value="options"/>
+    <input type="hidden" name="form" value="fields"/>
     <table id="container" style="width: 100%; border-spacing: 10px 0; margin-bottom: 20px; margin-top: 20px; border-collapse: collapse;">
         <tbody class="sortable">
         <?php
