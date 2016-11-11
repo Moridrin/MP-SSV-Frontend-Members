@@ -76,11 +76,7 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
     {
         ob_start();
         echo ssv_get_td(ssv_get_text_input("Name", $this->id, $this->name, 'text', array('required')));
-        if (get_option('ssv_frontend_members_view_required__options_column', 'true') == 'true') {
-            echo ssv_get_td(ssv_get_checkbox("Required", $this->id, $this->required));
-        } else {
-            echo ssv_get_hidden($this->id, "Required", $this->required);
-        }
+        echo ssv_get_td(ssv_get_checkbox("Required", $this->id, $this->required));
         if (get_option('ssv_frontend_members_view_display__preview_column', 'true') == 'true') {
             echo ssv_get_td(ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled"), array()));
         } else {

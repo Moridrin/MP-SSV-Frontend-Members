@@ -11,8 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
     FrontendMembersField::saveAllFromPost();
 } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'option_columns' && check_admin_referer('ssv_save_frontend_members_profile_page_column_options')) {
     foreach (
-        array('required__options',
-              'default',
+        array('default',
               'style',
               'display__preview',
               'placeholder',
@@ -35,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
         <tr>
             <td><input id="title" type="checkbox" name="title" value="yes" checked disabled/><label for="title">Title</td>
             <td><input id="input_type" type="checkbox" name="input_type" value="yes" checked disabled/><label for="input_type">Input Type</td>
-            <td><input id="required__options" type="checkbox" name="required__options" value="yes" <?php if (get_option('ssv_frontend_members_view_required__options_column') == 'true') { echo 'checked'; } ?> /><label for="required__options">Required/Options</td>
+            <td><input id="required__options" type="checkbox" name="required__options" value="yes" checked disabled/><label for="required__options">Required/Options</td>
             <td><input id="default" type="checkbox" name="default" value="yes" <?php if (get_option('ssv_frontend_members_view_default_column') == 'true') { echo 'checked'; } ?> /><label for="default">Default</td>
             <td><input id="class" type="checkbox" name="class" value="yes" <?php if (get_option('ssv_frontend_members_view_class_column') == 'true') { echo 'checked'; } ?> /><label for="class">Class</td>
         </tr>

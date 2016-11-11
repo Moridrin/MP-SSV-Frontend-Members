@@ -29,9 +29,7 @@ class FrontendMembersFieldHeader extends FrontendMembersField
         ob_start();
         echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
         echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
-        if (get_option('ssv_frontend_members_view_required__options_column', 'true') == 'true') {
-            echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
-        }
+        echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
         if (get_option('ssv_frontend_members_view_display__preview_column', 'true') == 'true') {
             echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
         }

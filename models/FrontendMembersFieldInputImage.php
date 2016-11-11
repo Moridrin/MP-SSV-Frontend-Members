@@ -67,11 +67,7 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
     {
         ob_start();
         echo ssv_get_td(ssv_get_text_input("Name", $this->id, $this->name, 'text', array('required')));
-        if (get_option('ssv_frontend_members_view_required__options_column', 'true') == 'true') {
-            echo ssv_get_td(ssv_get_checkbox("Required", $this->id, $this->required));
-        } else {
-            echo ssv_get_hidden($this->id, "Required", $this->required);
-        }
+        echo ssv_get_td(ssv_get_checkbox("Required", $this->id, $this->required));
         if (get_option('ssv_frontend_members_view_display__preview_column', 'true') == 'true') {
             echo ssv_get_td(ssv_get_checkbox("Preview", $this->id, $this->preview));
         } else {
@@ -94,8 +90,11 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
      *
      * @return string the HTML element
      */
-    public function getHTML($frontend_member = null, $size = 150)
-    {
+    public
+    function getHTML(
+        $frontend_member = null,
+        $size = 150
+    ) {
         ob_start();
         if ($frontend_member == null) {
             $location      = "";
@@ -156,8 +155,10 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
         return ob_get_clean();
     }
 
-    public function save($remove = false)
-    {
+    public
+    function save(
+        $remove = false
+    ) {
         parent::save($remove);
         global $wpdb;
         $table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;

@@ -31,10 +31,7 @@ class FrontendMembersFieldLabel extends FrontendMembersField
     public function getOptionRow()
     {
         ob_start();
-        $colspan = 1;
-        if (get_option('ssv_frontend_members_view_required__options_column', 'true') == 'true') {
-            $colspan++;
-        }
+        $colspan = 2;
         if (get_option('ssv_frontend_members_view_display__preview_column', 'true') == 'true') {
             $colspan++;
         }
