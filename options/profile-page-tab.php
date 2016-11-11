@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
         array('required__options',
               'default',
               'style',
-              'display',
+              'display__preview',
               'placeholder',
               'class',
         ) as $column
@@ -37,14 +37,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
             <td><input id="input_type" type="checkbox" name="input_type" value="yes" checked disabled/><label for="input_type">Input Type</td>
             <td><input id="required__options" type="checkbox" name="required__options" value="yes" <?php if (get_option('ssv_frontend_members_view_required__options_column') == 'true') { echo 'checked'; } ?> /><label for="required__options">Required/Options</td>
             <td><input id="default" type="checkbox" name="default" value="yes" <?php if (get_option('ssv_frontend_members_view_default_column') == 'true') { echo 'checked'; } ?> /><label for="default">Default</td>
-            <td><input id="style" type="checkbox" name="style" value="yes" <?php if (get_option('ssv_frontend_members_view_style_column') == 'true') { echo 'checked'; } ?> /><label for="style">Style</td>
+            <td><input id="class" type="checkbox" name="class" value="yes" <?php if (get_option('ssv_frontend_members_view_class_column') == 'true') { echo 'checked'; } ?> /><label for="class">Class</td>
         </tr>
         <tr>
             <td><input id="field_type" type="checkbox" name="field_type" value="yes" checked disabled/><label for="field_type">Field Type</td>
             <td><input id="name" type="checkbox" name="name" value="yes" checked disabled/><label for="name">Name</td>
-            <td><input id="display" type="checkbox" name="display" value="yes" <?php if (get_option('ssv_frontend_members_view_display_column') == 'true') { echo 'checked'; } ?> /><label for="display">Display</td>
+            <td><input id="display__preview" type="checkbox" name="display__preview" value="yes" <?php if (get_option('ssv_frontend_members_view_display__preview_column') == 'true') { echo 'checked'; } ?> /><label for="display__preview">Display</td>
             <td><input id="placeholder" type="checkbox" name="placeholder" value="yes" <?php if (get_option('ssv_frontend_members_view_placeholder_column') == 'true') { echo 'checked'; } ?> /><label for="placeholder">Placeholder</td>
-            <td><input id="class" type="checkbox" name="class" value="yes" <?php if (get_option('ssv_frontend_members_view_class_column') == 'true') { echo 'checked'; } ?> /><label for="class">Class</td>
+            <td><input id="style" type="checkbox" name="style" value="yes" <?php if (get_option('ssv_frontend_members_view_style_column') == 'true') { echo 'checked'; } ?> /><label for="style">Style</td>
         </tr>
     </table>
     <?php

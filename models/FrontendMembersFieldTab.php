@@ -39,11 +39,16 @@ class FrontendMembersFieldTab extends FrontendMembersField
 		ob_start();
         echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
         echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
-        echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
-        echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
-        echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
-        echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
-        if (get_option('ssv_frontend_members_register_page', 'same_as_profile_page') == 'custom') {
+        if (get_option('ssv_frontend_members_view_required__options_column', 'true') == 'true') {
+            echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+        }
+        if (get_option('ssv_frontend_members_view_display__preview_column', 'true') == 'true') {
+            echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+        }
+        if (get_option('ssv_frontend_members_view_default_column', 'true') == 'true') {
+            echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+        }
+        if (get_option('ssv_frontend_members_view_placeholder_column', 'true') == 'true') {
             echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
         }
 		$content = ob_get_clean();

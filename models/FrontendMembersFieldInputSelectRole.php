@@ -50,10 +50,20 @@ class FrontendMembersFieldInputSelectRole extends FrontendMembersFieldInputSelec
 	{
 		ob_start();
         echo parent::getOptionRow();
-        echo ssv_get_td(ssv_get_options($this->id, self::getOptionsAsArray(), "role"));
-        echo ssv_get_td(ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
-        echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
-        echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+        if (get_option('ssv_frontend_members_view_required__options_column', 'true') == 'true') {
+            echo ssv_get_td(ssv_get_options($this->id, self::getOptionsAsArray(), "role"));
+        }
+        if (get_option('ssv_frontend_members_view_display__preview_column', 'true') == 'true') {
+            echo ssv_get_td(ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled"), array()));
+        } else {
+            echo ssv_get_hidden($this->id, "Display", $this->display);
+        }
+        if (get_option('ssv_frontend_members_view_default_column', 'true') == 'true') {
+            echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+        }
+        if (get_option('ssv_frontend_members_view_placeholder_column', 'true') == 'true') {
+            echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+        }
 		$content = ob_get_clean();
 
 		return parent::getOptionRowInput($content);

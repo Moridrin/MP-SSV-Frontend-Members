@@ -70,10 +70,18 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
     {
         ob_start();
         echo ssv_get_td(ssv_get_role_select($this->id, "Role", $this->role));
-        echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
-        echo ssv_get_td(ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled")));
-        echo ssv_get_td(ssv_get_checkbox("Checked by Default", $this->id, $this->defaultValue));
-        if (get_option('ssv_frontend_members_view_advanced_profile_page', 'false') == 'true') {
+        if (get_option('ssv_frontend_members_view_required__options_column', 'true') == 'true') {
+            echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+        }
+        if (get_option('ssv_frontend_members_view_display__preview_column', 'true') == 'true') {
+            echo ssv_get_td(ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled"), array()));
+        } else {
+            echo ssv_get_hidden($this->id, "Display", $this->display);
+        }
+        if (get_option('ssv_frontend_members_view_default_column', 'true') == 'true') {
+            echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+        }
+        if (get_option('ssv_frontend_members_view_placeholder_column', 'true') == 'true') {
             echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
         }
         $content = ob_get_clean();
