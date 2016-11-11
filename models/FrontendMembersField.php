@@ -11,6 +11,7 @@ if (!defined('ABSPATH')) {
 require_once "FrontendMembersFieldTab.php";
 require_once "FrontendMembersFieldHeader.php";
 require_once "FrontendMembersFieldInput.php";
+require_once "FrontendMembersFieldLabel.php";
 
 class FrontendMembersField
 {
@@ -182,6 +183,10 @@ class FrontendMembersField
                         break;
                 }
                 break;
+            case "label":
+                $text = $field->getMeta("text");
+                $field      = new FrontendMembersFieldLabel($field, $text);
+                break;
         }
 
         return $field;
@@ -195,13 +200,13 @@ class FrontendMembersField
     protected static function fromDatabaseFields($database_fields)
     {
         return new FrontendMembersField(
-            $database_fields['id'],
-            $database_fields['field_index'],
-            $database_fields['field_type'],
-            $database_fields['field_title'],
-            $database_fields['registration_page'],
-            $database_fields['field_class'],
-            $database_fields['field_style']
+            stripslashes($database_fields['id']),
+            stripslashes($database_fields['field_index']),
+            stripslashes($database_fields['field_type']),
+            stripslashes($database_fields['field_title']),
+            stripslashes($database_fields['registration_page']),
+            stripslashes($database_fields['field_class']),
+            stripslashes($database_fields['field_style'])
         );
     }
 
@@ -212,7 +217,7 @@ class FrontendMembersField
      *
      * @return string the meta value linked to the given key.
      */
-    public function getMeta($key)
+    public function getMeta($key, $stripslaches = true)
     {
         global $wpdb;
         $table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
@@ -223,7 +228,7 @@ class FrontendMembersField
 			AND meta_key = '$key';"
         );
 
-        return stripslashes($value);
+        return $stripslaches ? stripslashes($value) : $value;
     }
 
     /**
@@ -271,7 +276,7 @@ class FrontendMembersField
         $variables = array();
         foreach ($_POST as $name => $value) {
             if (in_array($id, explode("_", $name))) {
-                $variables[str_replace($id . "_", "", $name)] = $value;
+                $variables[substr($name, strlen($id) + 1)] = $value;
             }
         }
         $field = new FrontendMembersField(
@@ -326,6 +331,10 @@ class FrontendMembersField
                         break;
                 }
                 break;
+            case "label":
+                $text = $field->getMetaFromPOST("text", false);
+                $field      = new FrontendMembersFieldLabel($field, $text);
+                break;
         }
 
         return $field;
@@ -338,13 +347,13 @@ class FrontendMembersField
      *
      * @return string the meta value linked to the given key.
      */
-    public function getMetaFromPOST($key)
+    public function getMetaFromPOST($key, $sanitize_text_field = true)
     {
         if (!isset($_POST[$this->id . "_" . $key])) {
             return "no";
         }
 
-        return sanitize_text_field($_POST[$this->id . "_" . $key]);
+        return $sanitize_text_field ? sanitize_text_field($_POST[$this->id . "_" . $key]) : $_POST[$this->id . "_" . $key];
     }
 
     /**
@@ -425,7 +434,7 @@ class FrontendMembersField
      */
     public function getOptionRow()
     {
-        throw new BadMethodCallException();
+        throw new BadMethodCallException('Class ' . get_class($this) . ' does not override the getOptionRow() function.');
     }
 
     /**
@@ -440,7 +449,7 @@ class FrontendMembersField
         echo ssv_get_td(ssv_get_draggable_icon());
         echo ssv_get_td(ssv_get_text_input("Field Title", $this->id, $this->title));
         if (get_theme_support('mui')) {
-            echo ssv_get_td(ssv_get_select("Field Type", $this->id, $this->type, array("Tab", "Header", "Input"), array('onchange="ssv_type_changed(\'' . $this->id . '\')"')));
+            echo ssv_get_td(ssv_get_select("Field Type", $this->id, $this->type, array("Tab", "Header", "Input", "Label"), array('onchange="ssv_type_changed(\'' . $this->id . '\')"')));
         } else {
             echo ssv_get_td(ssv_get_select("Field Type", $this->id, $this->type, array("Header", "Input"), array('onchange="ssv_type_changed(\'' . $this->id . '\')"')));
         }

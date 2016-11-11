@@ -55,21 +55,6 @@ class FrontendMembersFieldInput extends FrontendMembersField
     }
 
     /**
-     * @param int    $index      is an index that specifies the display (/tab) order for the field.
-     * @param string $title      is the title of this component.
-     * @param string $input_type is the input type of the input field.
-     * @param string $name       is the name of the input field.
-     *
-     * @return FrontendMembersFieldInput
-     */
-    protected static function createInput($index, $title, $input_type, $name)
-    {
-        $field = parent::createField($index, $title, 'input');
-
-        return new FrontendMembersFieldInput($field, $input_type, $name);
-    }
-
-    /**
      * @param string $content is a string of all input columns.
      * @param string $input_type_custom
      *

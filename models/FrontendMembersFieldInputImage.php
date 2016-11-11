@@ -61,20 +61,6 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
     }
 
     /**
-     * @param int    $index    is an index that specifies the display (/tab) order for the field.
-     * @param string $title    is the title of this component.
-     * @param string $name     is the name of the input field.
-     * @param bool   $required is true if this is a required input field.
-     * @param bool   $preview  is true if the already set image should be displayed as preview.
-     *
-     * @return FrontendMembersFieldInputImage
-     */
-    public static function create($index, $title, $name, $required = false, $preview = true)
-    {
-        return new FrontendMembersFieldInputImage(parent::createInput($index, $title, 'image', $name), $required, $preview);
-    }
-
-    /**
      * @return string row that can be added to the profile page options table.
      */
     public function getOptionRow()

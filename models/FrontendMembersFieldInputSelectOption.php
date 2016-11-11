@@ -24,38 +24,6 @@ class FrontendMembersFieldInputSelectOption
         $this->value = $value;
     }
 
-    public function create(
-        $index,
-        /** @noinspection PhpUnusedParameterInspection */
-        $parent_id,
-        /** @noinspection PhpUnusedParameterInspection */
-        $value = ""
-    ) {
-        global $wpdb;
-        $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
-        $max_in_database = $wpdb->get_var('SELECT MAX(id) FROM ' . $table . ';');
-        if ($max_in_database == null) {
-            $id = 0;
-        } else {
-            $id = $max_in_database + 1;
-        }
-        $wpdb->insert(
-            $table,
-            array(
-                'id'          => $id,
-                'field_index' => $index,
-                'field_type'  => 'group_option',
-                'field_title' => ''
-            ),
-            array(
-                '%d',
-                '%d',
-                '%s',
-                '%s'
-            )
-        );
-    }
-
     public function save($remove = false) { }
 
     protected function replace()

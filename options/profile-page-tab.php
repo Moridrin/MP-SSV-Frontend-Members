@@ -63,14 +63,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
     }
     $new_field_content = ssv_get_td(ssv_get_draggable_icon());
     $new_field_content .= ssv_get_td(ssv_get_text_input("Field Title", '\' + id + \'', "", "text", array("required"), false));
-    $new_field_content .= ssv_get_td(ssv_get_select("Field Type", '\' + id + \'', "input", array("Tab", "Header", "Input"), array("onchange=\"ssv_type_changed(' + id + ')\""), false, null, true, false));
+    $new_field_content .= ssv_get_td(ssv_get_select("Field Type", '\' + id + \'', "input", array("Tab", "Header", "Input", "Label"), array("onchange=\"ssv_type_changed(' + id + ')\""), false, null, true, false));
     $new_field_content .= ssv_get_td(ssv_get_select("Input Type", '\' + id + \'', "text", array("Text", "Text Select", "Role Select", "Text Checkbox", "Role Checkbox", "Image"), array("onchange=\"ssv_input_type_changed(' + id + ')\""), true, null, true, false));
     $new_field_content .= ssv_get_td(ssv_get_text_input("Name", '\' + id + \'', "", "text", array("required"), false));
     $new_field_content .= ssv_get_td(ssv_get_checkbox("Required", '\' + id + \'', "no", array(), false, false));
     $new_field_content .= ssv_get_td(ssv_get_select("Display", '\' + id + \'', "normal", array("Normal", "ReadOnly", "Disabled"), array(), false, null, true, false));
+    if (get_option('ssv_frontend_members_register_page', 'false') == 'true') {
+        $new_field_content .= ssv_get_td(ssv_get_checkbox("Registration Page", '\' + id + \'', "yes", array(), true, false));
+    }
     if (get_option('ssv_frontend_members_view_advanced_profile_page', 'false') == 'true') {
         $new_field_content .= ssv_get_td(ssv_get_text_input("Placeholder", '\' + id + \'', "", 'text', array(), false));
-        $new_field_content .= ssv_get_td(ssv_get_checkbox("Registration Page", '\' + id + \'', "yes", array(), true, false));
         $new_field_content .= ssv_get_td(ssv_get_text_input("Field Class", '\' + id + \'', "", 'text', array(), false));
         $new_field_content .= ssv_get_td(ssv_get_text_input("Field Style", '\' + id + \'', "", 'text', array(), false));
     }
@@ -88,10 +90,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
     function ssv_type_changed(sender_id) {
         var tr = document.getElementById(sender_id);
         var type = document.getElementById(sender_id + "_field_type").value;
+        $("#" + sender_id + "_text").parent().remove();
         $("#" + sender_id + "_input_type").parent().remove();
         $("#" + sender_id + "_name").parent().remove();
         $("#" + sender_id + "_required").parent().remove();
         $("#" + sender_id + "_display").parent().remove();
+        $("#" + sender_id + "_checked_by_default").parent().remove();
+        $("#" + sender_id + "_default_value").parent().remove();
         $("#" + sender_id + "_placeholder").parent().remove();
         $("#" + sender_id + "_preview").parent().remove();
         $("#" + sender_id + "_help_text").parent().remove();
@@ -105,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
         $("#" + sender_id + "_field_style").parent().remove();
         if (type == "input") {
             $(tr).append(
-                '<?php echo ssv_get_td(ssv_get_select("Input Type", '\' + sender_id + \'', "text", array("Text", "Text Select", "Role Select", "Text Checkbox", "Role Checkbox", "Image"), array("onchange=\"ssv_input_type_changed(' + id + ')\""), true, null, true, false)); ?>'
+                '<?php echo ssv_get_td(ssv_get_select("Input Type", '\' + sender_id + \'', "text", array("Text", "Text Select", "Role Select", "Text Checkbox", "Role Checkbox", "Image"), array("onchange=\"ssv_input_type_changed(' + sender_id + ')\""), true, null, true, false)); ?>'
             ).append(
                 '<?php echo ssv_get_td(ssv_get_text_input("Name", '\' + sender_id + \'', "", "text", array("required"), false)); ?>'
             ).append(
@@ -118,6 +123,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
                 '<?php echo ssv_get_td(ssv_get_text_input("Placeholder", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
             );
             <?php endif; ?>
+        } else if (type == 'label') {
+            <?php $colspan = get_option('ssv_frontend_members_view_advanced_profile_page', 'false') == 'true' ? 5 : 6; ?>
+            $(tr).append(
+                '<?php echo ssv_get_td(ssv_get_text_area("Text", '\' + sender_id + \'', "", "text", array("required"), false), $colspan); ?>'
+            );
         } else {
             $(tr).append(
                 '<?php echo ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
@@ -134,10 +144,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
             );
             <?php endif; ?>
         }
-        <?php if (get_option('ssv_frontend_members_view_advanced_profile_page', 'false') == 'true'): ?>
+        <?php if (get_option('ssv_frontend_members_register_page', 'false') == 'true'): ?>
         $(tr).append(
             '<?php echo ssv_get_td(ssv_get_checkbox("Registration Page", '\' + sender_id + \'', "yes", array(), true, false)); ?>'
-        ).append(
+        );
+        <?php else: ?>
+        $(tr).append(
+            '<?php echo ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
+        );
+        <?php endif; ?>
+        <?php if (get_option('ssv_frontend_members_view_advanced_profile_page', 'false') == 'true'): ?>
+        $(tr).append(
             '<?php echo ssv_get_td(ssv_get_text_input("Field Class", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
         ).append(
             '<?php echo ssv_get_td(ssv_get_text_input("Field Style", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
@@ -156,6 +173,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
         $("#" + sender_id + "_name").parent().remove();
         $("#" + sender_id + "_required").parent().remove();
         $("#" + sender_id + "_display").parent().remove();
+        $("#" + sender_id + "_checked_by_default").parent().remove();
+        $("#" + sender_id + "_default_value").parent().remove();
         $("#" + sender_id + "_placeholder").parent().remove();
         $("#" + sender_id + "_preview").parent().remove();
         $("#" + sender_id + "_help_text").parent().remove();
@@ -203,6 +222,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
                     '<?php echo ssv_get_td(ssv_get_checkbox("Required", '\' + sender_id + \'', "no", array(), false, false)); ?>'
                 ).append(
                     '<?php echo ssv_get_td(ssv_get_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"), array(), false, null, true, false)); ?>'
+                ).append(
+                    '<?php echo ssv_get_td(ssv_get_checkbox("Checked by Default", '\' + sender_id + \'', "no")); ?>'
                 );
             <?php if (get_option('ssv_frontend_members_view_advanced_profile_page', 'false') == 'true'): ?>
                 $(tr).append(
@@ -217,6 +238,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
                     '<?php echo ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
                 ).append(
                     '<?php echo ssv_get_td(ssv_get_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"), array(), false, null, true, false)); ?>'
+                ).append(
+                    '<?php echo ssv_get_td(ssv_get_checkbox("Checked by Default", '\' + sender_id + \'', "no")); ?>'
                 );
             <?php if (get_option('ssv_frontend_members_view_advanced_profile_page', 'false') == 'true'): ?>
                 $(tr).append(
@@ -270,10 +293,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
             <?php endif; ?>
                 break;
         }
-        <?php if (get_option('ssv_frontend_members_view_advanced_profile_page', 'false') == 'true'): ?>
+        <?php if (get_option('ssv_frontend_members_register_page', 'false') == 'true'): ?>
         $(tr).append(
             '<?php echo ssv_get_td(ssv_get_checkbox("Registration Page", '\' + sender_id + \'', "yes", array(), true, false)); ?>'
-        ).append(
+        );
+        <?php else: ?>
+        $(tr).append(
+            '<?php echo ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
+        );
+        <?php endif; ?>
+        <?php if (get_option('ssv_frontend_members_view_advanced_profile_page', 'false') == 'true'): ?>
+        $(tr).append(
             '<?php echo ssv_get_td(ssv_get_text_input("Field Class", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
         ).append(
             '<?php echo ssv_get_td(ssv_get_text_input("Field Style", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
@@ -300,7 +330,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
     function add_role_option(sender_id) {
         var li = document.getElementById(sender_id + "_add_option").parentElement;
         id++;
-        <?php $object_name = '\' + sender_id + \'' . "_" . '\' + id + \''; ?>
+        <?php $object_name = '\' + sender_id + \'' . "_option" . '\' + id + \''; ?>
         $(li).before(
             '<li><?php echo ssv_get_role_select($object_name, "option", "", false, array(), false); ?></li>'
         );

@@ -22,17 +22,6 @@ class FrontendMembersFieldTab extends FrontendMembersField
 	}
 
 	/**
-	 * @param int    $index is an index that specifies the display (/tab) order for the field.
-	 * @param string $title is the title of this component.
-	 *
-	 * @return FrontendMembersFieldTab the newly created component.
-	 */
-	public static function create($index, $title)
-	{
-		return new FrontendMembersFieldTab(parent::createField($index, $title, 'tab'));
-	}
-
-	/**
 	 * @param array $database_fields the array returned by wpdb.
 	 *
 	 * @return FrontendMembersFieldTab

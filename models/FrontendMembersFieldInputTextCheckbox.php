@@ -63,21 +63,6 @@ class FrontendMembersFieldInputTextCheckbox extends FrontendMembersFieldInput
     }
 
     /**
-     * @param int    $index        is an index that specifies the display (/tab) order for the field.
-     * @param string $title        is the title of this component.
-     * @param string $name         is the name of the input field.
-     * @param string $help_text    is the name of the role or the role itself associated with this checkbox.
-     * @param string $display      is the way the input field is displayed (readonly, disabled or normal) default is normal.
-     * @param string $defaultValue is whether the checkbox is checked or not when filling in the form.
-     *
-     * @return FrontendMembersFieldInputTextCheckbox
-     */
-    public static function create($index, $title, $name, $help_text = "", $display = "normal", $defaultValue = "")
-    {
-        return new FrontendMembersFieldInputTextCheckbox(parent::createInput($index, $title, 'role_checkbox', $name), $help_text, $display, $defaultValue);
-    }
-
-    /**
      * @return string row that can be added to the profile page options table.
      */
     public function getOptionRow()

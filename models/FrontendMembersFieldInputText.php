@@ -67,22 +67,6 @@ class FrontendMembersFieldInputText extends FrontendMembersFieldInput
     }
 
     /**
-     * @param int    $index        is an index that specifies the display (/tab) order for the field.
-     * @param string $title        is the title of this component.
-     * @param string $name         is the name of the input field.
-     * @param bool   $required     is true if this is a required input field.
-     * @param string $display      is the way the input field is displayed (readonly, disabled or normal) default is normal.
-     * @param string $placeholder  is the placeholder text that gives an example of what to enter.
-     * @param string $defaultValue is whether the checkbox is checked or not when filling in the form.
-     *
-     * @return FrontendMembersFieldInputText
-     */
-    public static function create($index, $title, $name, $required = false, $display = "normal", $placeholder = "", $defaultValue = "")
-    {
-        return new FrontendMembersFieldInputText(parent::createInput($index, $title, 'text', $name), $required, $display, $placeholder, $defaultValue);
-    }
-
-    /**
      * @return string row that can be added to the profile page options table.
      */
     public function getOptionRow()

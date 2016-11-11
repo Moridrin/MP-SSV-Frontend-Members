@@ -28,20 +28,6 @@ class FrontendMembersFieldInputSelectRole extends FrontendMembersFieldInputSelec
         }
 	}
 
-	/**
-	 * @param int    $index   is an index that specifies the display (/tab) order for the field.
-	 * @param string $title   is the title of this component.
-	 * @param string $name    is the name of the input field.
-	 * @param array  $options is an array with all the options for the select field.
-	 * @param string $display is the way the input field is displayed (readonly, disabled or normal) default is normal.
-	 *
-     * @return FrontendMembersFieldInputSelectRole
-	 */
-	public static function create($index, $title, $name, $options = array(), $display = "normal")
-	{
-        return new FrontendMembersFieldInputSelectRole(parent::createInput($index, $title, 'role_select', $name), $options, $display);
-	}
-
 	public function getOptionsFromPOST($variables)
 	{
 		$options = array();

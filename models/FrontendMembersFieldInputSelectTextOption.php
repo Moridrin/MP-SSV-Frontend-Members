@@ -17,12 +17,6 @@ class FrontendMembersFieldInputSelectTextOption extends FrontendMembersFieldInpu
         parent::__construct($id, $index, $parent_id, $value);
     }
 
-    public function create($index, $parent_id, $value = "")
-    {
-        parent::create($index, $parent_id, $value);
-        return new FrontendMembersFieldInputSelectTextOption($id, $index, $parent_id, $value);
-    }
-
     public function getHTML($selected_value)
     {
         ob_start();

@@ -22,17 +22,6 @@ class FrontendMembersFieldHeader extends FrontendMembersField
     }
 
     /**
-     * @param int    $index is an index that specifies the display (/tab) order for the field.
-     * @param string $title is the title of this component.
-     *
-     * @return FrontendMembersFieldHeader the newly created component.
-     */
-    public static function create($index, $title)
-    {
-        return new FrontendMembersFieldHeader(parent::createField($index, $title, 'header'));
-    }
-
-    /**
      * @return string row that can be added to the profile page options table.
      */
     public function getOptionRow()
