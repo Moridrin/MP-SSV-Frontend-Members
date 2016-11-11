@@ -33,6 +33,9 @@ class FrontendMembersFieldLabel extends FrontendMembersField
         ob_start();
         $colspan = get_option('ssv_frontend_members_view_advanced_profile_page', 'false') == 'true' ? 6 : 5;
         echo ssv_get_td(ssv_get_text_area("Text", $this->id, $this->text, "text", array("required"), false), $colspan);
+        if (get_option('ssv_frontend_members_register_page', 'same_as_profile_page') == 'custom') {
+            echo ssv_get_td(ssv_get_checkbox('Registration Page', $this->id, $this->registration_page, array(), true));
+        }
         $content = ob_get_clean();
 
         return parent::getOptionRowField($content);

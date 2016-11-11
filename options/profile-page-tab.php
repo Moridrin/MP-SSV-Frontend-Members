@@ -3,22 +3,66 @@ if (!defined('ABSPATH')) {
     exit;
 }
 if (!current_user_can('manage_options')) {
-    ?>
-    <p>You are unauthorized to view or edit this page.</p>
-    <?php
+    ?><p>You are unauthorized to view or edit this page.</p><?php
     return;
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_frontend_members_profile_page_options')) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_admin_referer('ssv_save_frontend_members_profile_page_options')) {
     FrontendMembersField::saveAllFromPost();
+} elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'option_columns' && check_admin_referer('ssv_save_frontend_members_profile_page_column_options')) {
+    foreach (
+        array('required__options',
+              'default',
+              'style',
+              'display',
+              'placeholder',
+              'class',
+        ) as $column
+    ) {
+        if (isset($_POST[$column])) {
+            update_option('ssv_frontend_members_view_' . $column . '_column', 'true');
+        } else {
+            update_option('ssv_frontend_members_view_' . $column . '_column', 'false');
+        }
+    }
 }
 ?>
 <!--suppress JSUnusedLocalSymbols -->
+<h1>Columns to Display</h1>
+<form id="ssv-frontend-members-option-columns" name="ssv-frontend-members-option-columns" method="post" action="#">
+    <input type="hidden" name="form" value="option_columns"/>
+    <table id="container" style="width: 100%; border-spacing: 10px 0; margin-bottom: 20px; margin-top: 20px; border-collapse: collapse;">
+        <tr>
+            <td><input id="title" type="checkbox" name="title" value="yes" checked disabled/><label for="title">Title</td>
+            <td><input id="input_type" type="checkbox" name="input_type" value="yes" checked disabled/><label for="input_type">Input Type</td>
+            <td><input id="required__options" type="checkbox" name="required__options" value="yes" <?php if (get_option('ssv_frontend_members_view_required__options_column') == 'true') { echo 'checked'; } ?> /><label for="required__options">Required/Options</td>
+            <td><input id="default" type="checkbox" name="default" value="yes" <?php if (get_option('ssv_frontend_members_view_default_column') == 'true') { echo 'checked'; } ?> /><label for="default">Default</td>
+            <td><input id="style" type="checkbox" name="style" value="yes" <?php if (get_option('ssv_frontend_members_view_style_column') == 'true') { echo 'checked'; } ?> /><label for="style">Style</td>
+        </tr>
+        <tr>
+            <td><input id="field_type" type="checkbox" name="field_type" value="yes" checked disabled/><label for="field_type">Field Type</td>
+            <td><input id="name" type="checkbox" name="name" value="yes" checked disabled/><label for="name">Name</td>
+            <td><input id="display" type="checkbox" name="display" value="yes" <?php if (get_option('ssv_frontend_members_view_display_column') == 'true') { echo 'checked'; } ?> /><label for="display">Display</td>
+            <td><input id="placeholder" type="checkbox" name="placeholder" value="yes" <?php if (get_option('ssv_frontend_members_view_placeholder_column') == 'true') { echo 'checked'; } ?> /><label for="placeholder">Placeholder</td>
+            <td><input id="class" type="checkbox" name="class" value="yes" <?php if (get_option('ssv_frontend_members_view_class_column') == 'true') { echo 'checked'; } ?> /><label for="class">Class</td>
+        </tr>
+    </table>
+    <?php
+    wp_nonce_field('ssv_save_frontend_members_profile_page_column_options');
+    submit_button();
+    ?>
+</form>
+<h1>Fields</h1>
 <form id="ssv-frontend-members-options" name="ssv-frontend-members-options" method="post" action="#">
+    <input type="hidden" name="form" value="options"/>
     <table id="container" style="width: 100%; border-spacing: 10px 0; margin-bottom: 20px; margin-top: 20px; border-collapse: collapse;">
         <tbody class="sortable">
         <?php
-        $fields = FrontendMembersField::getAll();
+        if ($_GET['tab'] == 'register_page') {
+            $fields = FrontendMembersField::getAll(array('registration_page' => 'yes'));
+        } else {
+            $fields = FrontendMembersField::getAll();
+        }
         foreach ($fields as $field) {
             /* @var $field FrontendMembersField */
             echo $field->getOptionRow();

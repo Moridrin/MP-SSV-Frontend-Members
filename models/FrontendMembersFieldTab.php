@@ -43,6 +43,9 @@ class FrontendMembersFieldTab extends FrontendMembersField
         echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
         echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
         echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+        if (get_option('ssv_frontend_members_register_page', 'same_as_profile_page') == 'custom') {
+            echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+        }
 		$content = ob_get_clean();
 
 		return parent::getOptionRowField($content, get_theme_support('mui'));

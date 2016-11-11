@@ -35,6 +35,9 @@ class FrontendMembersFieldHeader extends FrontendMembersField
         if (get_option('ssv_frontend_members_view_advanced_profile_page', 'false') == 'true') {
             echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
         }
+        if (get_option('ssv_frontend_members_register_page', 'same_as_profile_page') == 'custom') {
+            echo ssv_get_td(ssv_get_checkbox('Registration Page', $this->id, $this->registration_page, array(), true));
+        }
         $content = ob_get_clean();
 
         return parent::getOptionRowField($content);

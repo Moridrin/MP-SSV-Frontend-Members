@@ -71,13 +71,13 @@ class FrontendMembersField
      *
      * @return array
      */
-    public static function getItemsInTab($tab, $filters = array("field_type" => '!group_option'))
+    public static function getItemsInTab($tab, $fieldFilters = array(), $metaFilters = array(), $include_options = false)
     {
         if ($tab instanceof FrontendMembersFieldTab) {
             $tab = $tab->id;
         }
         $all_fields      = self::getAll();
-        $filtered_fields = self::getAll($filters);
+        $filtered_fields = self::getAll($fieldFilters, $metaFilters, $include_options);
         $is_in_tab       = false;
         $fields_in_tab   = array();
         foreach ($all_fields as $field) {
@@ -98,20 +98,27 @@ class FrontendMembersField
     }
 
     /**
-     * @param array $filters are applied to the SQL query.
+     * @param array $fieldFilters   are applied to the SQL query.
+     * @param array $metaFilters    are applied to the SQL query.
+     * @param bool  $include_options determines if the function also returns all option fields.
      *
      * @return array of all the FrontendMembersFields.
      */
-    public static function getAll($filters = array("field_type" => '!group_option'))
+    public static function getAll($fieldFilters = array(), $metaFilters = array(), $include_options = false)
     {
         global $wpdb;
         $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
         $sql   = "SELECT id FROM $table";
-        foreach ($filters as $filter => $value) {
+        if (!$include_options) {
+            $sql .= " WHERE field_type != 'group_option'";
+        } else {
+            $sql .= " WHERE 1";
+        }
+        foreach ($fieldFilters as $filter => $value) {
             if (substr($value, 0, 1) == "!") {
-                $sql .= " WHERE " . $filter . " != '" . str_replace("!", "", $value) . "'";
+                $sql .= " AND " . $filter . " != '" . str_replace("!", "", $value) . "'";
             } else {
-                $sql .= " WHERE " . $filter . " = '" . $value . "'";
+                $sql .= " AND " . $filter . " = '" . $value . "'";
             }
         }
         $sql .= " ORDER BY field_index ASC;";
@@ -119,8 +126,16 @@ class FrontendMembersField
         $database_fields = json_decode(json_encode($wpdb->get_results($sql)), true);
         $fields          = array();
         foreach ($database_fields as $database_field) {
-            $field    = self::fromID($database_field['id']);
-            $fields[] = $field;
+            $field         = self::fromID($database_field['id']);
+            $match_filters = true;
+            foreach ($metaFilters as $filter => $value) {
+                if ($field->getMeta($filter) === null || $field->getMeta($filter) != $value) {
+                    $match_filters = false;
+                }
+            }
+            if ($match_filters) {
+                $fields[] = $field;
+            }
         }
 
         return $fields;
@@ -184,8 +199,8 @@ class FrontendMembersField
                 }
                 break;
             case "label":
-                $text = $field->getMeta("text");
-                $field      = new FrontendMembersFieldLabel($field, $text);
+                $text  = $field->getMeta("text");
+                $field = new FrontendMembersFieldLabel($field, $text);
                 break;
         }
 
@@ -332,8 +347,8 @@ class FrontendMembersField
                 }
                 break;
             case "label":
-                $text = $field->getMetaFromPOST("text", false);
-                $field      = new FrontendMembersFieldLabel($field, $text);
+                $text  = $field->getMetaFromPOST("text", false);
+                $field = new FrontendMembersFieldLabel($field, $text);
                 break;
         }
 
@@ -454,9 +469,6 @@ class FrontendMembersField
             echo ssv_get_td(ssv_get_select("Field Type", $this->id, $this->type, array("Header", "Input"), array('onchange="ssv_type_changed(\'' . $this->id . '\')"')));
         }
         echo $content;
-        if (get_option('ssv_frontend_members_register_page', 'same_as_profile_page') == 'custom') {
-            echo ssv_get_td(ssv_get_checkbox('Registration Page', $this->id, $this->registration_page, array(), true));
-        }
         if (get_option('ssv_frontend_members_view_advanced_profile_page', 'false') == 'true') {
             echo ssv_get_td(ssv_get_text_input('Field Class', $this->id, $this->class));
             echo ssv_get_td(ssv_get_text_input('Field Style', $this->id, $this->style));

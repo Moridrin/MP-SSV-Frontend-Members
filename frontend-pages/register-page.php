@@ -36,7 +36,7 @@ function ssv_register_page_setup($content)
 function ssv_register_page_content()
 {
     ob_start();
-    $items = FrontendMembersField::getAll();
+    $items = FrontendMembersField::getAll(array('registration_page' => 'yes'));
     ?>
     <!--suppress HtmlUnknownTarget -->
     <form name="members_form" id="members_form" action="/register" method="post" enctype="multipart/form-data">

@@ -41,8 +41,10 @@ class FrontendMembersFieldInput extends FrontendMembersField
      *
      * @param FrontendMember|null $frontend_member is the member to check if this member already has the required value.
      */
-    public function isValueRequiredForMember($frontend_member = null)
-    {
+    public function isValueRequiredForMember(
+        /** @noinspection PhpUnusedParameterInspection */
+        $frontend_member = null
+    ) {
         throw new BadMethodCallException();
     }
 
@@ -65,6 +67,9 @@ class FrontendMembersFieldInput extends FrontendMembersField
         ob_start();
         echo ssv_get_td(ssv_get_select("Input Type", $this->id, $this->input_type, array("Text", "Text Select", "Role Select", "Text Checkbox", "Role Checkbox", "Image"), array('onchange="ssv_input_type_changed(\'' . $this->id . '\')"'), true, $input_type_custom));
         echo $content;
+        if (get_option('ssv_frontend_members_register_page', 'same_as_profile_page') == 'custom') {
+            echo ssv_get_td(ssv_get_checkbox('Registration Page', $this->id, $this->registration_page, array(), true));
+        }
         $content = ob_get_clean();
 
         return parent::getOptionRowField($content);
