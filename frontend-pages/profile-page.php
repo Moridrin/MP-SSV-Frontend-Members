@@ -144,7 +144,7 @@ function ssv_profile_page_content_tabs($member, $can_edit = false, $action_url =
         <div class="mui-tabs__pane <?php echo esc_html($active_class); ?>" id="pane-<?php echo esc_html($tab->id); ?>">
             <form name="members_<?php echo esc_html($tab->title); ?>_form" id="member_<?php echo esc_html($tab->title); ?>_form" action="<?php echo esc_html($action_url) ?>" method="post" enctype="multipart/form-data">
                 <?php
-                echo ssv_get_hidden($tab->id, 'tab', $tab->id);
+                echo ssv_get_hidden(null, 'tab', $tab->id);
                 $items_in_tab = FrontendMembersField::getItemsInTab($tab);
                 foreach ($items_in_tab as $item) {
                     if (isset($item->name) && isset($_SESSION['field_errors'][$item->name])) {

@@ -78,12 +78,7 @@ function ssv_register_ssv_frontend_members()
 		) $charset_collate;";
     dbDelta($sql);
 
-    FrontendMembersFieldTab::create(0, "General")->save();
-    FrontendMembersFieldHeader::create(1, "Account")->save();
-    FrontendMembersFieldInputText::create(2, "Email", "email", true)->save();
-    FrontendMembersFieldHeader::create(3, "Personal Info")->save();
-    FrontendMembersFieldInputText::create(4, "First Name", "first_name")->save();
-    FrontendMembersFieldInputText::create(5, "Last Name", "last_name")->save();
+    FrontendMembersField::createStartData();
 
     /* Pages */
     $register_post    = array(
@@ -124,10 +119,9 @@ function ssv_register_ssv_frontend_members()
     update_option('change_password_post_id', $change_password_post_id);
 
     /* Options */
-    update_option('ssv_frontend_members_register_page', 'same_as_profile_page');
+    update_option('ssv_frontend_members_custom_register_page', 'false');
     update_option('ssv_frontend_members_default_member_role', 'subscriber');
     update_option('ssv_frontend_members_board_role', 'administrator');
-    update_option('ssv_frontend_members_view_advanced_profile_page', 'false');
     update_option('ssv_frontend_members_main_column', 'plugin_default');
     update_option('ssv_frontend_members_user_columns', json_encode(array('wp_Role', 'wp_Posts')));
     update_option('ssv_frontend_members_member_admin', get_option('admin_email'));

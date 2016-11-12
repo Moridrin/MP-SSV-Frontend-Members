@@ -47,7 +47,7 @@ class FrontendMembersFieldHeader extends FrontendMembersField
     public function getHTML()
     {
         ob_start();
-        ?><h1 class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>"><?php echo $this->title; ?></h1><?php
+        ?><h1 id="<?php echo $this->id; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>"><?php echo $this->title; ?></h1><?php
         return ob_get_clean();
     }
 

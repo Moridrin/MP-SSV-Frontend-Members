@@ -45,6 +45,18 @@ class FrontendMembersField
         $this->style             = $style;
     }
 
+    public static function createStartData()
+    {
+        if (current_theme_supports('mui')) {
+            (new FrontendMembersFieldTab(new FrontendMembersField(0, 0, 'tab', 'General', 'no', '', '')))->save();
+        }
+        (new FrontendMembersFieldHeader(new FrontendMembersField(1, 1, 'header', 'Account', 'no', '', '')))->save();
+        (new FrontendMembersFieldInputText(new FrontendMembersFieldInput(new FrontendMembersField(2, 2, 'input', 'Email', 'no', '', ''), 'text', 'email'), 'no', 'normal', '', ''))->save();
+        (new FrontendMembersFieldHeader(new FrontendMembersField(3, 3, 'header', 'Personal Info', 'no', '', '')))->save();
+        (new FrontendMembersFieldInputText(new FrontendMembersFieldInput(new FrontendMembersField(4, 4, 'input', 'First Name', 'no', '', ''), 'text', 'first_name'), 'no', 'normal', '', ''))->save();
+        (new FrontendMembersFieldInputText(new FrontendMembersFieldInput(new FrontendMembersField(5, 5, 'input', 'Last Name', 'no', '', ''), 'text', 'last_name'), 'no', 'normal', '', ''))->save();
+    }
+
     /**
      * This function returns all tabs.
      *
@@ -76,7 +88,7 @@ class FrontendMembersField
         if ($tab instanceof FrontendMembersFieldTab) {
             $tab = $tab->id;
         }
-        $all_fields      = self::getAll();
+        $all_fields      = self::getAll(array('registration_page' => 'no'));
         $filtered_fields = self::getAll($fieldFilters, $metaFilters, $include_options);
         $is_in_tab       = false;
         $fields_in_tab   = array();
@@ -98,8 +110,8 @@ class FrontendMembersField
     }
 
     /**
-     * @param array $fieldFilters   are applied to the SQL query.
-     * @param array $metaFilters    are applied to the SQL query.
+     * @param array $fieldFilters    are applied to the SQL query.
+     * @param array $metaFilters     are applied to the SQL query.
      * @param bool  $include_options determines if the function also returns all option fields.
      *
      * @return array of all the FrontendMembersFields.
@@ -276,6 +288,38 @@ class FrontendMembersField
                 $field                                                          = self::fromPOST(str_replace("_field_title", "", $name));
                 $field->save();
             }
+        }
+    }
+
+    public static function importFieldsToRegister()
+    {
+        //Remove current registration page fields.
+        global $wpdb;
+        $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
+        $wpdb->delete(
+            $table,
+            array("registration_page" => 'yes'),
+            array('%s')
+        );
+        $modifyIndex = $wpdb->get_var("SELECT MAX(id) FROM $table") + 1;
+
+        //Duplicate Profile Fields
+        $fields = self::getAll();
+        foreach ($fields as $field) {
+            if ($field instanceof FrontendMembersFieldTab) {
+                continue;
+            }
+            $field->id += $modifyIndex;
+            $field->registration_page = 'yes';
+            if (isset($field->options)) {
+                foreach ($field->options as $option) {
+                    /** @var FrontendMembersFieldInputSelectOption | FrontendMembersFieldInputSelectRoleOption | FrontendMembersFieldInputSelectTextOption $option */
+                    $option->id += $modifyIndex;
+                    $option->parent_id += $modifyIndex;
+                    $option->save();
+                }
+            }
+            $field->save();
         }
     }
 
@@ -464,10 +508,10 @@ class FrontendMembersField
         echo ssv_get_td(ssv_get_draggable_icon());
         echo ssv_get_hidden($this->id, 'registration_page', $this->registration_page);
         echo ssv_get_td(ssv_get_text_input("Field Title", $this->id, $this->title));
-        if (get_theme_support('mui')) {
+        if (get_theme_support('mui') && $_GET['tab'] != 'register_page') {
             echo ssv_get_td(ssv_get_select("Field Type", $this->id, $this->type, array("Tab", "Header", "Input", "Label"), array('onchange="ssv_type_changed(\'' . $this->id . '\')"')));
         } else {
-            echo ssv_get_td(ssv_get_select("Field Type", $this->id, $this->type, array("Header", "Input"), array('onchange="ssv_type_changed(\'' . $this->id . '\')"')));
+            echo ssv_get_td(ssv_get_select("Field Type", $this->id, $this->type, array("Header", "Input", "Label"), array('onchange="ssv_type_changed(\'' . $this->id . '\')"')));
         }
         echo $content;
         if (get_option('ssv_frontend_members_view_class_column', 'true') == 'true') {

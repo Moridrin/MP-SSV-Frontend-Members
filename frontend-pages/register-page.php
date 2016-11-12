@@ -43,7 +43,7 @@ function ssv_register_page_content()
         <?php
         foreach ($items as $item) {
             if (!$item instanceof FrontendMembersFieldTab) {
-                if (get_option('ssv_frontend_members_register_page') != 'custom' || $item->registration_page == 'yes') {
+                if (get_option('ssv_frontend_members_custom_register_page', 'false') != 'true' || $item->registration_page == 'yes') {
                     /** @noinspection PhpUndefinedMethodInspection */
                     echo $item->getHTML();
                 }

@@ -31,7 +31,7 @@ class FrontendMembersFieldLabel extends FrontendMembersField
     public function getOptionRow()
     {
         ob_start();
-        $colspan = 2;
+        $colspan = 3;
         if (get_option('ssv_frontend_members_view_display__preview_column', 'true') == 'true') {
             $colspan++;
         }
@@ -41,7 +41,6 @@ class FrontendMembersFieldLabel extends FrontendMembersField
         if (get_option('ssv_frontend_members_view_placeholder_column', 'true') == 'true') {
             $colspan++;
         }
-//        $colspan = get_option('ssv_frontend_members_view_advanced_profile_page', 'false') == 'true' ? 6 : 5;
         echo ssv_get_td(ssv_get_text_area("Text", $this->id, $this->text, "text", array("required"), false), $colspan);
         $content = ob_get_clean();
 

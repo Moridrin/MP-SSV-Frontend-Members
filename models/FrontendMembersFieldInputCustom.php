@@ -83,7 +83,7 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
             echo ssv_get_hidden($this->id, "Display", $this->display);
         }
         if (get_option('ssv_frontend_members_view_default_column', 'true') == 'true') {
-            echo ssv_get_td(ssv_get_text_input("Default Value", $this->id, $this->defaultValue));
+            echo ssv_get_td(ssv_get_text_input("Default Value", $this->id, $this->defaultValue, $this->input_type_custom));
         } else {
             echo ssv_get_hidden($this->id, "Default Value", $this->defaultValue);
         }

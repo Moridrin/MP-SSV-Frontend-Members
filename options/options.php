@@ -23,9 +23,11 @@ function ssv_frontend_members_settings_page()
             <a href="?page=<?php echo __FILE__; ?>&tab=profile_page" class="nav-tab <?php if ($active_tab == "profile_page") {
                 echo "nav-tab-active";
             } ?>">Profile Page</a>
-            <a href="?page=<?php echo __FILE__; ?>&tab=register_page" class="nav-tab <?php if ($active_tab == "register_page") {
-                echo "nav-tab-active";
-            } ?>">Register Page</a>
+            <?php if (get_option('ssv_frontend_members_custom_register_page', 'false') == 'true'): ?>
+                <a href="?page=<?php echo __FILE__; ?>&tab=register_page" class="nav-tab <?php if ($active_tab == "register_page") {
+                    echo "nav-tab-active";
+                } ?>">Register Page</a>
+            <?php endif; ?>
             <a href="?page=<?php echo __FILE__; ?>&tab=users_page_columns" class="nav-tab <?php if ($active_tab == "users_page_columns") {
                 echo "nav-tab-active";
             } ?>">Users Page Columns</a>
