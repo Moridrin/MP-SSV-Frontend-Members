@@ -1,6 +1,6 @@
 <?php
-require_once('../include/fpdf/SSV_FPDF.php');
 session_start();
+require_once('../include/fpdf/SSV_FPDF.php');
 if (
     !isset($_SESSION['ABSPATH'])
     || !isset($_SESSION['first_name'])
@@ -39,17 +39,17 @@ if (
 $pdf = new SSV_FPDF();
 $pdf->build(
     $_SESSION['ABSPATH'],
-    $_SESSION['first_name'],
-    $_SESSION['initials'],
-    $_SESSION['last_name'],
-    $_SESSION['gender'],
-    $_SESSION['iban'],
-    $_SESSION['date_of_birth'],
-    $_SESSION['street'],
-    $_SESSION['email'],
-    $_SESSION['postal_code'],
-    $_SESSION['city'],
-    $_SESSION['phone_number'],
-    $_SESSION['emergency_phone']
+    iconv('UTF-8', 'windows-1252', $_SESSION['first_name']),
+    iconv('UTF-8', 'windows-1252', $_SESSION['initials']),
+    iconv('UTF-8', 'windows-1252', $_SESSION['last_name']),
+    iconv('UTF-8', 'windows-1252', $_SESSION['gender']),
+    iconv('UTF-8', 'windows-1252', $_SESSION['iban']),
+    iconv('UTF-8', 'windows-1252', $_SESSION['date_of_birth']),
+    iconv('UTF-8', 'windows-1252', $_SESSION['street']),
+    iconv('UTF-8', 'windows-1252', $_SESSION['email']),
+    iconv('UTF-8', 'windows-1252', $_SESSION['postal_code']),
+    iconv('UTF-8', 'windows-1252', $_SESSION['city']),
+    iconv('UTF-8', 'windows-1252', $_SESSION['phone_number']),
+    iconv('UTF-8', 'windows-1252', $_SESSION['emergency_phone'])
 );
 $pdf->Output('I');

@@ -11,6 +11,7 @@ if (!defined('ABSPATH')) {
 require_once "FrontendMembersFieldTab.php";
 require_once "FrontendMembersFieldHeader.php";
 require_once "FrontendMembersFieldInput.php";
+require_once "FrontendMembersFieldLabel.php";
 
 class FrontendMembersField
 {
@@ -35,13 +36,25 @@ class FrontendMembersField
      */
     protected function __construct($id, $index, $type, $title, $registration_page, $class, $style)
     {
-        $this->id = $id;
-        $this->index = $index;
-        $this->type = $type;
-        $this->title = $title;
+        $this->id                = $id;
+        $this->index             = $index;
+        $this->type              = $type;
+        $this->title             = $title;
         $this->registration_page = $registration_page;
-        $this->class = $class;
-        $this->style = $style;
+        $this->class             = $class;
+        $this->style             = $style;
+    }
+
+    public static function createStartData()
+    {
+        if (current_theme_supports('mui')) {
+            (new FrontendMembersFieldTab(new FrontendMembersField(0, 0, 'tab', 'General', 'no', '', '')))->save();
+        }
+        (new FrontendMembersFieldHeader(new FrontendMembersField(1, 1, 'header', 'Account', 'no', '', '')))->save();
+        (new FrontendMembersFieldInputText(new FrontendMembersFieldInput(new FrontendMembersField(2, 2, 'input', 'Email', 'no', '', ''), 'text', 'email'), 'no', 'normal', '', ''))->save();
+        (new FrontendMembersFieldHeader(new FrontendMembersField(3, 3, 'header', 'Personal Info', 'no', '', '')))->save();
+        (new FrontendMembersFieldInputText(new FrontendMembersFieldInput(new FrontendMembersField(4, 4, 'input', 'First Name', 'no', '', ''), 'text', 'first_name'), 'no', 'normal', '', ''))->save();
+        (new FrontendMembersFieldInputText(new FrontendMembersFieldInput(new FrontendMembersField(5, 5, 'input', 'Last Name', 'no', '', ''), 'text', 'last_name'), 'no', 'normal', '', ''))->save();
     }
 
     /**
@@ -52,8 +65,8 @@ class FrontendMembersField
     public static function getTabs()
     {
         global $wpdb;
-        $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
-        $tabs = array();
+        $table         = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
+        $tabs          = array();
         $database_rows = json_decode(json_encode($wpdb->get_results("SELECT * FROM $table WHERE field_type = 'tab' ORDER BY field_index ASC;")), true);
         foreach ($database_rows as $database_row) {
             $tabs[] = FrontendMembersFieldTab::fromDatabaseFields($database_row);
@@ -65,24 +78,29 @@ class FrontendMembersField
     /**
      * This function returns all the items in the given Tab.
      *
-     * @param FrontendMembersFieldTab $tab is the tab where you want the fields from.
+     * @param FrontendMembersFieldTab|int $tab     is the tab (or its ID) where you want the fields from.
+     * @param array                       $filters is the filter set for the getAll function.
      *
      * @return array
      */
-    public static function getItemsInTab($tab)
+    public static function getItemsInTab($tab, $fieldFilters = array(), $metaFilters = array(), $include_options = false)
     {
-        $all_fields = self::getAll();
-        $is_in_tab = false;
-        $fields_in_tab = array();
+        if ($tab instanceof FrontendMembersFieldTab) {
+            $tab = $tab->id;
+        }
+        $all_fields      = self::getAll(array('registration_page' => 'no'));
+        $filtered_fields = self::getAll($fieldFilters, $metaFilters, $include_options);
+        $is_in_tab       = false;
+        $fields_in_tab   = array();
         foreach ($all_fields as $field) {
             if ($field instanceof FrontendMembersFieldTab) {
-                if ($field == $tab) {
+                if ($field->id == $tab) {
                     $is_in_tab = true;
                 } else {
                     $is_in_tab = false;
                 }
             } else {
-                if ($is_in_tab) {
+                if ($is_in_tab && in_array($field, $filtered_fields)) {
                     $fields_in_tab[] = $field;
                 }
             }
@@ -92,29 +110,44 @@ class FrontendMembersField
     }
 
     /**
-     * @param array $filters are applied to the SQL query.
+     * @param array $fieldFilters    are applied to the SQL query.
+     * @param array $metaFilters     are applied to the SQL query.
+     * @param bool  $include_options determines if the function also returns all option fields.
      *
      * @return array of all the FrontendMembersFields.
      */
-    public static function getAll($filters = array("field_type" => '!group_option'))
+    public static function getAll($fieldFilters = array(), $metaFilters = array(), $include_options = false)
     {
         global $wpdb;
         $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
-        $sql = "SELECT id FROM $table";
-        foreach ($filters as $filter => $value) {
+        $sql   = "SELECT id FROM $table";
+        if (!$include_options) {
+            $sql .= " WHERE field_type != 'group_option'";
+        } else {
+            $sql .= " WHERE 1";
+        }
+        foreach ($fieldFilters as $filter => $value) {
             if (substr($value, 0, 1) == "!") {
-                $sql .= " WHERE " . $filter . " != '" . str_replace("!", "", $value) . "'";
+                $sql .= " AND " . $filter . " != '" . str_replace("!", "", $value) . "'";
             } else {
-                $sql .= " WHERE " . $filter . " = '" . $value . "'";
+                $sql .= " AND " . $filter . " = '" . $value . "'";
             }
         }
         $sql .= " ORDER BY field_index ASC;";
 
         $database_fields = json_decode(json_encode($wpdb->get_results($sql)), true);
-        $fields = array();
+        $fields          = array();
         foreach ($database_fields as $database_field) {
-            $field = self::fromID($database_field['id']);
-            $fields[] = $field;
+            $field         = self::fromID($database_field['id']);
+            $match_filters = true;
+            foreach ($metaFilters as $filter => $value) {
+                if ($field->getMeta($filter) === null || $field->getMeta($filter) != $value) {
+                    $match_filters = false;
+                }
+            }
+            if ($match_filters) {
+                $fields[] = $field;
+            }
         }
 
         return $fields;
@@ -128,7 +161,7 @@ class FrontendMembersField
     protected static function fromID($id)
     {
         global $wpdb;
-        $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
+        $table           = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
         $database_fields = json_decode(
             json_encode(
                 $wpdb->get_row(
@@ -136,9 +169,10 @@ class FrontendMembersField
 					FROM $table
 					WHERE id = $id;"
                 )
-            ), true
+            ),
+            true
         );
-        $field = self::fromDatabaseFields($database_fields);
+        $field           = self::fromDatabaseFields($database_fields);
         switch ($field->type) {
             case "tab":
                 $field = new FrontendMembersFieldTab($field);
@@ -147,33 +181,38 @@ class FrontendMembersField
                 $field = new FrontendMembersFieldHeader($field);
                 break;
             case "input":
-                $input_type = $field->getMeta("input_type");
-                $name = $field->getMeta("name");
-                $field = new FrontendMembersFieldInput($field, $input_type, $name);
+                $input_type   = $field->getMeta("input_type");
+                $name         = $field->getMeta("name");
+                $defaultValue = $field->getMeta("default_value");
+                $field        = new FrontendMembersFieldInput($field, $input_type, $name, $defaultValue);
                 switch ($input_type) {
                     case "custom":
-                        $field = new FrontendMembersFieldInputCustom($field, $field->getMeta('input_type_custom'), $field->getMeta('required'), $field->getMeta('display'), $field->getMeta('placeholder'));
+                        $field = new FrontendMembersFieldInputCustom($field, $field->getMeta('input_type_custom'), $field->getMeta('required'), $field->getMeta('display'), $field->getMeta('placeholder'), $field->getMeta('default_value'));
                         break;
                     case "image":
                         $field = new FrontendMembersFieldInputImage($field, $field->getMeta('required'), $field->getMeta('preview'));
                         break;
                     case "role_checkbox":
-                        $field = new FrontendMembersFieldInputRoleCheckbox($field, $field->getMeta('role'), $field->getMeta('display'));
+                        $field = new FrontendMembersFieldInputRoleCheckbox($field, $field->getMeta('role'), $field->getMeta('display'), $field->getMeta('default_value'));
                         break;
                     case "role_select":
                         $field = new FrontendMembersFieldInputSelectRole($field, $field->getMeta('display'));
                         break;
                     case "text":
-                        $field = new FrontendMembersFieldInputText($field, $field->getMeta('required'), $field->getMeta('display'), $field->getMeta('placeholder'));
+                        $field = new FrontendMembersFieldInputText($field, $field->getMeta('required'), $field->getMeta('display'), $field->getMeta('placeholder'), $field->getMeta('default_value'));
                         break;
                     case "text_checkbox":
-                        $field = new FrontendMembersFieldInputTextCheckbox($field, $field->getMeta('help_text'), $field->getMeta('display'));
+                        $field = new FrontendMembersFieldInputTextCheckbox($field, $field->getMeta('help_text'), $field->getMeta('display'), $field->getMeta('default_value'));
                         break;
                     case "text_select":
-                        $field = new FrontendMembersFieldInputSelectText($field, $field->getMeta('display'));
+                        $field          = new FrontendMembersFieldInputSelectText($field, $field->getMeta('display'));
                         $field->options = $field->getOptions();
                         break;
                 }
+                break;
+            case "label":
+                $text  = $field->getMeta("text");
+                $field = new FrontendMembersFieldLabel($field, $text);
                 break;
         }
 
@@ -188,13 +227,13 @@ class FrontendMembersField
     protected static function fromDatabaseFields($database_fields)
     {
         return new FrontendMembersField(
-            $database_fields['id'],
-            $database_fields['field_index'],
-            $database_fields['field_type'],
-            $database_fields['field_title'],
-            $database_fields['registration_page'],
-            $database_fields['field_class'],
-            $database_fields['field_style']
+            stripslashes($database_fields['id']),
+            stripslashes($database_fields['field_index']),
+            stripslashes($database_fields['field_type']),
+            stripslashes($database_fields['field_title']),
+            stripslashes($database_fields['registration_page']),
+            stripslashes($database_fields['field_class']),
+            stripslashes($database_fields['field_style'])
         );
     }
 
@@ -205,7 +244,7 @@ class FrontendMembersField
      *
      * @return string the meta value linked to the given key.
      */
-    public function getMeta($key)
+    public function getMeta($key, $stripslaches = true)
     {
         global $wpdb;
         $table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
@@ -216,24 +255,23 @@ class FrontendMembersField
 			AND meta_key = '$key';"
         );
 
-        return stripslashes($value);
+        return $stripslaches ? stripslashes($value) : $value;
     }
 
     /**
-     *
      * @return array of all the FrontendMembersFields.
      */
     public static function getAllFieldNames()
     {
         global $wpdb;
         $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
-        $sql = "SELECT id FROM $table WHERE field_type = 'input' ORDER BY field_index ASC;";
-        $ids = json_decode(json_encode($wpdb->get_results($sql)), true);
+        $sql   = "SELECT id FROM $table WHERE field_type = 'input' ORDER BY field_index ASC;";
+        $ids   = json_decode(json_encode($wpdb->get_results($sql)), true);
 
         $table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
         $names = array();
         foreach ($ids as $id) {
-            $sql = "SELECT meta_value FROM $table WHERE meta_key = 'name' AND field_id = " . $id['id'];
+            $sql     = "SELECT meta_value FROM $table WHERE meta_key = 'name' AND field_id = " . $id['id'];
             $names[] = json_decode(json_encode($wpdb->get_var($sql)), true);
         }
 
@@ -242,14 +280,46 @@ class FrontendMembersField
 
     public static function saveAllFromPost()
     {
-        $id = 0;
+        $index = 0;
         foreach ($_POST as $name => $val) {
             if (strpos($name, "_field_title") !== false) {
-                $id++;
-                $_POST[str_replace("_field_title", "", $name) . "_field_index"] = $id; //Set field_index
-                $field = self::fromPOST(str_replace("_field_title", "", $name));
+                $index++;
+                $_POST[str_replace("_field_title", "", $name) . "_field_index"] = $index; //Set field_index
+                $field                                                          = self::fromPOST(str_replace("_field_title", "", $name));
                 $field->save();
             }
+        }
+    }
+
+    public static function importFieldsToRegister()
+    {
+        //Remove current registration page fields.
+        global $wpdb;
+        $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
+        $wpdb->delete(
+            $table,
+            array("registration_page" => 'yes'),
+            array('%s')
+        );
+        $modifyIndex = $wpdb->get_var("SELECT MAX(id) FROM $table") + 1;
+
+        //Duplicate Profile Fields
+        $fields = self::getAll();
+        foreach ($fields as $field) {
+            if ($field instanceof FrontendMembersFieldTab) {
+                continue;
+            }
+            $field->id += $modifyIndex;
+            $field->registration_page = 'yes';
+            if (isset($field->options)) {
+                foreach ($field->options as $option) {
+                    /** @var FrontendMembersFieldInputSelectOption | FrontendMembersFieldInputSelectRoleOption | FrontendMembersFieldInputSelectTextOption $option */
+                    $option->id += $modifyIndex;
+                    $option->parent_id += $modifyIndex;
+                    $option->save();
+                }
+            }
+            $field->save();
         }
     }
 
@@ -265,7 +335,7 @@ class FrontendMembersField
         $variables = array();
         foreach ($_POST as $name => $value) {
             if (in_array($id, explode("_", $name))) {
-                $variables[str_replace($id . "_", "", $name)] = $value;
+                $variables[substr($name, strlen($id) + 1)] = $value;
             }
         }
         $field = new FrontendMembersField(
@@ -292,33 +362,37 @@ class FrontendMembersField
                 break;
             case "input":
                 $input_type = $field->getMetaFromPOST("input_type");
-                $name = $field->getMetaFromPOST("name");
-                $field = new FrontendMembersFieldInput($field, $input_type, $name);
+                $name       = $field->getMetaFromPOST("name");
+                $field      = new FrontendMembersFieldInput($field, $input_type, $name);
                 switch ($input_type) {
                     case "custom":
-                        $field = new FrontendMembersFieldInputCustom($field, $field->getMetaFromPOST('input_type_custom'), $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('placeholder'));
+                        $field = new FrontendMembersFieldInputCustom($field, $field->getMetaFromPOST('input_type_custom'), $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('placeholder'), $field->getMetaFromPOST('default_value'));
                         break;
                     case "image":
                         $field = new FrontendMembersFieldInputImage($field, $field->getMetaFromPOST('required'), $field->getMetaFromPOST('preview'));
                         break;
                     case "role_checkbox":
-                        $field = new FrontendMembersFieldInputRoleCheckbox($field, $field->getMetaFromPOST('role'), $field->getMetaFromPOST('display'));
+                        $field = new FrontendMembersFieldInputRoleCheckbox($field, $field->getMetaFromPOST('role'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('checked_by_default'));
                         break;
                     case "role_select":
-                        $field = new FrontendMembersFieldInputSelectRole($field, $field->getMetaFromPOST('display'));
+                        $field          = new FrontendMembersFieldInputSelectRole($field, $field->getMetaFromPOST('display'));
                         $field->options = $field->getOptionsFromPOST($variables);
                         break;
                     case "text":
-                        $field = new FrontendMembersFieldInputText($field, $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('placeholder'));
+                        $field = new FrontendMembersFieldInputText($field, $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('placeholder'), $field->getMetaFromPOST('default_value'));
                         break;
                     case "text_checkbox":
-                        $field = new FrontendMembersFieldInputTextCheckbox($field, $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'));
+                        $field = new FrontendMembersFieldInputTextCheckbox($field, $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('checked_by_default'));
                         break;
                     case "text_select":
-                        $field = new FrontendMembersFieldInputSelectText($field, $field->getMetaFromPOST('display'));
+                        $field          = new FrontendMembersFieldInputSelectText($field, $field->getMetaFromPOST('display'));
                         $field->options = $field->getOptionsFromPOST($variables);
                         break;
                 }
+                break;
+            case "label":
+                $text  = $field->getMetaFromPOST("text", false);
+                $field = new FrontendMembersFieldLabel($field, $text);
                 break;
         }
 
@@ -332,13 +406,13 @@ class FrontendMembersField
      *
      * @return string the meta value linked to the given key.
      */
-    public function getMetaFromPOST($key)
+    public function getMetaFromPOST($key, $sanitize_text_field = true)
     {
         if (!isset($_POST[$this->id . "_" . $key])) {
             return "no";
         }
 
-        return sanitize_text_field($_POST[$this->id . "_" . $key]);
+        return $sanitize_text_field ? sanitize_text_field($_POST[$this->id . "_" . $key]) : $_POST[$this->id . "_" . $key];
     }
 
     /**
@@ -356,7 +430,7 @@ class FrontendMembersField
     protected static function createField($index, $title, $type, $registration_page = 'true', $class = '', $style = '')
     {
         global $wpdb;
-        $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
+        $table           = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
         $max_in_database = $wpdb->get_var('SELECT MAX(id) FROM ' . $table . ';');
         if ($max_in_database == null) {
             $id = 0;
@@ -372,13 +446,13 @@ class FrontendMembersField
                 'field_title'       => $title,
                 'registration_page' => $registration_page,
                 'field_class'       => $class,
-                'field_style'       => $style
+                'field_style'       => $style,
             ),
             array(
                 '%d',
                 '%d',
                 '%s',
-                '%s'
+                '%s',
             )
         );
 
@@ -402,12 +476,12 @@ class FrontendMembersField
             array(
                 'id'         => $this->id,
                 'meta_key'   => $key,
-                'meta_value' => $value
+                'meta_value' => $value,
             ),
             array(
                 '%d',
                 '%s',
-                '%s'
+                '%s',
             )
         );
     }
@@ -419,7 +493,7 @@ class FrontendMembersField
      */
     public function getOptionRow()
     {
-        throw new BadMethodCallException();
+        throw new BadMethodCallException('Class ' . get_class($this) . ' does not override the getOptionRow() function.');
     }
 
     /**
@@ -432,21 +506,22 @@ class FrontendMembersField
     {
         ob_start();
         echo ssv_get_td(ssv_get_draggable_icon());
+        echo ssv_get_hidden($this->id, 'registration_page', $this->registration_page);
         echo ssv_get_td(ssv_get_text_input("Field Title", $this->id, $this->title));
-        if (get_theme_support('mui')) {
-            echo ssv_get_td(ssv_get_select("Field Type", $this->id, $this->type, array("Tab", "Header", "Input"), array('onchange="ssv_type_changed(\'' . $this->id . '\')"')));
+        if (get_theme_support('mui') && $_GET['tab'] != 'register_page') {
+            echo ssv_get_td(ssv_get_select("Field Type", $this->id, $this->type, array("Tab", "Header", "Input", "Label"), array('onchange="ssv_type_changed(\'' . $this->id . '\')"')));
         } else {
-            echo ssv_get_td(ssv_get_select("Field Type", $this->id, $this->type, array("Header", "Input"), array('onchange="ssv_type_changed(\'' . $this->id . '\')"')));
+            echo ssv_get_td(ssv_get_select("Field Type", $this->id, $this->type, array("Header", "Input", "Label"), array('onchange="ssv_type_changed(\'' . $this->id . '\')"')));
         }
         echo $content;
-        if (get_option('ssv_frontend_members_register_page', 'same_as_profile_page') == 'custom') {
-            echo ssv_get_td(ssv_get_checkbox('Registration Page', $this->id, $this->registration_page, array(), true));
-        }
-        if (get_option('ssv_frontend_members_view_advanced_profile_page', 'false') == 'true') {
+        if (get_option('ssv_frontend_members_view_class_column', 'true') == 'true') {
             echo ssv_get_td(ssv_get_text_input('Field Class', $this->id, $this->class));
-            echo ssv_get_td(ssv_get_text_input('Field Style', $this->id, $this->style));
         } else {
             echo ssv_get_hidden($this->id, 'Field Class', $this->class);
+        }
+        if (get_option('ssv_frontend_members_view_style_column', 'true') == 'true') {
+            echo ssv_get_td(ssv_get_text_input('Field Style', $this->id, $this->style));
+        } else {
             echo ssv_get_hidden($this->id, 'Field Style', $this->style);
         }
 
@@ -455,12 +530,11 @@ class FrontendMembersField
 
     protected function save($remove = false)
     {
-//        ssv_print($this->id);
         global $wpdb;
         if (strlen($this->title) <= 0) {
             $remove = true;
         }
-        $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
+        $table  = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
         $update = $wpdb->get_results(
             "SELECT id
 					FROM $table

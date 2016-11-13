@@ -2,6 +2,7 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+session_start();
 
 /**
  * This function redirects the user to the login page if he/she is not signed in.
@@ -34,6 +35,30 @@ function ssv_profile_page_setup($content)
         return $content;
     }
 
+    $_SESSION['field_errors'] = array();
+
+    if (isset($_GET['view']) && $_GET['view'] == 'directDebitPDF') {
+        if (isset($_GET['user_id'])) {
+            $member = FrontendMember::get_by_id($_GET['user_id']);
+        } else {
+            $member = FrontendMember::get_current_user();
+        }
+        $_SESSION["ABSPATH"]         = ABSPATH;
+        $_SESSION["first_name"]      = $member->first_name;
+        $_SESSION["initials"]        = $member->getMeta('initials');
+        $_SESSION["last_name"]       = $member->last_name;
+        $_SESSION["gender"]          = $member->getMeta('gender');
+        $_SESSION["iban"]            = $member->getMeta('iban');
+        $_SESSION["date_of_birth"]   = $member->getMeta('date_of_birth');
+        $_SESSION["street"]          = $member->getMeta('street');
+        $_SESSION["email"]           = $member->getMeta('email');
+        $_SESSION["postal_code"]     = $member->getMeta('postal_code');
+        $_SESSION["city"]            = $member->getMeta('city');
+        $_SESSION["phone_number"]    = $member->getMeta('phone_number');
+        $_SESSION["emergency_phone"] = $member->getMeta('emergency_phone');
+        ssv_redirect(get_site_url() . '/wp-content/plugins/ssv-frontend-members/frontend-pages/direct-debit-pdf.php');
+    }
+
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['remove_image']) && check_admin_referer('ssv_remove_image_from_profile')) {
         global $wpdb;
         $field_id       = $_POST['remove_image'];
@@ -64,52 +89,68 @@ function ssv_profile_page_setup($content)
  */
 function ssv_profile_page_content()
 {
-    $tabs = FrontendMembersField::getTabs();
-    if (current_theme_supports('mui')) {
-        if (count($tabs) > 0) {
-            $content = '<div class="mui--hidden-xs">';
-            $content .= ssv_profile_page_content_tabs();
-            $content .= '</div>';
-            $content .= '<div class="mui--visible-xs-block">';
-            $content .= ssv_profile_page_content_single_page();
-            $content .= '</div>';
-        } else {
-            $content = ssv_profile_page_content_single_page();
-        }
-    } else {
-        $content = ssv_profile_page_content_single_page();
-    }
-
-    return $content;
-}
-
-function ssv_profile_page_content_tabs()
-{
     if (isset($_GET['user_id'])) {
-        $member     = get_user_by('id', $_GET['user_id']);
+        $member     = FrontendMember::get_by_id($_GET['user_id']);
         $action_url = '/profile/?user_id=' . $member->ID;
     } else {
-        $member     = wp_get_current_user();
+        $member     = FrontendMember::get_current_user();
         $action_url = '/profile/';
     }
     $can_edit = ($member == wp_get_current_user() || current_user_can('edit_user'));
 
     $member = new FrontendMember($member);
+
+    if (current_theme_supports('mui')) {
+        $tabs = FrontendMembersField::getTabs();
+        if (count($tabs) > 0) {
+            $content = '<div class="mui--hidden-xs">';
+            $content .= ssv_profile_page_content_tabs($member, $can_edit, $action_url);
+            $content .= '</div>';
+            $content .= '<div class="mui--visible-xs-block">';
+            $content .= ssv_profile_page_content_single_page($member, $can_edit);
+            $content .= '</div>';
+        } else {
+            $content = ssv_profile_page_content_single_page($member, $can_edit);
+        }
+    } else {
+        $content = ssv_profile_page_content_single_page($member, $can_edit);
+    }
+
+    return $content;
+}
+
+/**
+ * @param FrontendMember $member
+ * @param string         $action_url
+ * @param bool           $can_edit
+ *
+ * @return string
+ */
+function ssv_profile_page_content_tabs($member, $can_edit = false, $action_url = '/profile/')
+{
     ob_start();
     echo ssv_get_profile_page_tab_select($member);
     $tabs = FrontendMembersField::getTabs();
     foreach ($tabs as $tab) {
-        if ($tabs[0] == $tab) {
+        $active_class = "";
+        if (isset($_POST['tab'])) {
+            if ($tab->id == $_POST['tab']) {
+                $active_class = "mui--is-active";
+            }
+        } elseif ($tabs[0] == $tab) {
             $active_class = "mui--is-active";
-        } else {
-            $active_class = "";
         }
         ?>
         <div class="mui-tabs__pane <?php echo esc_html($active_class); ?>" id="pane-<?php echo esc_html($tab->id); ?>">
             <form name="members_<?php echo esc_html($tab->title); ?>_form" id="member_<?php echo esc_html($tab->title); ?>_form" action="<?php echo esc_html($action_url) ?>" method="post" enctype="multipart/form-data">
                 <?php
+                echo ssv_get_hidden(null, 'tab', $tab->id);
                 $items_in_tab = FrontendMembersField::getItemsInTab($tab);
                 foreach ($items_in_tab as $item) {
+                    if (isset($item->name) && isset($_SESSION['field_errors'][$item->name])) {
+                        /** @noinspection PhpUndefinedMethodInspection */
+                        echo $_SESSION['field_errors'][$item->name]->htmlPrint();
+                    }
                     /** @noinspection PhpUndefinedMethodInspection */
                     echo $item->getHTML($member);
                 }
@@ -126,39 +167,18 @@ function ssv_profile_page_content_tabs()
         </div>
         <?php
     }
-    session_start();
-    $_SESSION["ABSPATH"] = ABSPATH;
-    $_SESSION["first_name"] = $member->first_name;
-    $_SESSION["initials"] = $member->getMeta('initials');
-    $_SESSION["last_name"] = $member->last_name;
-    $_SESSION["gender"] = $member->getMeta('gender');
-    $_SESSION["iban"] = $member->getMeta('iban');
-    $_SESSION["date_of_birth"] = $member->getMeta('date_of_birth');
-    $_SESSION["street"] = $member->getMeta('street');
-    $_SESSION["email"] = $member->getMeta('email');
-    $_SESSION["postal_code"] = $member->getMeta('postal_code');
-    $_SESSION["city"] = $member->getMeta('city');
-    $_SESSION["phone_number"] = $member->getMeta('phone_number');
-    $_SESSION["emergency_phone"] = $member->getMeta('emergency_phone');
-    ?>
-    <a href="<?php echo get_site_url() . '/wp-content/plugins/ssv-frontend-members/frontend-pages/direct-debit-pdf.php'; ?>" target="_blank" class="mui-btn mui-btn--primary button-primary">Direct Debit PDF</a>
-    <?php
 
     return ob_get_clean();
 }
 
-function ssv_profile_page_content_single_page()
+/**
+ * @param FrontendMember $member
+ * @param bool           $can_edit
+ *
+ * @return string
+ */
+function ssv_profile_page_content_single_page($member, $can_edit = false)
 {
-    $can_edit = false;
-    if (isset($_GET['user_id'])) {
-        $member = get_user_by('id', $_GET['user_id']);
-    } else {
-        $member = wp_get_current_user();
-    }
-    if ($member == wp_get_current_user() || current_user_can('edit_user')) {
-        $can_edit = true;
-    }
-    $member = new FrontendMember($member);
     ob_start();
     $items = FrontendMembersField::getAll();
     ?>
@@ -199,7 +219,9 @@ function ssv_get_profile_page_tab_select($member)
     for ($i = 0; $i < count($tabs); $i++) {
         $tab = $tabs[$i];
         if ($tab instanceof FrontendMembersFieldTab) {
-            if ($i == 0) {
+            if (isset($_POST['tab']) && $tab->id == $_POST['tab']) {
+                    echo $tab->getTabButton(true);
+            } elseif (!isset($_POST['tab']) && $i == 0) {
                 echo $tab->getTabButton(true);
             } else {
                 echo $tab->getTabButton();
@@ -218,18 +240,35 @@ function ssv_get_profile_page_tab_select($member)
 function ssv_save_members_profile()
 {
     if (isset($_GET['user_id'])) {
-        $user = get_user_by('id', $_GET['user_id']);
+        $user = FrontendMember::get_by_id($_GET['user_id']);
     } else {
-        $user = wp_get_current_user();
+        $user = FrontendMember::get_current_user();
     }
-    $user = new FrontendMember($user);
-    foreach ($_POST as $name => $val) {
-        if (strpos($name, "_reset") !== false) {
-            $name = str_replace("_reset", "", $name);
+    $filters = array('field_type' => 'input');
+    if (current_theme_supports('mui')) {
+        $items = FrontendMembersField::getItemsInTab($_POST['tab'], $filters);
+    } else {
+        $items = FrontendMembersField::getAll($filters);
+    }
+    /** @var FrontendMembersFieldInput $item */
+    foreach ($items as $item) {
+        $value = null;
+        if (isset($_POST[$item->name]) || isset($_POST[$item->name . '_reset'])) {
+            $value = isset($_POST[$item->name]) ? $_POST[$item->name] : $_POST[$item->name . '_reset'];
         }
-        $update_response = $user->updateMeta($name, $val);
-        if ($update_response !== true) {
-            $update_response->htmlPrint();
+        if ($item->isValueRequiredForMember($user) && $value == null) {
+            $error                                 = new Message($item->title . ' is required but there was no value given.', Message::ERROR_MESSAGE);
+            $_SESSION['field_errors'][$item->name] = $error;
+        } elseif (!$item->isEditable() && $value != null && $user->getMeta($item->name) != $value) {
+            $error                                 = new Message('You are not allowed to edit ' . $item->title . '.', Message::NOTIFICATION_MESSAGE);
+            $_SESSION['field_errors'][$item->name] = $error;
+        } elseif ($user->getMeta($item->name) != $value && $item->isEditable()) {
+            if (!($item instanceof FrontendMembersFieldInputImage && $item->required && $value == null)) {
+                $update_response = $user->updateMeta($item->name, sanitize_text_field($value));
+                if ($update_response !== true) {
+                    echo $update_response->htmlPrint();
+                }
+            }
         }
     }
     foreach ($_FILES as $name => $file) {
@@ -256,7 +295,6 @@ function ssv_save_members_profile()
     if (is_plugin_active('ssv-mailchimp/ssv-mailchimp.php')) {
         ssv_update_mailchimp_member($user);
     }
-    unset($_POST);
 }
 
 add_filter('the_content', 'ssv_profile_page_setup');

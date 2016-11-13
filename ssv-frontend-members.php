@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
  * - Easy manage, view and edit member profiles.
  * - Etc.
  * This plugin is fully compatible with the SSV library which can add functionality like: MailChimp, Events, etc.
- * Version: 1.3.4
+ * Version: 1.4.0
  * Author: Jeroen Berkvens
  * Author URI: http://nl.linkedin.com/in/jberkvens/
  * License: WTFPL
@@ -78,12 +78,7 @@ function ssv_register_ssv_frontend_members()
 		) $charset_collate;";
     dbDelta($sql);
 
-    FrontendMembersFieldTab::create(0, "General")->save();
-    FrontendMembersFieldHeader::create(1, "Account")->save();
-    FrontendMembersFieldInputText::create(2, "Email", "email", true)->save();
-    FrontendMembersFieldHeader::create(3, "Personal Info")->save();
-    FrontendMembersFieldInputText::create(4, "First Name", "first_name")->save();
-    FrontendMembersFieldInputText::create(5, "Last Name", "last_name")->save();
+    FrontendMembersField::createStartData();
 
     /* Pages */
     $register_post    = array(
@@ -124,10 +119,9 @@ function ssv_register_ssv_frontend_members()
     update_option('change_password_post_id', $change_password_post_id);
 
     /* Options */
-    update_option('ssv_frontend_members_register_page', 'same_as_profile_page');
+    update_option('ssv_frontend_members_custom_register_page', 'false');
     update_option('ssv_frontend_members_default_member_role', 'subscriber');
     update_option('ssv_frontend_members_board_role', 'administrator');
-    update_option('ssv_frontend_members_view_advanced_profile_page', 'false');
     update_option('ssv_frontend_members_main_column', 'plugin_default');
     update_option('ssv_frontend_members_user_columns', json_encode(array('wp_Role', 'wp_Posts')));
     update_option('ssv_frontend_members_member_admin', get_option('admin_email'));
@@ -264,10 +258,11 @@ function ssv_custom_user_column_values($val, $column_name, $user_id)
     if ($column_name == 'ssv_member') {
         $username_block = '';
         $username_block .= '<img style="float: left; margin-right: 10px; margin-top: 1px;" class="avatar avatar-32 photo" src="' . esc_url($frontendMember->getMeta('profile_picture')) . '" height="32" width="32"/>';
-        $username_block .= '<strong>' . $frontendMember->getProfileLink() . '</strong><br/>';
+        $username_block .= '<strong>' . $frontendMember->getProfileLink('_blank') . '</strong><br/>';
+        $directDebitPDF  = $frontendMember->getProfileURL() . '&view=directDebitPDF';
         $editURL         = 'user-edit.php?user_id=' . $frontendMember->ID . '&wp_http_referer=%2Fwp-admin%2Fusers.php';
         $capebilitiesURL = 'users.php?page=users-user-role-editor.php&object=user&user_id=' . $frontendMember->ID;
-        $username_block .= '<div class="row-actions"><span class="edit"><a href="' . esc_url($editURL) . '">Edit</a> | </span><span class="capabilities"><a href="' . esc_url($capebilitiesURL) . '">Capabilities</a></span></div>';
+        $username_block .= '<div class="row-actions"><span class="direct_debit_pdf"><a href="' . esc_url($directDebitPDF) . '" target="_blank">PDF</a> | </span><span class="edit"><a href="' . esc_url($editURL) . '">Edit</a> | </span><span class="capabilities"><a href="' . esc_url($capebilitiesURL) . '">Capabilities</a></span></div>';
         return $username_block;
     } elseif (ssv_starts_with($column_name, 'ssv_')) {
         return $frontendMember->getMeta(str_replace('ssv_', '', $column_name));

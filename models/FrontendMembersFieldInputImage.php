@@ -24,21 +24,40 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
     {
         parent::__construct($field, $field->input_type, $field->name);
         $this->required = $required;
-        $this->preview = $preview;
+        $this->preview  = $preview;
     }
 
     /**
-     * @param int    $index    is an index that specifies the display (/tab) order for the field.
-     * @param string $title    is the title of this component.
-     * @param string $name     is the name of the input field.
-     * @param bool   $required is true if this is a required input field.
-     * @param bool   $preview  is true if the already set image should be displayed as preview.
+     * If the field is required than this field does need a value.
      *
-     * @return FrontendMembersFieldInputImage
+     * @param FrontendMember|null $frontend_member is the member to check if this member already has the required value.
+     *
+     * @return bool returns if the field is required.
      */
-    public static function create($index, $title, $name, $required = false, $preview = true)
+    public function isValueRequiredForMember($frontend_member = null)
     {
-        return new FrontendMembersFieldInputImage(parent::createInput($index, $title, 'image', $name), $required, $preview);
+        if (!$this->isEditable()) {
+            return false;
+        }
+        if (FrontendMember::get_current_user() != null && FrontendMember::get_current_user()->isBoard()) {
+            return false;
+        }
+        if ($frontend_member == null) {
+            return $this->required == "yes";
+        } else {
+            $location = $frontend_member->getMeta($this->name);
+            return $this->required == "yes" && $location == "";
+        }
+    }
+
+    /**
+     * This field is always editable.
+     *
+     * @return bool returns true.
+     */
+    public function isEditable()
+    {
+        return true;
     }
 
     /**
@@ -49,8 +68,15 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
         ob_start();
         echo ssv_get_td(ssv_get_text_input("Name", $this->id, $this->name, 'text', array('required')));
         echo ssv_get_td(ssv_get_checkbox("Required", $this->id, $this->required));
-        echo ssv_get_td(ssv_get_checkbox("Preview", $this->id, $this->preview));
-        if (get_option('ssv_frontend_members_view_advanced_profile_page', 'false') == 'true') {
+        if (get_option('ssv_frontend_members_view_display__preview_column', 'true') == 'true') {
+            echo ssv_get_td(ssv_get_checkbox("Preview", $this->id, $this->preview));
+        } else {
+            echo ssv_get_hidden($this->id, "Display", $this->preview);
+        }
+        if (get_option('ssv_frontend_members_view_default_column', 'true') == 'true') {
+            echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+        }
+        if (get_option('ssv_frontend_members_view_placeholder_column', 'true') == 'true') {
             echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
         }
         $content = ob_get_clean();
@@ -64,11 +90,14 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
      *
      * @return string the HTML element
      */
-    public function getHTML($frontend_member = null, $size = 150)
-    {
+    public
+    function getHTML(
+        $frontend_member = null,
+        $size = 150
+    ) {
         ob_start();
         if ($frontend_member == null) {
-            $location = "";
+            $location      = "";
             $this->preview = "no";
         } else {
             $location = $frontend_member->getMeta($this->name);
@@ -126,8 +155,10 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
         return ob_get_clean();
     }
 
-    public function save($remove = false)
-    {
+    public
+    function save(
+        $remove = false
+    ) {
         parent::save($remove);
         global $wpdb;
         $table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;

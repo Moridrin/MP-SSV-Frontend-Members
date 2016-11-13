@@ -36,14 +36,14 @@ function ssv_register_page_setup($content)
 function ssv_register_page_content()
 {
     ob_start();
-    $items = FrontendMembersField::getAll();
+    $items = FrontendMembersField::getAll(array('registration_page' => 'yes'));
     ?>
     <!--suppress HtmlUnknownTarget -->
     <form name="members_form" id="members_form" action="/register" method="post" enctype="multipart/form-data">
         <?php
         foreach ($items as $item) {
             if (!$item instanceof FrontendMembersFieldTab) {
-                if (get_option('ssv_frontend_members_register_page') != 'custom' || $item->registration_page == 'yes') {
+                if (get_option('ssv_frontend_members_custom_register_page', 'false') != 'true' || $item->registration_page == 'yes') {
                     /** @noinspection PhpUndefinedMethodInspection */
                     echo $item->getHTML();
                 }
@@ -76,12 +76,12 @@ function ssv_register_page_content()
 function ssv_create_members_profile()
 {
     if (is_user_logged_in() && FrontendMember::get_current_user()->isBoard()) {
-        $password = wp_generate_password();
+        $password          = wp_generate_password();
         $_POST['password'] = $password;
-        $email = $_POST['email'];
-        $display_name = $_POST['first_name'] . ' ' . $_POST['last_name'];
+        $email             = $_POST['email'];
+        $display_name      = $_POST['first_name'] . ' ' . $_POST['last_name'];
     } elseif ($_POST['password'] != $_POST['password_confirm']) {
-            return new Message('Password does not match', Message::ERROR_MESSAGE);
+        return new Message('Password does not match', Message::ERROR_MESSAGE);
     }
     if (isset($_POST['iban']) && !ssv_is_valid_iban($_POST['iban'])) {
         return new Message('Invalid IBAN', Message::ERROR_MESSAGE);
@@ -95,11 +95,14 @@ function ssv_create_members_profile()
         }
     }
     $user = FrontendMember::registerFromPOST();
-    foreach ($_POST as $name => $val) {
-        if (strpos($name, "_reset") !== false) {
-            $name = str_replace("_reset", "", $name);
+    $items = FrontendMembersField::getAll(array('field_type' => 'input'));
+    /** @var FrontendMembersFieldInput $item */
+    foreach ($items as $item) {
+        if ($item->isValueRequiredForMember() && !isset($_POST[$item->name]) && !isset($_POST[$item->name . '_reset'])) {
+            return new Message($item->title . ' is required but there was no value given.', Message::ERROR_MESSAGE);
         }
-        $user->updateMeta($name, sanitize_text_field($val));
+        $value = isset($_POST[$item->name]) ? $_POST[$item->name] : $_POST[$item->name . '_reset'];
+        $user->updateMeta($item->name, sanitize_text_field($value));
     }
     $user->updateMeta("display_name", $user->getMeta('first_name') . ' ' . $user->getMeta('last_name'));
     foreach ($_FILES as $name => $file) {
@@ -126,13 +129,16 @@ function ssv_create_members_profile()
     if (is_plugin_active('ssv-mailchimp/ssv-mailchimp.php')) {
         ssv_update_mailchimp_member($user);
     }
-    if (FrontendMember::get_current_user()->isBoard()) {
-        $to = $email;
+    if (is_user_logged_in() && FrontendMember::get_current_user()->isBoard()) {
+        /** @noinspection PhpUndefinedVariableInspection */
+        $to      = $email;
         $subject = 'Account registration';
+        /** @noinspection PhpUndefinedVariableInspection */
         $message = 'Hello ' . $display_name . ',<br/><br/>';
         $message .= 'Your account for ' . get_bloginfo('name') . ' has been created.<br/>';
-        $url     = get_site_url() . '/login';
+        $url = get_site_url() . '/login';
         $message .= 'You can sign in <a href="' . $url . '">here</a> with username: ' . $email . '<br/>';
+        /** @noinspection PhpUndefinedVariableInspection */
         $message .= 'And password: ' . $password . '<br/>';
         $message .= 'Please update your profile with the necessary information.';
         wp_mail($to, $subject, $message);

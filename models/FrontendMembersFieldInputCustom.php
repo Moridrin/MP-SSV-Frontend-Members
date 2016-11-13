@@ -15,40 +15,58 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
     public $required;
     public $display;
     public $placeholder;
+    public $defaultValue;
 
     /**
      * FrontendMembersFieldInputCustom constructor.
      *
-     * @param FrontendMembersFieldInput $field       is the parent field.
+     * @param FrontendMembersFieldInput $field        is the parent field.
      * @param string                    $input_type_custom
-     * @param bool                      $required    is true if this is a required input field.
-     * @param string                    $display     is the way the input field is displayed (readonly, disabled or normal) default is normal.
-     * @param string                    $placeholder is the placeholder text that gives an example of what to enter.
+     * @param bool                      $required     is true if this is a required input field.
+     * @param string                    $display      is the way the input field is displayed (readonly, disabled or normal) default is normal.
+     * @param string                    $placeholder  is the placeholder text that gives an example of what to enter.
+     * @param string                    $defaultValue is the default input_type_custom that is already entered when you fill in the form.
      */
-    protected function __construct($field, $input_type_custom, $required, $display, $placeholder)
+    protected function __construct($field, $input_type_custom, $required, $display, $placeholder, $defaultValue)
     {
         parent::__construct($field, $field->input_type, $field->name);
         $this->input_type_custom = $input_type_custom;
-        $this->required = $required;
-        $this->display = $display;
-        $this->placeholder = $placeholder;
+        $this->required          = $required;
+        $this->display           = $display;
+        $this->placeholder       = $placeholder;
+        $this->defaultValue      = $defaultValue ?: '';
     }
 
     /**
-     * @param int    $index             is an index that specifies the display (/tab) order for the field.
-     * @param string $title             is the title of this component.
-     * @param string $input_type        is the input type of the input field.
-     * @param string $input_type_custom is the custom input type.
-     * @param string $name              is the name of the input field.
-     * @param bool   $required          is true if this is a required input field.
-     * @param string $display           is the way the input field is displayed (readonly, disabled or normal) default is normal.
-     * @param string $placeholder       is the placeholder text that gives an example of what to enter.
+     * If the field is required than this field does need a value.
      *
-     * @return FrontendMembersFieldInputCustom
+     * @param FrontendMember|null $frontend_member is the member to check if this member already has the required value.
+     *
+     * @return bool returns if the field is required.
      */
-    public static function create($index, $title, $input_type, $input_type_custom, $name, $required = false, $display = "normal", $placeholder = "")
+    public function isValueRequiredForMember($frontend_member = null)
     {
-        return new FrontendMembersFieldInputCustom(parent::createInput($index, $title, $input_type, $name), $input_type_custom, $required, $display, $placeholder);
+        if (!$this->isEditable()) {
+            return false;
+        }
+        if (FrontendMember::get_current_user() != null && FrontendMember::get_current_user()->isBoard()) {
+            return false;
+        } else {
+            return $this->required == 'yes';
+        }
+    }
+
+    /**
+     * If the field is displayed normally than this field is editable.
+     *
+     * @return bool returns if the field is displayed normally.
+     */
+    public function isEditable()
+    {
+        if (FrontendMember::get_current_user() != null && FrontendMember::get_current_user()->isBoard()) {
+            return true;
+        }
+        return $this->display == 'normal';
     }
 
     /**
@@ -59,8 +77,17 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
         ob_start();
         echo ssv_get_td(ssv_get_text_input("Name", $this->id, $this->name, 'text', array('required')));
         echo ssv_get_td(ssv_get_checkbox("Required", $this->id, $this->required));
-        echo ssv_get_td(ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled"), array()));
-        if (get_option('ssv_frontend_members_view_advanced_profile_page', 'false') == 'true') {
+        if (get_option('ssv_frontend_members_view_display__preview_column', 'true') == 'true') {
+            echo ssv_get_td(ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled"), array()));
+        } else {
+            echo ssv_get_hidden($this->id, "Display", $this->display);
+        }
+        if (get_option('ssv_frontend_members_view_default_column', 'true') == 'true') {
+            echo ssv_get_td(ssv_get_text_input("Default Value", $this->id, $this->defaultValue, $this->input_type_custom));
+        } else {
+            echo ssv_get_hidden($this->id, "Default Value", $this->defaultValue);
+        }
+        if (get_option('ssv_frontend_members_view_placeholder_column', 'true') == 'true') {
             echo ssv_get_td(ssv_get_text_input("Placeholder", $this->id, $this->placeholder));
         } else {
             echo ssv_get_hidden($this->id, "Placeholder", $this->placeholder);
@@ -79,7 +106,7 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
     {
         ob_start();
         if ($frontend_member == null) {
-            $value = "";
+            $value         = $this->defaultValue;
             $this->display = 'normal';
         } else {
             $value = $frontend_member->getMeta($this->name);
@@ -87,7 +114,7 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
         if (current_theme_supports('mui')) {
             ?>
             <div class="mui-textfield">
-                <input type="<?php echo $this->input_type_custom; ?>" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="<?php echo $value; ?>" <?php if (wp_get_current_user()->ID == 0 || !(new FrontendMember(wp_get_current_user()))->isBoard()) {
+                <input type="<?php echo $this->input_type_custom; ?>" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="<?php echo $value; ?>" <?php if (!is_user_logged_in() || !FrontendMember::get_current_user()->isBoard()) {
                     echo $this->display;
                 } ?>
                        placeholder="<?php echo $this->placeholder; ?>" <?php if ($this->required == "yes") {
@@ -99,7 +126,7 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
         } else {
             ?>
             <label><?php echo $this->title; ?></label>
-            <input type="<?php echo $this->input_type_custom; ?>" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="<?php echo $value; ?>" <?php if (wp_get_current_user()->ID == 0 || !(new FrontendMember(wp_get_current_user()))->isBoard()) {
+            <input type="<?php echo $this->input_type_custom; ?>" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="<?php echo $value; ?>" <?php if (!is_user_logged_in() || !FrontendMember::get_current_user()->isBoard()) {
                 echo $this->display;
             } ?>
                    placeholder="<?php echo $this->placeholder; ?>" <?php if ($this->required == "yes") {
@@ -135,6 +162,11 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
         $wpdb->replace(
             $table,
             array("field_id" => $this->id, "meta_key" => "placeholder", "meta_value" => $this->placeholder),
+            array('%d', '%s', '%s')
+        );
+        $wpdb->replace(
+            $table,
+            array("field_id" => $this->id, "meta_key" => "default_value", "meta_value" => $this->defaultValue),
             array('%d', '%s', '%s')
         );
     }

@@ -11,14 +11,13 @@ if (!current_user_can('manage_options')) {
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_frontend_members_general_options')) {
     global $options;
-    update_option('ssv_frontend_members_register_page', sanitize_text_field($_POST['ssv_frontend_members_register_page']));
+    if (isset($_POST['ssv_frontend_members_custom_register_page'])) {
+        update_option('ssv_frontend_members_custom_register_page', 'true');
+    } else {
+        update_option('ssv_frontend_members_custom_register_page', 'false');
+    }
     update_option('ssv_frontend_members_default_member_role', sanitize_text_field($_POST['ssv_frontend_members_default_member_role']));
     update_option('ssv_frontend_members_board_role', sanitize_text_field($_POST['ssv_frontend_members_board_role']));
-    if (isset($_POST['ssv_frontend_members_view_advanced_profile_page'])) {
-        update_option('ssv_frontend_members_view_advanced_profile_page', 'true');
-    } else {
-        update_option('ssv_frontend_members_view_advanced_profile_page', 'false');
-    }
     if (isset($_POST['ssv_frontend_members_recaptcha'])) {
         update_option('ssv_frontend_members_recaptcha', 'true');
     } else {
@@ -31,22 +30,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
 <form method="post" action="#">
     <table class="form-table">
         <tr>
-            <th scope="row">Register Page</th>
+            <th scope="row">Custom Register Page</th>
             <td>
-                <select name="ssv_frontend_members_register_page" title="Register Page">
-                    <option value="same_as_profile_page" <?php if (esc_attr(stripslashes(get_option('ssv_frontend_members_register_page'))) == 'same_as_profile_page') {
-                        echo "selected";
-                    } ?>>Same as Profile Page
-                    </option>
-                    <option value="required_profile_page_fields_only"<?php if (esc_attr(stripslashes(get_option('ssv_frontend_members_register_page'))) == 'required_profile_page_fields_only') {
-                        echo "selected";
-                    } ?>>Required fields Only
-                    </option>
-                    <option value="custom"<?php if (esc_attr(stripslashes(get_option('ssv_frontend_members_register_page'))) == 'custom') {
-                        echo "selected";
-                    } ?>>Custom
-                    </option>
-                </select>
+                <label>
+                    <input type="checkbox" name="ssv_frontend_members_custom_register_page" value="true" <?php if (get_option('ssv_frontend_members_custom_register_page', 'false') == 'true') {
+                        echo "checked";
+                    } ?>/>
+                </label>
             </td>
         </tr>
         <tr>
@@ -63,16 +53,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
                 <select name="ssv_frontend_members_board_role" title="Board Role">
                     <?php wp_dropdown_roles(esc_attr(stripslashes(get_option('ssv_frontend_members_board_role')))); ?>
                 </select>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">Advanced Profile Page Tab</th>
-            <td>
-                <label>
-                    <input type="checkbox" name="ssv_frontend_members_view_advanced_profile_page" value="true" <?php if (get_option('ssv_frontend_members_view_advanced_profile_page') == 'true') {
-                        echo "checked";
-                    } ?>/>
-                </label>
             </td>
         </tr>
         <tr>

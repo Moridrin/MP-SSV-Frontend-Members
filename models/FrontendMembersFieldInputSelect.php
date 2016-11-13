@@ -15,6 +15,38 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
     public $display;
 
     /**
+     * A checkbox always has a value ('no' or 'yes')
+     *
+     * @param FrontendMember|null $frontend_member is the member to check if this member already has the required value.
+     *
+     * @return bool required
+     */
+    public function isValueRequiredForMember($frontend_member = null)
+    {
+        if (!$this->isEditable()) {
+            return false;
+        }
+        if (FrontendMember::get_current_user() != null && FrontendMember::get_current_user()->isBoard()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * If the field is displayed normally than this field is editable.
+     *
+     * @return bool returns if the field is displayed normally.
+     */
+    public function isEditable()
+    {
+        if (FrontendMember::get_current_user() != null && FrontendMember::get_current_user()->isBoard()) {
+            return true;
+        }
+        return $this->display == 'normal';
+    }
+
+    /**
      * This function returns all the group options for this field.
      *
      * @return array|null with all options linked to this FrontendMembersField or null if this is not a group field.
@@ -24,7 +56,7 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
         global $wpdb;
 
         //Get Option Field ID's
-        $table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
+        $table      = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
         $option_ids = $wpdb->get_results(
             "SELECT field_id
 			FROM $table
@@ -51,7 +83,7 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
 
         //Create Options and Get Value
         $options = array();
-        $table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
+        $table   = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
         foreach ($option_fields as $option_field) {
             $option_field = json_decode(json_encode($option_field), true);
             if ($this instanceof FrontendMembersFieldInputSelectText) {
@@ -59,14 +91,14 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
             } else {
                 $option = new FrontendMembersFieldInputSelectRoleOption($option_field['id'], $option_field['field_index'], $this->id);
             }
-            $value = $wpdb->get_var(
+            $value         = $wpdb->get_var(
                 "SELECT meta_value
 			FROM $table
 			WHERE field_id = '$option->id'
 			AND meta_key = 'value';"
             );
             $option->value = stripslashes($value);
-            $options[] = $option;
+            $options[]     = $option;
         }
 
         return $options;
@@ -99,7 +131,7 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
     {
         ob_start();
         if ($frontend_member == null) {
-            $value = "";
+            $value         = "";
             $this->display = 'normal';
         } else {
             $value = $frontend_member->getMeta($this->name);

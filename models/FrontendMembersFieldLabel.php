@@ -5,20 +5,24 @@ if (!defined('ABSPATH')) {
 
 /**
  * Created by: Jeroen Berkvens
- * Date: 23-4-2016
- * Time: 16:01
+ * Date: 11-11-2016
+ * Time: 06:45
  */
-class FrontendMembersFieldHeader extends FrontendMembersField
+class FrontendMembersFieldLabel extends FrontendMembersField
 {
 
+    public $text;
+
     /**
-     * FrontendMembersFieldHeader constructor.
+     * FrontendMembersFieldLabel constructor.
      *
      * @param FrontendMembersField $field is the parent field.
+     * @param int                  $text is the main text in the label.
      */
-    protected function __construct($field)
+    protected function __construct($field, $text)
     {
         parent::__construct($field->id, $field->index, $field->type, $field->title, $field->registration_page, $field->class, $field->style);
+        $this->text = $text;
     }
 
     /**
@@ -27,18 +31,17 @@ class FrontendMembersFieldHeader extends FrontendMembersField
     public function getOptionRow()
     {
         ob_start();
-        echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
-        echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
-        echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+        $colspan = 3;
         if (get_option('ssv_frontend_members_view_display__preview_column', 'true') == 'true') {
-            echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+            $colspan++;
         }
         if (get_option('ssv_frontend_members_view_default_column', 'true') == 'true') {
-            echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+            $colspan++;
         }
         if (get_option('ssv_frontend_members_view_placeholder_column', 'true') == 'true') {
-            echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
+            $colspan++;
         }
+        echo ssv_get_td(ssv_get_text_area("Text", $this->id, $this->text, "text", array("required"), false), $colspan);
         $content = ob_get_clean();
 
         return parent::getOptionRowField($content);
@@ -47,12 +50,19 @@ class FrontendMembersFieldHeader extends FrontendMembersField
     public function getHTML()
     {
         ob_start();
-        ?><h1 id="<?php echo $this->id; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>"><?php echo $this->title; ?></h1><?php
+        ?><div class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>"><?php echo $this->text; ?></div><?php
         return ob_get_clean();
     }
 
     public function save($remove = false)
     {
         parent::save($remove);
+        global $wpdb;
+        $table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
+        $wpdb->replace(
+            $table,
+            array("field_id" => $this->id, "meta_key" => "text", "meta_value" => $this->text),
+            array('%d', '%s', '%s')
+        );
     }
 }
