@@ -29,7 +29,8 @@ require_once "frontend-pages/change-password-page.php";
 require_once "frontend-pages/login-page.php";
 require_once "frontend-pages/profile-page.php";
 require_once "frontend-pages/register-page.php";
-require_once "options/options.php";
+require_once "backend-pages/all-users-page-upgrades.php";
+require_once "backend-pages/options/options.php";
 require_once "content_filters.php";
 
 /**

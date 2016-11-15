@@ -116,7 +116,7 @@ class FrontendMembersField
      *
      * @return array of all the FrontendMembersFields.
      */
-    public static function getAll($fieldFilters = array(), $metaFilters = array(), $include_options = false)
+    public static function getAll($fieldFilters, $metaFilters = array(), $include_options = false)
     {
         global $wpdb;
         $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
@@ -304,7 +304,7 @@ class FrontendMembersField
         $modifyIndex = $wpdb->get_var("SELECT MAX(id) FROM $table") + 1;
 
         //Duplicate Profile Fields
-        $fields = self::getAll();
+        $fields = self::getAll(array('registration_page' => 'no'));
         foreach ($fields as $field) {
             if ($field instanceof FrontendMembersFieldTab) {
                 continue;
