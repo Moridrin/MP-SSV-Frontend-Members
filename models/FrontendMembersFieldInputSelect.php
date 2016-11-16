@@ -172,4 +172,24 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
         echo ssv_get_td(ssv_get_text_input("Name", $this->id, $this->name, "text", array("required")));
         return ob_get_clean();
     }
+
+    /**
+     * This function creates an input field for the filter.
+     *
+     * @return string div with a filter field.
+     */
+    public function getFilter()
+    {
+        ob_start();
+        ?>
+        <select id="<?php echo esc_html($this->id); ?>" name="filter_<?php echo esc_html($this->name); ?>">
+            <?php foreach ($this->options as $option) {
+                /* @var $option FrontendMembersFieldInputSelectRoleOption|FrontendMembersFieldInputSelectTextOption */
+                echo $option->getHTML(isset($_SESSION['filter_' . $this->name]) ? $_SESSION['filter_' . $this->name] : '');
+            }
+            ?>
+        </select>
+        <?php
+        return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
+    }
 }

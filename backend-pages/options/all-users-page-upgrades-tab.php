@@ -9,10 +9,11 @@ if (!current_user_can('manage_options')) {
     return;
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_frontend_members_users_page_columns_options')) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_frontend_members_all_users_page_upgrades_options')) {
     global $options;
     update_option('ssv_frontend_members_main_column', sanitize_text_field($_POST['ssv_frontend_members_main_column']));
     update_option('ssv_frontend_members_user_columns', sanitize_text_field(json_encode($_POST['ssv_frontend_members_user_columns'])));
+    update_option('ssv_frontend_members_user_filters', sanitize_text_field(json_encode($_POST['ssv_frontend_members_user_filters'])));
 }
 ?>
 <form method="post" action="#">
@@ -64,7 +65,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
                 </select>
             </td>
         </tr>
+        <tr>
+            <th scope="row">Filters</th>
+            <td>
+                <?php
+                $selected = json_decode(get_option('ssv_frontend_members_user_filters'));
+                $selected = $selected ?: array();
+                $fieldNames = FrontendMembersField::getAllFieldNames();
+                ?>
+                <select size="<?= count($fieldNames) + 3 ?>" name="ssv_frontend_members_user_filters[]" multiple title="Filters">
+                    <?php
+                    foreach ($fieldNames as $fieldName) {
+                        echo '<option value="' . $fieldName . '" ';
+                        if (in_array($fieldName, $selected)) {
+                            echo 'selected';
+                        }
+                        echo '>' . $fieldName . '</option>';
+                    }
+                    ?>
+                </select>
+            </td>
+        </tr>
     </table>
-    <?php wp_nonce_field('ssv_save_frontend_members_users_page_columns_options'); ?>
+    <?php wp_nonce_field('ssv_save_frontend_members_all_users_page_upgrades_options'); ?>
     <?php submit_button(); ?>
 </form>

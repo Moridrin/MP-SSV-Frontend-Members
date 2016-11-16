@@ -88,6 +88,20 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
     }
 
     /**
+     * This function creates an input field for the filter.
+     *
+     * @return string div with a filter field.
+     */
+    public function getFilter()
+    {
+        ob_start();
+        ?>
+        <input type="checkbox" id="<?php echo esc_html($this->id); ?>" name="filter_<?php echo esc_html($this->name); ?>" title="<?php echo esc_html($this->title); ?> <?= isset($_SESSION['filter_' . $this->name]) ? 'checked' : '' ?>"> <?php echo esc_html($this->title); ?>
+        <?php
+        return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
+    }
+
+    /**
      * @param FrontendMember $frontend_member
      *
      * @return string the HTML element

@@ -85,6 +85,20 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
     }
 
     /**
+     * This function creates an input field for the filter. This field allows to filters on if the user has the image or not.
+     *
+     * @return string div with a filter field.
+     */
+    public function getFilter()
+    {
+        ob_start();
+        ?>
+        <input type="checkbox" id="<?php echo esc_html($this->id); ?>" name="filter_<?php echo esc_html($this->name); ?>" title="<?php echo esc_html($this->title); ?>" <?= isset($_SESSION['filter_' . $this->name]) ? 'checked' : '' ?>> Has <?php echo esc_html($this->title); ?>
+        <?php
+        return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
+    }
+
+    /**
      * @param FrontendMember $frontend_member
      * @param int            $size
      *
