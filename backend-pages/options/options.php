@@ -34,7 +34,7 @@ function ssv_frontend_members_settings_page()
             <a href="?page=<?php echo __FILE__; ?>&tab=email" class="nav-tab <?php if ($active_tab == "email") {
                 echo "nav-tab-active";
             } ?>">Email</a>
-            <a href="http://studentensurvival.com/ssv/ssv-frontend-members/" target="_blank" class="nav-tab">Help <img src="<?php echo plugin_dir_url(__DIR__); ?>general/images/link-new-tab.png" width="14px"
+            <a href="http://studentensurvival.com/ssv/ssv-frontend-members/" target="_blank" class="nav-tab">Help <img src="<?php echo plugin_dir_url(__DIR__); ?>../general/images/link-new-tab.png" width="14px"
                                                                                                                        style="vertical-align:middle"></a>
         </h2>
         <?php
@@ -47,7 +47,7 @@ function ssv_frontend_members_settings_page()
                 require_once "profile-page-tab.php";
                 break;
             case "users_page_columns":
-                require_once "users-page-columns.php";
+                require_once "all-users-page-upgrades-tab.php";
                 break;
             case "email":
                 require_once "email-tab.php";

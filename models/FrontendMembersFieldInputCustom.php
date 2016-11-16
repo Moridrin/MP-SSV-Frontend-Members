@@ -98,6 +98,20 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
     }
 
     /**
+     * This function creates an input field for the filter.
+     *
+     * @return string div with a filter field.
+     */
+    public function getFilter()
+    {
+        ob_start();
+        ?>
+        <input type="text" id="<?php echo esc_html($this->id); ?>" name="filter_<?php echo esc_html($this->name); ?>" placeholder="<?php echo esc_html($this->title); ?>" value="<?= isset($_SESSION['filter_' . $this->name]) ? esc_html($_SESSION['filter_' . $this->name]) : '' ?>">
+        <?php
+        return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
+    }
+
+    /**
      * @param FrontendMember $frontend_member
      *
      * @return string
