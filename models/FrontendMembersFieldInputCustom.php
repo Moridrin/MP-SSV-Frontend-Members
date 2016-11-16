@@ -106,7 +106,7 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
     {
         ob_start();
         ?>
-        <input type="text" id="<?php echo esc_html($this->id); ?>" name="filter_<?php echo esc_html($this->name); ?>" placeholder="<?php echo esc_html($this->title); ?>" value="<?= isset($_SESSION['filter_' . $this->name]) ? $_SESSION['filter_' . $this->name] : '' ?>">
+        <input type="text" id="<?php echo esc_html($this->id); ?>" name="filter_<?php echo esc_html($this->name); ?>" placeholder="<?php echo esc_html($this->title); ?>" value="<?= isset($_SESSION['filter_' . $this->name]) ? esc_html($_SESSION['filter_' . $this->name]) : '' ?>">
         <?php
         return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
     }

@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
                 $selected = $selected ?: array();
                 $fieldNames = FrontendMembersField::getAllFieldNames();
                 ?>
-                <select size="<?= count($fieldNames) + 3 ?>" name="ssv_frontend_members_user_filters[]" multiple title="Filters">
+                <select size="<?= count($fieldNames) ?>" name="ssv_frontend_members_user_filters[]" multiple title="Filters">
                     <?php
                     foreach ($fieldNames as $fieldName) {
                         echo '<option value="' . $fieldName . '" ';

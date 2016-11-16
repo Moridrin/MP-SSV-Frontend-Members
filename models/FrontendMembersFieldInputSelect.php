@@ -183,6 +183,7 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
         ob_start();
         ?>
         <select id="<?php echo esc_html($this->id); ?>" name="filter_<?php echo esc_html($this->name); ?>">
+            <option value="">[<?php echo esc_html($this->title); ?>]</option>
             <?php foreach ($this->options as $option) {
                 /* @var $option FrontendMembersFieldInputSelectRoleOption|FrontendMembersFieldInputSelectTextOption */
                 echo $option->getHTML(isset($_SESSION['filter_' . $this->name]) ? $_SESSION['filter_' . $this->name] : '');

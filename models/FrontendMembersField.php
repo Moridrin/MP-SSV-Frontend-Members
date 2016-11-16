@@ -275,7 +275,7 @@ class FrontendMembersField
             $names[] = json_decode(json_encode($wpdb->get_var($sql)), true);
         }
 
-        return $names;
+        return array_unique($names);
     }
 
     public static function saveAllFromPost()

@@ -3,35 +3,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function ssv_add_ssv_frontend_members_users_page()
-{
-    add_submenu_page('users.php', 'All Users', 'All Users', 'edit_users', __FILE__, 'ssv_frontend_members_users_page');
-}
-
-function ssv_frontend_members_users_page()
-{
-    $active_tab = "general";
-    if (isset($_GET['tab'])) {
-        $active_tab = $_GET['tab'];
-    }
-    ?>
-    <div class="wrap">
-        <h1>Filters</h1>
-
-        <h1>Frontend Members</h1>
-        <h2 class="nav-tab-wrapper">
-            <?php foreach (array('Member') as $member_type): ?>
-                <a href="?page=<?php echo __FILE__; ?>&tab=<?php echo strtolower($member_type); ?>" class="nav-tab <?php if ($active_tab == strtolower($member_type)) {
-                    echo "nav-tab-active";
-                } ?>"><?php echo $member_type; ?></a>
-            <?php endforeach; ?>
-        </h2>
-    </div>
-    <?php
-}
-
-add_action('admin_menu', 'ssv_add_ssv_frontend_members_users_page');
-
 function ssv_custom_user_column_values($val, $column_name, $user_id)
 {
     $frontendMember = FrontendMember::get_by_id($user_id);
@@ -92,9 +63,12 @@ function ssv_custom_user_columns($column_headers)
 
 add_action('manage_users_columns', 'ssv_custom_user_columns');
 
-function add_course_section_filter()
+function ssv_include_custom_user_filter_fields()
 {
-    $fields = FrontendMembersField::getAll(array('registration_page' => 'no', 'field_type' => 'input'));
+    if (strpos($_SERVER['REQUEST_URI'], 'users.php') === false || get_option('ssv_frontend_members_custom_users_filters', 'under') == 'hide') {
+        return;
+    }
+    $fields = FrontendMembersField::getAll(array('field_type' => 'input'));
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         foreach ($fields as $field) {
             /** @var FrontendMembersFieldInput $field */
@@ -104,100 +78,108 @@ function add_course_section_filter()
                 $_SESSION['filter_' . $field->name] = $_POST['filter_' . $field->name];
             }
         }
-    }
-    $filters  = '<h1>Filters</h1>';
-    $selected = json_decode(get_option('ssv_frontend_members_user_filters'));
-    $selected = $selected ?: array();
-    foreach ($fields as $field) {
-        /** @var FrontendMembersFieldInput $field */
-        if (in_array($field->name, $selected)) {
-            $filters .= '<div style="display: inline-block; margin-right: 10px;">';
-            $filters .= $field->getFilter();
-            $filters .= '</div>';
+        if (isset($_GET['paged']) && $_GET['paged'] > 1) {
+            $uri = $_SERVER['REQUEST_URI'];
+            $uri = str_replace('paged=' . $_GET['paged'], 'paged=1', $uri);
+            ssv_redirect($uri);
         }
     }
-    $filters .= '<br/>';
-    $filters .= '<button type="submit" value="submit" class="button">Filter</button>';
+    $filters     = '';
+    $selected    = json_decode(get_option('ssv_frontend_members_user_filters'));
+    $selected    = $selected ?: array();
+    $addedFields = array();
+    foreach ($fields as $field) {
+        /** @var FrontendMembersFieldInput $field */
+        if (in_array($field->name, $selected) && !in_array($field->name, $addedFields)) {
+            $filters .= '<div style="display: inline-block; margin-right: 6px;">';
+            $filters .= $field->getFilter();
+            $filters .= '</div>';
+            $addedFields[] = $field->name;
+        }
+    }
+    $filters .= '<br/><button type="submit" value="submit" class="button" style="margin-right: 6px;">Filter</button>';
+    $filters .= '<button type="submit" name="clear_filters" value="clear_filters" class="button">Clear Filters</button>';
     ?>
     <script>
         window.onload = function () {
             jQuery(document).ready(function ($) {
                 var old_filter_area = $('.subsubsub');
+                old_filter_area.before('<h2 style="margin-bottom: 0;">Filters</h2>');
                 old_filter_area.after('<form name="filter_form" method="post"><div id="filter_area"></div></form>');
+                <?php if (get_option('ssv_frontend_members_custom_users_filters', 'under') == 'replace'): ?>
                 old_filter_area.remove();
+                <?php endif; ?>
                 var filter_area = $('#filter_area');
                 filter_area.html('<?php echo $filters; ?>');
             });
         };
     </script>
     <?php
-//    die('<br/><br/>bla');
 }
 
-add_action('admin_init', 'add_course_section_filter');
+add_action('admin_init', 'ssv_include_custom_user_filter_fields');
 
-function filter_users_by_course_section($query)
+function ssv_custom_user_filters($query)
 {
-//    die('<br/><br/>test');
+    if (strpos($_SERVER['REQUEST_URI'], 'users.php') === false) {
+        return $query;
+    }
     global $wpdb;
-    if (strpos($_SERVER['REQUEST_URI'], 'users.php') !== false) {
-        $filters = array();
-        $fields = FrontendMembersField::getAll(array('registration_page' => 'no', 'field_type' => 'input'));
-        foreach ($fields as $field) {
-            /** @var FrontendMembersFieldInput $field */
-            if (isset($_SESSION['filter_' . $field->name])) {
-                $filters[$field->name] = $_SESSION['filter_' . $field->name];
+    $filtered = array();
+    $fields   = FrontendMembersField::getAll(array('field_type' => 'input'));
+    foreach ($fields as $field) {
+        /** @var FrontendMembersFieldInput $field */
+        if (isset($_SESSION['filter_' . $field->name]) && !in_array($field->name, $filtered)) {
+            $value = $_SESSION['filter_' . $field->name];
+            switch (get_class($field)) {
+                case FrontendMembersFieldInputCustom::class:
+                case FrontendMembersFieldInputText::class:
+                    $table_alias = $field->name . 'meta';
+                    $query->query_from .= " JOIN {$wpdb->usermeta} {$table_alias} ON {$table_alias}.user_id = {$wpdb->users}.ID AND {$table_alias}.meta_key = '{$field->name}'";
+                    if (strpos($value, '<') !== false) {
+                        $value = str_replace('<', '', $value);
+                        $query->query_where .= " AND {$table_alias}.meta_value < '{$value}'";
+                    } elseif (strpos($value, '>') !== false) {
+                        $value = str_replace('>', '', $value);
+                        $query->query_where .= " AND {$table_alias}.meta_value > '{$value}'";
+                    } elseif (strpos($value, '!') !== false && (strpos($value, "'") !== false || strpos($value, '"') !== false)) {
+                        $value = str_replace('!', '', $value);
+                        $value = str_replace("'", '', $value);
+                        $value = str_replace('"', '', $value);
+                        $query->query_where .= " AND {$table_alias}.meta_value != '{$value}'";
+                    } elseif (strpos($value, '!') !== false) {
+                        $value = str_replace('!', '', $value);
+                        $query->query_where .= " AND {$table_alias}.meta_value NOT LIKE '%{$value}%'";
+                    } elseif (strpos($value, "\\'") !== false || strpos($value, '\\"') !== false) {
+                        $value = str_replace("\\'", '', $value);
+                        $value = str_replace('\\"', '', $value);
+                        $query->query_where .= " AND {$table_alias}.meta_value = '{$value}'";
+                    } else {
+                        $query->query_where .= " AND {$table_alias}.meta_value LIKE '%{$value}%'";
+                    }
+                    break;
+                case FrontendMembersFieldInputImage::class:
+                    $table_alias = $field->name . 'meta';
+                    $query->query_from .= " LEFT OUTER JOIN {$wpdb->usermeta} {$table_alias} ON {$table_alias}.user_id = {$wpdb->users}.ID AND {$table_alias}.meta_key = '{$field->name}'";
+                    if ($value == 'no') {
+                        $query->query_where .= " AND profile_picturemeta.meta_key IS NULL";
+                    } else {
+                        $query->query_where .= " AND profile_picturemeta.meta_key = '" . $field->name . "'";
+                    }
+                    break;
+                case FrontendMembersFieldInputSelect::class:
+                case FrontendMembersFieldInputRoleCheckbox::class:
+                case FrontendMembersFieldInputTextCheckbox::class:
+                default:
+                    $table_alias = $field->name . 'meta';
+                    $query->query_from .= " JOIN {$wpdb->usermeta} {$table_alias} ON {$table_alias}.user_id = {$wpdb->users}.ID AND {$table_alias}.meta_key = '{$field->name}'";
+                    $query->query_where .= " AND {$table_alias}.meta_value LIKE '{$value}'";
+                    break;
             }
-        }
-        foreach ($filters as $filter => $value) {
-            $table_alias = $filter . 'meta';
-            $query->query_from .= " JOIN {$wpdb->usermeta} {$table_alias} ON {$table_alias}.user_id = {$wpdb->users}.ID AND {$table_alias}.meta_key = '{$filter}'";
-            $query->query_where .= " AND {$table_alias}.meta_value LIKE '%{$value}%'";
+            $filtered[] = $field->name;
         }
     }
+    return $query;
 }
 
-add_filter('pre_user_query', 'filter_users_by_course_section');
-
-//
-//function add_course_section_filter()
-//{
-//    if (isset($_GET['ssv_meta_key']) && isset($_GET['ssv_meta_value'])) {
-//        $meta_key = $_GET['ssv_meta_key'];
-//        $meta_value = $_GET['ssv_meta_value'];
-//    } else {
-//        $meta_key = '';
-//        $meta_value = '';
-//    }
-//    ?>
-    <!--    <input type="text" name="ssv_meta_key" value="--><?php //echo $meta_key; ?><!--"/>-->
-    <!--    <input type="text" name="ssv_meta_value" value="--><?php //echo $meta_value; ?><!--"/>-->
-    <!--    --><?php
-//    echo '<input type="submit" class="button" value="Filter">';
-//}
-//
-//add_action('restrict_manage_users', 'add_course_section_filter');
-//
-//function filter_users_by_course_section($query)
-//{
-//    global $pagenow;
-//
-//    if (is_admin()
-//        && 'users.php' == $pagenow
-//        && isset($_GET['ssv_meta_key'])
-//        && isset($_GET['ssv_meta_value'])
-//    ) {
-//        $meta_key    = $_GET['ssv_meta_key'];
-//        $meta_value    = $_GET['ssv_meta_value'];
-//        $meta_query = array(
-//            array(
-//                'key'   => $meta_key,
-//                'value' => $meta_value,
-//            ),
-//        );
-//        $query->set('meta_key', $meta_key);
-//        $query->set('meta_query', $meta_query);
-//    }
-//}
-//
-//add_filter('pre_get_users', 'filter_users_by_course_section');
+add_filter('pre_user_query', 'ssv_custom_user_filters');

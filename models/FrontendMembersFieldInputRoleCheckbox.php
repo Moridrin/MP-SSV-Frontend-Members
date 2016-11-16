@@ -95,8 +95,13 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
     public function getFilter()
     {
         ob_start();
+        $value = isset($_SESSION['filter_' . $this->name]) ? $_SESSION['filter_' . $this->name] : '';
         ?>
-        <input type="checkbox" id="<?php echo esc_html($this->id); ?>" name="filter_<?php echo esc_html($this->name); ?>" title="<?php echo esc_html($this->title); ?> <?= isset($_SESSION['filter_' . $this->name]) ? 'checked' : '' ?>"> <?php echo esc_html($this->title); ?>
+        <select id="<?php echo esc_html($this->id); ?>" name="filter_<?php echo esc_html($this->name); ?>" title="<?php echo esc_html($this->title); ?>">
+            <option value="">[<?php echo esc_html($this->title); ?>]</option>
+            <option value="yes" <?= $value == 'yes' ? 'selected' : '' ?>>Selected</option>
+            <option value="no" <?= $value == 'no' ? 'selected' : '' ?>>Not Selected</option>
+         </select>
         <?php
         return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
     }

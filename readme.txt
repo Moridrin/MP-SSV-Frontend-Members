@@ -37,15 +37,23 @@ The best way is to add an issue on GitHub (https://github.com/Moridrin/ssv-front
 
 == Changelog ==
 
+= 1.4.1 =
+* Users Filters
+  * Filter based on Profile/Registration page fields
+  * Select which filters to display in settings
+  * Enable/Disable custom user filters
+  * Replace or Append to user role filters
+  * SQL parameters working ([<], [>], [!], ['[something]'])
+
 = 1.4.0 =
 * Profile to PDF support improved.
-** Works now with a redirect through profile page ensuring the correct session data.
-** Moved to backend users overview.
+  * Works now with a redirect through profile page ensuring the correct session data.
+  * Moved to backend users overview.
 * Improvements to Fields
-** Default values
-** Verification of mandatory fields
-** Label fields
-** Columns to display selection
+  * Default values
+  * Verification of mandatory fields
+  * Label fields
+  * Columns to display selection
 
 = 1.3.4 =
 * Profile to PDF support replaced with Direct Debit PDF.
