@@ -290,11 +290,12 @@ function ssv_save_members_profile()
             }
         }
     }
-    /** @noinspection PhpIncludeInspection */
-    require_once(ABSPATH . 'wp-admin/includes/plugin.php');
-    if (is_plugin_active('ssv-mailchimp/ssv-mailchimp.php')) {
-        ssv_update_mailchimp_member($user);
-    }
+    do_action('ssv_frontend_member_saved', $user);
+//    /** @noinspection PhpIncludeInspection */
+//    require_once(ABSPATH . 'wp-admin/includes/plugin.php');
+//    if (is_plugin_active('ssv-mailchimp/ssv-mailchimp.php')) {
+//        ssv_update_mailchimp_member($user);
+//    }
 }
 
 add_filter('the_content', 'ssv_profile_page_setup');
