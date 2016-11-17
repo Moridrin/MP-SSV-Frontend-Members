@@ -72,6 +72,16 @@ class FrontendMembersFieldInput extends FrontendMembersField
         return parent::getOptionRowField($content);
     }
 
+    /**
+     * This function is implemented in all subclasses.
+     *
+     * @return string div with a filter field.
+     */
+    public function getFilter()
+    {
+        throw new BadMethodCallException('Class ' . get_class($this) . ' does not override the getFilter() function.');
+    }
+
     protected function save($remove = false)
     {
         $remove = parent::save($remove);

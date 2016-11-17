@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
  * - Easy manage, view and edit member profiles.
  * - Etc.
  * This plugin is fully compatible with the SSV library which can add functionality like: MailChimp, Events, etc.
- * Version: 1.4.0
+ * Version: 1.4.1
  * Author: Jeroen Berkvens
  * Author URI: http://nl.linkedin.com/in/jberkvens/
  * License: WTFPL
@@ -29,7 +29,8 @@ require_once "frontend-pages/change-password-page.php";
 require_once "frontend-pages/login-page.php";
 require_once "frontend-pages/profile-page.php";
 require_once "frontend-pages/register-page.php";
-require_once "options/options.php";
+require_once "backend-pages/all-users-page-upgrades.php";
+require_once "backend-pages/options/options.php";
 require_once "content_filters.php";
 
 /**
@@ -251,63 +252,3 @@ function ssv_custom_user_column_types($contactmethods)
 }
 
 add_filter('user_contactmethods', 'ssv_custom_user_column_types', 10, 1);
-
-function ssv_custom_user_column_values($val, $column_name, $user_id)
-{
-    $frontendMember = FrontendMember::get_by_id($user_id);
-    if ($column_name == 'ssv_member') {
-        $username_block = '';
-        $username_block .= '<img style="float: left; margin-right: 10px; margin-top: 1px;" class="avatar avatar-32 photo" src="' . esc_url($frontendMember->getMeta('profile_picture')) . '" height="32" width="32"/>';
-        $username_block .= '<strong>' . $frontendMember->getProfileLink('_blank') . '</strong><br/>';
-        $directDebitPDF  = $frontendMember->getProfileURL() . '&view=directDebitPDF';
-        $editURL         = 'user-edit.php?user_id=' . $frontendMember->ID . '&wp_http_referer=%2Fwp-admin%2Fusers.php';
-        $capebilitiesURL = 'users.php?page=users-user-role-editor.php&object=user&user_id=' . $frontendMember->ID;
-        $username_block .= '<div class="row-actions"><span class="direct_debit_pdf"><a href="' . esc_url($directDebitPDF) . '" target="_blank">PDF</a> | </span><span class="edit"><a href="' . esc_url($editURL) . '">Edit</a> | </span><span class="capabilities"><a href="' . esc_url($capebilitiesURL) . '">Capabilities</a></span></div>';
-        return $username_block;
-    } elseif (ssv_starts_with($column_name, 'ssv_')) {
-        return $frontendMember->getMeta(str_replace('ssv_', '', $column_name));
-    }
-    return $val;
-}
-
-add_filter('manage_users_custom_column', 'ssv_custom_user_column_values', 10, 3);
-
-function ssv_custom_user_columns($column_headers)
-{
-    unset($column_headers);
-    $column_headers['cb'] = '<input type="checkbox" />';
-    global $wpdb;
-    if (get_option('ssv_frontend_members_main_column') == 'wordpress_default') {
-        $column_headers['username'] = 'Username';
-    } else {
-        $url = $_SERVER['REQUEST_URI'];
-        if (empty($_GET)) {
-            $url .= '?orderby=name';
-        } elseif (!isset($_GET['orderby'])) {
-            $url .= '&orderby=name';
-        } elseif (!isset($_GET['order'])) {
-            $url .= '&order=DESC';
-        } elseif ($_GET['order'] == 'DESC') {
-            $url .= '&order=ASC';
-        } else {
-            $url .= '&order=DESC';
-        }
-        $column_headers['ssv_member'] = '<a href="' . $url . '">Member</a>';
-    }
-    $selected_columns = json_decode(get_option('ssv_frontend_members_user_columns'));
-    $selected_columns = $selected_columns ?: array();
-    foreach ($selected_columns as $column) {
-        $sql   = 'SELECT field_id FROM ' . FRONTEND_MEMBERS_FIELD_META_TABLE_NAME . ' WHERE meta_key = "name" AND meta_value = "' . $column . '"';
-        $sql   = 'SELECT field_title FROM ' . FRONTEND_MEMBERS_FIELDS_TABLE_NAME . ' WHERE id = (' . $sql . ')';
-        $title = $wpdb->get_var($sql);
-        if (ssv_starts_with($column, 'wp_')) {
-            $column                              = str_replace('wp_', '', $column);
-            $column_headers[strtolower($column)] = $column;
-        } else {
-            $column_headers['ssv_' . $column] = $title;
-        }
-    }
-    return $column_headers;
-}
-
-add_action('manage_users_columns', 'ssv_custom_user_columns');

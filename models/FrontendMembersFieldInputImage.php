@@ -85,6 +85,25 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
     }
 
     /**
+     * This function creates an input field for the filter. This field allows to filters on if the user has the image or not.
+     *
+     * @return string div with a filter field.
+     */
+    public function getFilter()
+    {
+        ob_start();
+        $value = isset($_SESSION['filter_' . $this->name]) ? $_SESSION['filter_' . $this->name] : '';
+        ?>
+        <select id="<?php echo esc_html($this->id); ?>" name="filter_<?php echo esc_html($this->name); ?>" title="<?php echo esc_html($this->title); ?>">
+            <option value="">[<?php echo esc_html($this->title); ?>]</option>
+            <option value="yes" <?= $value == 'yes' ? 'selected' : '' ?>><?php echo esc_html("Has ") . esc_html($this->title); ?></option>
+            <option value="no" <?= $value == 'no' ? 'selected' : '' ?>><?php echo esc_html("Doesn't have ") . esc_html($this->title); ?></option>
+        </select>
+        <?php
+        return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
+    }
+
+    /**
      * @param FrontendMember $frontend_member
      * @param int            $size
      *

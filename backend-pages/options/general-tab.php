@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
     }
     update_option('ssv_frontend_members_default_member_role', sanitize_text_field($_POST['ssv_frontend_members_default_member_role']));
     update_option('ssv_frontend_members_board_role', sanitize_text_field($_POST['ssv_frontend_members_board_role']));
+    update_option('ssv_frontend_members_custom_users_filters', sanitize_text_field($_POST['ssv_frontend_members_custom_users_filters']));
     if (isset($_POST['ssv_frontend_members_recaptcha'])) {
         update_option('ssv_frontend_members_recaptcha', 'true');
     } else {
@@ -52,6 +53,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
             <td>
                 <select name="ssv_frontend_members_board_role" title="Board Role">
                     <?php wp_dropdown_roles(esc_attr(stripslashes(get_option('ssv_frontend_members_board_role')))); ?>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">Custom Users Filters</th>
+            <td>
+                <select name="ssv_frontend_members_custom_users_filters" title="Board Role">
+                    <option value="hide" <?= get_option('ssv_frontend_members_custom_users_filters', 'under') == 'hide' ? 'selected' : '' ?>>Hide</option>
+                    <option value="replace" <?= get_option('ssv_frontend_members_custom_users_filters', 'under') == 'replace' ? 'selected' : '' ?>>Replace User Role Links</option>
+                    <option value="under" <?= get_option('ssv_frontend_members_custom_users_filters', 'under') == 'under' ? 'selected' : '' ?>>Under User Role Links</option>
                 </select>
             </td>
         </tr>
