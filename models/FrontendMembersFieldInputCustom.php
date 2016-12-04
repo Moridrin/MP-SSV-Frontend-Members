@@ -115,39 +115,29 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
      * @param FrontendMember $frontend_member
      *
      * @return string
+     * @throws Exception if te theme does not support MUI (will be removed later).
      */
     public function getHTML($frontend_member = null)
     {
-        ob_start();
         if ($frontend_member == null) {
-            $value         = $this->defaultValue;
+            $value         = isset($_POST[$this->name])? $_POST[$this->name] : $this->defaultValue;
             $this->display = 'normal';
         } else {
             $value = $frontend_member->getMeta($this->name);
         }
+        $isBoard = (!is_user_logged_in() || !FrontendMember::get_current_user()->isBoard());
+        ob_start();
         if (current_theme_supports('mui')) {
             ?>
             <div class="mui-textfield">
-                <input type="<?php echo $this->input_type_custom; ?>" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="<?php echo $value; ?>" <?php if (!is_user_logged_in() || !FrontendMember::get_current_user()->isBoard()) {
-                    echo $this->display;
-                } ?>
-                       placeholder="<?php echo $this->placeholder; ?>" <?php if ($this->required == "yes") {
-                    echo "required";
-                } ?> class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>"/>
-                <label><?php echo $this->title; ?></label>
+                <input type="<?= $this->input_type_custom ?>" id="<?= $this->id ?>" name="<?= $this->name ?>"
+                       value="<?= $value ?>" <?= $isBoard ? $this->display : '' ?> placeholder="<?= $this->placeholder ?>"
+                    <?= $this->required == "yes" ? "required" : "" ?> class="<?= $this->class ?>" style="<?php echo $this->style; ?>"/>
+                <label><?= $this->title ?></label>
             </div>
             <?php
         } else {
-            ?>
-            <label><?php echo $this->title; ?></label>
-            <input type="<?php echo $this->input_type_custom; ?>" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" value="<?php echo $value; ?>" <?php if (!is_user_logged_in() || !FrontendMember::get_current_user()->isBoard()) {
-                echo $this->display;
-            } ?>
-                   placeholder="<?php echo $this->placeholder; ?>" <?php if ($this->required == "yes") {
-                echo "required";
-            } ?> class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>"/>
-            <br/>
-            <?php
+            throw new Exception('Themes without MUI support are currently not supported by this plugin.');
         }
 
         return ob_get_clean();

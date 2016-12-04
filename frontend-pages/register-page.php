@@ -95,14 +95,19 @@ function ssv_create_members_profile()
         }
     }
     $user = FrontendMember::registerFromPOST();
+    if (get_class($user) == Message::class) {
+        return $user;
+    }
     $items = FrontendMembersField::getAll(array('field_type' => 'input'));
     /** @var FrontendMembersFieldInput $item */
     foreach ($items as $item) {
         if ($item->isValueRequiredForMember() && !isset($_POST[$item->name]) && !isset($_POST[$item->name . '_reset'])) {
             return new Message($item->title . ' is required but there was no value given.', Message::ERROR_MESSAGE);
         }
-        $value = isset($_POST[$item->name]) ? $_POST[$item->name] : $_POST[$item->name . '_reset'];
-        $user->updateMeta($item->name, sanitize_text_field($value));
+        if (isset($_POST[$item->name]) || isset($_POST[$item->name . '_reset'])) {
+            $value = isset($_POST[$item->name]) ? $_POST[$item->name] : $_POST[$item->name . '_reset'];
+            $user->updateMeta($item->name, sanitize_text_field($value));
+        }
     }
     $user->updateMeta("display_name", $user->getMeta('first_name') . ' ' . $user->getMeta('last_name'));
     foreach ($_FILES as $name => $file) {

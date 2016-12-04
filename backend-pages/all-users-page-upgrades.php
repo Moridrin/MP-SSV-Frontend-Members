@@ -8,7 +8,8 @@ function ssv_custom_user_column_values($val, $column_name, $user_id)
     $frontendMember = FrontendMember::get_by_id($user_id);
     if ($column_name == 'ssv_member') {
         $username_block = '';
-        $username_block .= '<img style="float: left; margin-right: 10px; margin-top: 1px;" class="avatar avatar-32 photo" src="' . esc_url($frontendMember->getMeta('profile_picture')) . '" height="32" width="32"/>';
+        $username_block .= get_avatar($frontendMember->ID, 32, '', '', array('extra_attr' => 'style="float: left; margin-right: 5px; margin-top: 1px;"'));
+//        $username_block .= '<img style="float: left; margin-right: 10px; margin-top: 1px;" class="avatar avatar-32 photo" src="' . esc_url($frontendMember->getMeta('profile_picture')) . '" height="32" width="32"/>';
         $username_block .= '<strong>' . $frontendMember->getProfileLink('_blank') . '</strong><br/>';
         $directDebitPDF  = $frontendMember->getProfileURL() . '&view=directDebitPDF';
         $editURL         = 'user-edit.php?user_id=' . $frontendMember->ID . '&wp_http_referer=%2Fwp-admin%2Fusers.php';
