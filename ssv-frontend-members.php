@@ -167,7 +167,7 @@ register_deactivation_hook(__FILE__, 'ssv_unregister_ssv_frontend_members');
  *
  * @return string The <img> component of the avatar.
  */
-function ssv_frontend_members_avatar($avatar, $id_or_email, $size = 150, $default = null, $alt = "")
+function ssv_frontend_members_avatar($avatar, $id_or_email, $size = 150, $default = null, $alt = "", $args = array())
 {
     $user = false;
 
@@ -182,18 +182,19 @@ function ssv_frontend_members_avatar($avatar, $id_or_email, $size = 150, $defaul
     } else {
         $user = get_user_by('email', $id_or_email);
     }
+    $class = isset($args['class']) ? $args['class'] : '';
 
     if ($user && is_object($user)) {
         $custom_avatar = esc_url(get_user_meta($user->ID, 'profile_picture', true));
         if (isset($custom_avatar) && !empty($custom_avatar)) {
-            $avatar = "<img alt='{$alt}' src='{$custom_avatar}' class='avatar avatar-{$size} photo' height='{$size}' width='{$size}' />";
+            $avatar = "<img alt='{$alt}' src='{$custom_avatar}' class='avatar avatar-{$size} photo {$class}' height='{$size}' width='{$size}' />";
         }
     }
 
     return $avatar ?: $default;
 }
 
-add_filter('get_avatar', 'ssv_frontend_members_avatar', 1, 5);
+add_filter('get_avatar', 'ssv_frontend_members_avatar', 1, 6);
 
 /**
  * This function overrides the normal WordPress login function. With this function you can login with both your
