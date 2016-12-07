@@ -136,7 +136,7 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
         if ($this->required == 'no' && $location != "") {
             ?>
             <br/>
-            <button class="mui-btn mui-btn--accent button-accent" type="button" id="<?php echo $this->id; ?>_remove" name="<?php echo $this->id; ?>_remove">Remove</button>
+            <button class="btn waves-effect waves-light btn waves-effect waves-light--accent button-accent" type="button" id="<?php echo $this->id; ?>_remove" name="<?php echo $this->id; ?>_remove">Remove</button>
             <script>
                 var removeImageClickHandler = function (e) {
                     $.ajax({

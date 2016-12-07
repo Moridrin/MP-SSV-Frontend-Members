@@ -32,7 +32,7 @@ function ssv_login_page_content($content)
             }
         }
     }
-    if (current_theme_supports('mui')) {
+    if (current_theme_supports('materialize')) {
         ?>
         <!--suppress HtmlUnknownTarget -->
         <form name="loginform" id="loginform" action="/wp-login.php" method="post">
@@ -45,35 +45,14 @@ function ssv_login_page_content($content)
                 <label for="user_pass">Password</label>
             </div>
             <div>
-                <input name="rememberme" type="checkbox" id="rememberme" value="forever" checked="checked" style="width: auto; margin-right: 10px;">
-                <label for="rememberme">Remember Me</label>
+                <p>
+                    <input name="rememberme" class="filled-in" type="checkbox" id="rememberme" value="forever" checked="checked" style="width: auto; margin-right: 10px;">
+                    <label for="rememberme">Remember Me</label>
+                </p>
             </div>
-            <button class="mui-btn mui-btn--primary button-primary" type="submit" name="wp-submit" id="wp-submit">Login</button>
+            <button class="btn waves-effect waves-light btn waves-effect waves-light--primary button-primary" type="submit" name="wp-submit" id="wp-submit">Login</button>
             <input type="hidden" name="redirect_to" value="<?= get_site_url() ?>/profile">
         </form>
-        Don't have an account? <!--suppress HtmlUnknownTarget -->
-        <a href="register">Click Here</a> to register.
-        <?php
-    } else {
-        ?>
-        <!--suppress HtmlUnknownTarget -->
-        <form name="loginform" id="loginform" action="/wp-login.php" method="post">
-            <div class="mui-textfield mui-textfield--float-label">
-                <label for="user_login">Username / Email</label>
-                <input type="text" name="log" id="user_login">
-            </div>
-            <div class="mui-textfield mui-textfield--float-label">
-                <label for="user_pass">Password</label>
-                <input type="password" name="pwd" id="user_pass">
-            </div>
-            <div>
-                <label for="rememberme">Remember Me</label>
-                <input name="rememberme" type="checkbox" id="rememberme" value="forever" checked="checked" style="width: auto; margin-right: 10px;">
-            </div>
-            <button class="mui-btn mui-btn--primary button-primary" type="submit" name="wp-submit" id="wp-submit">Login</button>
-            <input type="hidden" name="redirect_to" value="<?= get_site_url() ?>/profile">
-        </form>
-        <br/>
         Don't have an account? <!--suppress HtmlUnknownTarget -->
         <a href="register">Click Here</a> to register.
         <?php

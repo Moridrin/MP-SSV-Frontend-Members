@@ -159,7 +159,7 @@ function ssv_profile_page_content_tabs($member, $can_edit = false, $action_url =
                 if ($can_edit) {
                     wp_nonce_field('ssv_save_frontend_member_profile');
                     ?>
-                    <button class="mui-btn mui-btn--primary button-primary" type="submit" name="submit" id="submit">Save</button>
+                    <button class="btn waves-effect waves-light btn waves-effect waves-light--primary button-primary" type="submit" name="submit" id="submit">Save</button>
                     <?php
                 }
                 ?>
@@ -193,14 +193,14 @@ function ssv_profile_page_content_single_page($member, $can_edit = false)
         }
         if ($can_edit) {
             wp_nonce_field('ssv_save_frontend_member_profile');
-            echo '<button class="mui-btn mui-btn--primary button-primary" type="submit" name="submit" id="submit">Save</button>';
+            echo '<button class="btn waves-effect waves-light btn waves-effect waves-light--primary button-primary" type="submit" name="submit" id="submit">Save</button>';
         }
         ?>
     </form>
     <?php
     if ($member->isCurrentUser()) {
         $url = (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '?logout=success';
-        echo '<button type="button" class="mui-btn mui-btn--flat mui-btn--danger" href="' . wp_logout_url($url) . '" >Logout</button>';
+        echo '<button type="button" class="btn waves-effect waves-light btn waves-effect waves-light--flat btn waves-effect waves-light--danger" href="' . wp_logout_url($url) . '" >Logout</button>';
     }
 
     return ob_get_clean();
@@ -230,7 +230,7 @@ function ssv_get_profile_page_tab_select($member)
     }
     if ($member->isCurrentUser()) {
         $url = (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '?logout=success';
-        echo '<li><a class="mui-btn mui-btn--flat mui-btn--danger" href="' . wp_logout_url($url) . '">Logout</a></li>';
+        echo '<li><a class="btn waves-effect waves-light btn waves-effect waves-light--flat btn waves-effect waves-light--danger" href="' . wp_logout_url($url) . '">Logout</a></li>';
     }
     echo '</ul>';
 
