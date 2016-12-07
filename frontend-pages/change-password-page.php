@@ -50,7 +50,7 @@ function ssv_change_password_page_content($content)
                 <label for="confirm_new_password">Confirm New Password</label>
             </div>
             <?php wp_nonce_field('ssv_change_password'); ?>
-            <button class="mui-btn mui-btn--primary button-primary" type="submit" name="wp-submit" id="wp-submit">Change Password</button>
+            <button class="btn btn--primary waves-effect waves-light button-primary" type="submit" name="wp-submit" id="wp-submit">Change Password</button>
         </form>
         <?php
     } else {
@@ -70,7 +70,7 @@ function ssv_change_password_page_content($content)
                 <input type="password" name="confirm_new_password" id="confirm_new_password">
             </div>
             <?php wp_nonce_field('ssv_change_password'); ?>
-            <button class="mui-btn mui-btn--primary button-primary" type="submit" name="wp-submit" id="wp-submit">Change Password</button>
+            <button class="btn btn--primary waves-effect waves-light button-primary" type="submit" name="wp-submit" id="wp-submit">Change Password</button>
         </form>
         <?php
     }

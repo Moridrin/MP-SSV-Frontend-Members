@@ -65,7 +65,7 @@ function ssv_register_page_content()
             <?php endif; ?>
         <?php endif; ?>
         <input type="hidden" name="register" value="yes"/>
-        <button class="mui-btn mui-btn--primary" type="submit" name="submit" id="submit">Register</button>
+        <button class="btn btn--primary waves-effect waves-light" type="submit" name="submit" id="submit">Register</button>
         <?php wp_nonce_field('ssv_create_members_profile'); ?>
     </form>
     <?php
