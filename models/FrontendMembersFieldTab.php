@@ -56,11 +56,16 @@ class FrontendMembersFieldTab extends FrontendMembersField
 
     public function getTabButton($active = false)
     {
-        if ($active) {
-            return '<li class="mui--is-active"><a class="btn waves-effect waves-light btn waves-effect waves-light--flat" data-mui-toggle="tab" data-mui-controls="pane-' . $this->id . '"><p class="' . $this->class . '" style="' . $this->style . '">' . $this->title . '</p></a></li>';
-        } else {
-            return '<li><a class="btn waves-effect waves-light btn waves-effect waves-light--flat" data-mui-toggle="tab" data-mui-controls="pane-' . $this->id . '"><p class="' . $this->class . '" style="' . $this->style . '">' . $this->title . '</p></a></li>';
-        }
+        $class = $active ? 'tab active' : 'tab';
+        ob_start();
+        ?>
+        <li class="<?= $class ?>">
+            <a class="btn btn-flat btn-large <?= $this->class ?>" style="<?= $this->style ?>" href="#tab<?= $this->id ?>">
+                <?= $this->title ?>
+            </a>
+        </li>
+        <?php
+        return ob_get_clean();
     }
 
     public function getDivHeader($active = false)

@@ -2,7 +2,7 @@
 if (!defined('ABSPATH')) {
     exit;
 }
-function ssv_login_page_content($content)
+function mp_ssv_login_page_content($content)
 {
     global $post;
     ob_start();
@@ -29,12 +29,12 @@ function ssv_login_page_content($content)
         <!--suppress HtmlUnknownTarget -->
         <form name="loginform" id="loginform" action="/wp-login.php" method="post">
             <div class="mui-textfield mui-textfield--float-label">
-                <input type="text" name="log" id="user_login">
                 <label for="user_login">Username / Email</label>
+                <input type="text" name="log" id="user_login">
             </div>
             <div class="mui-textfield mui-textfield--float-label">
-                <input type="password" name="pwd" id="user_pass">
                 <label for="user_pass">Password</label>
+                <input type="password" name="pwd" id="user_pass">
             </div>
             <div>
                 <p>
@@ -53,5 +53,5 @@ function ssv_login_page_content($content)
     return $content;
 }
 
-add_filter('the_content', 'ssv_login_page_content');
+add_filter('the_content', 'mp_ssv_login_page_content');
 ?>
