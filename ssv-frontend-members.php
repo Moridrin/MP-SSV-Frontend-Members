@@ -157,6 +157,46 @@ function ssv_unregister_ssv_frontend_members()
 register_deactivation_hook(__FILE__, 'ssv_unregister_ssv_frontend_members');
 
 /**
+ * This function gets the user avatar (profile picture).
+ *
+ * @param string $avatar      is the avatar component that is requested in this method.
+ * @param mixed  $id_or_email is either the User ID (int) or the User Email (string).
+ * @param int    $size        is the size of the requested avatar in px. Default this is 150.
+ * @param null   $default     If the user does not have an avatar the default is returned.
+ * @param string $alt         is the alt text of the <img> component.
+ *
+ * @return string The <img> component of the avatar.
+ */
+function ssv_frontend_members_avatar($avatar, $id_or_email, $size = 150, $default = null, $alt = "", $args = array())
+{
+    $user = false;
+
+    if (is_numeric($id_or_email)) {
+        $id   = (int)$id_or_email;
+        $user = get_user_by('id', $id);
+    } elseif (is_object($id_or_email)) {
+        if (!empty($id_or_email->user_id)) {
+            $id   = (int)$id_or_email->user_id;
+            $user = get_user_by('id', $id);
+        }
+    } else {
+        $user = get_user_by('email', $id_or_email);
+    }
+    $class = isset($args['class']) ? $args['class'] : '';
+
+    if ($user && is_object($user)) {
+        $custom_avatar = esc_url(get_user_meta($user->ID, 'profile_picture', true));
+        if (isset($custom_avatar) && !empty($custom_avatar)) {
+            $avatar = "<img alt='{$alt}' src='{$custom_avatar}' class='avatar avatar-{$size} photo {$class}' height='{$size}' width='{$size}' />";
+        }
+    }
+
+    return $avatar ?: $default;
+}
+
+add_filter('get_avatar', 'ssv_frontend_members_avatar', 1, 6);
+
+/**
  * This function overrides the normal WordPress login function. With this function you can login with both your
  * username and your email.
  *
