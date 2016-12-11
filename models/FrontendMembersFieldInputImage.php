@@ -148,7 +148,6 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
                             <?php endif; ?>
                             <button class="btn waves-effect waves-light btn waves-effect waves-light--accent button-accent" type="button" id="<?php echo $this->id; ?>_remove" name="<?php echo $this->id; ?>_remove">Remove</button>
                         <?php endif; ?>
-
                     </div>
                 </div>
             </div>

@@ -123,7 +123,7 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
     }
 
     /**
-     * @param FrontendMember $frontend_member
+     * @param mixed $frontend_member
      *
      * @return string the HTML element
      */

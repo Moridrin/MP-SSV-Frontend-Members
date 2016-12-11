@@ -18,7 +18,7 @@ class FrontendMembersFieldHeader extends FrontendMembersField
      */
     protected function __construct($field)
     {
-        parent::__construct($field->id, $field->index, $field->type, $field->title, $field->registration_page, $field->class, $field->style);
+        parent::__construct($field->id, $field->index, $field->type, $field->title, $field->registrationPage, $field->class, $field->style);
     }
 
     /**
@@ -47,7 +47,11 @@ class FrontendMembersFieldHeader extends FrontendMembersField
     public function getHTML()
     {
         ob_start();
-        ?><h1 id="<?php echo $this->id; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>"><?php echo $this->title; ?></h1><?php
+        ?>
+        <div class="col s12">
+            <h1 id="<?php echo $this->id; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>"><?php echo $this->title; ?></h1>
+        </div>
+        <?php
         return ob_get_clean();
     }
 

@@ -18,7 +18,7 @@ class FrontendMembersFieldTab extends FrontendMembersField
      */
     protected function __construct($field)
     {
-        parent::__construct($field->id, $field->index, $field->type, $field->title, $field->registration_page, $field->class, $field->style);
+        parent::__construct($field->id, $field->index, $field->type, $field->title, $field->registrationPage, $field->class, $field->style);
     }
 
     /**
@@ -54,13 +54,18 @@ class FrontendMembersFieldTab extends FrontendMembersField
         return parent::getOptionRowField($content, get_theme_support('mui'));
     }
 
-    public function getTabButton($active = false)
+    /**
+     * @param bool $active is true if this is the currently selected tab.
+     *
+     * @return string
+     */
+    public function getHTML($active = false)
     {
         $class = $active ? 'tab active' : 'tab';
         ob_start();
         ?>
         <li class="<?= $class ?>">
-            <a class="btn btn-flat btn-large <?= $this->class ?>" style="<?= $this->style ?>" href="#tab<?= $this->id ?>">
+            <a class="btn btn-flat <?= $this->class ?>" style="<?= $this->style ?>" href="#tab<?= $this->id ?>">
                 <?= $this->title ?>
             </a>
         </li>

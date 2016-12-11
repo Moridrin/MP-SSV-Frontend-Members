@@ -119,24 +119,17 @@ class FrontendMembersFieldInputTextCheckbox extends FrontendMembersFieldInput
         } else {
             $value = $frontend_member->getMeta($this->name);
         }
-        if (current_theme_supports('mui')) {
+        $this->class = $this->class ?: 'filled-in';
+        $checked     = ($value == "yes" || ($value == null && $this->defaultValue == "yes")) ? 'checked' : '';
+        if (current_theme_supports('materialize')) {
             ?>
-            <input type="hidden" name="<?php echo $this->name; ?>" value="no"/>
-            <div class="mui-checkbox">
-                <label>
-                    <input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="yes" <?php if ($value == "yes" || ($value == null && $this->defaultValue == "yes")) : echo "checked"; endif; ?> <?php echo $this->required == 'yes' ? 'required' : ''; ?>>
-                    <?php echo $this->title; ?>
-                </label>
+            <div class="col s12">
+                <input type="hidden" id="<?= $this->id ?>" name="<?= $this->name ?>" value="no"/>
+                <p>
+                    <input type="checkbox" id="field_<?= $this->id ?>" name="<?= $this->name ?>" value="yes" class="<?= $this->class ?>" style="<?= $this->style; ?>" <?= $checked ?>/>
+                    <label for="field_<?= $this->id ?>"><?= $this->title ?></label>
+                </p>
             </div>
-            <?php
-        } else {
-            ?>
-            <input type="hidden" name="<?php echo $this->name; ?>" value="no"/>
-            <label>
-                <input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="yes" <?php if ($value == "yes" || ($value == null && $this->defaultValue == "yes")) : echo "checked"; endif; ?> <?php echo $this->required ? 'required' : ''; ?>>
-                <?php echo $this->title; ?>
-            </label>
-            <br/>
             <?php
         }
 

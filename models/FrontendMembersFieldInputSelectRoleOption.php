@@ -17,12 +17,12 @@ class FrontendMembersFieldInputSelectRoleOption extends FrontendMembersFieldInpu
         parent::__construct($id, $index, $parent_id, $value);
     }
 
-    public function getHTML($selected_value)
+    public function getHTML($selectedValue = null)
     {
         ob_start();
         global $wp_roles;
         ?>
-        <option value="<?php echo esc_html($this->value); ?>" <?php if ($this->value == $selected_value) : echo "selected"; endif; ?>><?php echo esc_html(translate_user_role($wp_roles->roles[$this->value]['name'])); ?></option>
+        <option value="<?php echo esc_html($this->value); ?>" <?php if ($this->value == $selectedValue) : echo "selected"; endif; ?>><?php echo esc_html(translate_user_role($wp_roles->roles[$this->value]['name'])); ?></option>
         <?php
         return ob_get_clean();
     }

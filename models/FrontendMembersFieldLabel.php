@@ -21,7 +21,7 @@ class FrontendMembersFieldLabel extends FrontendMembersField
      */
     protected function __construct($field, $text)
     {
-        parent::__construct($field->id, $field->index, $field->type, $field->title, $field->registration_page, $field->class, $field->style);
+        parent::__construct($field->id, $field->index, $field->type, $field->title, $field->registrationPage, $field->class, $field->style);
         $this->text = $text;
     }
 

@@ -101,7 +101,7 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
             <option value="">[<?php echo esc_html($this->title); ?>]</option>
             <option value="yes" <?= $value == 'yes' ? 'selected' : '' ?>>Selected</option>
             <option value="no" <?= $value == 'no' ? 'selected' : '' ?>>Not Selected</option>
-         </select>
+        </select>
         <?php
         return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
     }
@@ -121,27 +121,20 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
             $value = $frontend_member->getMeta($this->name);
         }
         global $wp_roles;
-        if (current_theme_supports('mui')) {
+        $this->class  = $this->class ?: 'filled-in';
+        $checked      = ($value == "yes" || ($value == null && $this->defaultValue == "yes")) ? 'checked' : '';
+        $userRoleName = translate_user_role($wp_roles->roles[$this->role]['name']);
+        if (current_theme_supports('materialize')) {
             ?>
-            <input type="hidden" name="<?php echo $this->name; ?>" value="no"/>
-            <div class="mui-checkbox">
-                <label>
-                    <input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="yes" <?php if ($value == "yes" || ($value == null && $this->defaultValue == "yes")) : echo "checked"; endif; ?>>
-                    <?php echo translate_user_role($wp_roles->roles[$this->role]['name']); ?>
-                </label>
+            <div class="col s12">
+                <input type="hidden" id="<?= $this->id ?>" name="<?= $this->name ?>" value="no"/>
+                <p>
+                    <input type="checkbox" id="field_<?= $this->id ?>" name="<?= $this->name ?>" value="yes" class="<?= $this->class ?>" style="<?= $this->style; ?>" <?= $checked ?>/>
+                    <label for="field_<?= $this->id ?>"><?= $userRoleName ?></label>
+                </p>
             </div>
             <?php
-        } else {
-            ?>
-            <input type="hidden" name="<?php echo $this->name; ?>" value="no"/>
-            <label>
-                <input type="checkbox" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="yes" <?php if ($value == "yes" || ($value == null && $this->defaultValue == "yes")) : echo "checked"; endif; ?>>
-                <?php echo translate_user_role($wp_roles->roles[$this->role]['name']); ?>
-            </label>
-            <br/>
-            <?php
         }
-
         return ob_get_clean();
     }
 

@@ -8,7 +8,15 @@ if (!current_user_can('manage_options')) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_admin_referer('ssv_save_frontend_members_profile_page_options')) {
-    FrontendMembersField::saveAllFromPost();
+    $index = 0;
+    foreach ($_POST as $name => $val) {
+        if (strpos($name, "_field_title") !== false) {
+            $index++;
+            $_POST[str_replace("_field_title", "", $name) . "_field_index"] = $index; //Set field_index
+            $field                                                          = FrontendMembersField::fromPOST(str_replace("_field_title", "", $name));
+            $field->save();
+        }
+    }
 } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'option_columns' && check_admin_referer('ssv_save_frontend_members_profile_page_column_options')) {
     foreach (
         array('default',
@@ -25,7 +33,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
         }
     }
 } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'import_options' && check_admin_referer('ssv_save_frontend_members_profile_page_import_options')) {
-    FrontendMembersField::importFieldsToRegister();
+    //Remove current registration page fields.
+    global $wpdb;
+    $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
+    $wpdb->delete(
+        $table,
+        array("registration_page" => 'yes'),
+        array('%s')
+    );
+    $modifyIndex = $wpdb->get_var("SELECT MAX(id) FROM $table") + 1;
+
+    //Duplicate Profile Fields
+    $fields = self::getAll(array('registration_page' => 'no'));
+    foreach ($fields as $field) {
+        if ($field instanceof FrontendMembersFieldTab) {
+            continue;
+        }
+        $field->id += $modifyIndex;
+        $field->registration_page = 'yes';
+        if (isset($field->options)) {
+            foreach ($field->options as $option) {
+                /** @var FrontendMembersFieldInputSelectOption | FrontendMembersFieldInputSelectRoleOption | FrontendMembersFieldInputSelectTextOption $option */
+                $option->id += $modifyIndex;
+                $option->parent_id += $modifyIndex;
+                $option->save();
+            }
+        }
+        $field->save();
+    }
 }
 ?>
 <!--suppress JSUnusedLocalSymbols -->

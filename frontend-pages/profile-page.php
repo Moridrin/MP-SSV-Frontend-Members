@@ -127,10 +127,12 @@ function mp_ssv_profile_page_content($content)
         ?>
         <div class="col s12 m10">
             <ul id="profile-menu" class="tabs">
-                <?php foreach ($tabs as $tab): ?>
-                    <?php /** @var FrontendMembersFieldTab $tab */ ?>
-                    <?= $tab->getTabButton($tab->id == $activeTabID); ?>
-                <?php endforeach; ?>
+                <?php
+                foreach ($tabs as $tab) {
+                    /** @var FrontendMembersFieldTab $tab */
+                    echo $tab->getHTML($tab->id == $activeTabID);
+                }
+                ?>
             </ul>
         </div>
         <div class="col s12 m2">
@@ -146,26 +148,31 @@ function mp_ssv_profile_page_content($content)
             ?>
             <div id="tab<?= esc_html($tab->id) ?>" class="col s12">
                 <form name="members_<?= esc_html($tab->title) ?>_form" id="member_<?= esc_html($tab->title) ?>_form" action="<?= esc_html($actionURL) ?>" method="post" enctype="multipart/form-data">
-                    <?php
-                    echo ssv_get_hidden(null, 'tab', $tab->id);
-                    $itemsInTab = FrontendMembersField::getItemsInTab($tab);
-                    foreach ($itemsInTab as $item) {
-                        if (isset($item->name) && isset($_SESSION['field_errors'][$item->name])) {
-                            /** @noinspection PhpUndefinedMethodInspection */
-                            echo $_SESSION['field_errors'][$item->name]->htmlPrint();
-                        }
-                        /** @noinspection PhpUndefinedMethodInspection */
-                        echo $item->getHTML($member);
-                    }
-                    ?>
-                    <?php
-                    if ($canEdit) {
-                        wp_nonce_field('ssv_save_frontend_member_profile');
-                        ?>
-                        <button class="btn waves-effect waves-light btn waves-effect waves-light--primary button-primary" type="submit" name="submit" id="submit">Save</button>
+                    <div class="row" style="padding: 10px;">
                         <?php
-                    }
-                    ?>
+                        echo ssv_get_hidden(null, 'tab', $tab->id);
+                        $itemsInTab = FrontendMembersField::getItemsInTab($tab);
+                        foreach ($itemsInTab as $item) {
+                            /** @var FrontendMembersFieldInput $item */
+                            if (isset($item->name) && isset($_SESSION['field_errors'][$item->name])) {
+                                /** @var Message $error */
+                                $error = $_SESSION['field_errors'][$item->name];
+                                echo $error->getHTML();
+                            }
+                            echo $item->getHTML($member);
+                        }
+                        ?>
+                        <?php
+                        if ($canEdit) {
+                            wp_nonce_field('ssv_save_frontend_member_profile');
+                            ?>
+                            <div class="col s12">
+                                <button class="btn waves-effect waves-light btn waves-effect waves-light--primary button-primary" type="submit" name="submit" id="submit">Save</button>
+                            </div>
+                            <?php
+                        }
+                        ?>
+                    </div>
                 </form>
             </div>
             <?php
@@ -243,9 +250,8 @@ function mp_ssv_save_members_profile()
         $member = FrontendMember::get_current_user();
     }
     $filters = array('field_type' => 'input');
-    if (current_theme_supports('materialize')) {
-        $items = FrontendMembersField::getItemsInTab($_POST['tab'], $filters);
-    } else {
+    $items   = FrontendMembersField::getItemsInTab($_POST['tab'], $filters);
+    if (!current_theme_supports('materialize')) {
         echo (new Message('Saving this profile requires a theme with "materialize" support.'))->getHTML();
     }
     foreach ($items as $item) {

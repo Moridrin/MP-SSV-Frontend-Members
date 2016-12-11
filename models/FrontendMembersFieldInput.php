@@ -31,7 +31,7 @@ class FrontendMembersFieldInput extends FrontendMembersField
      */
     protected function __construct($field, $input_type, $name)
     {
-        parent::__construct($field->id, $field->index, $field->type, $field->title, $field->registration_page, $field->class, $field->style);
+        parent::__construct($field->id, $field->index, $field->type, $field->title, $field->registrationPage, $field->class, $field->style);
         $this->input_type = $input_type;
         $this->name       = $name;
     }
@@ -74,12 +74,18 @@ class FrontendMembersFieldInput extends FrontendMembersField
 
     /**
      * This function is implemented in all subclasses.
-     *
-     * @return string div with a filter field.
      */
     public function getFilter()
     {
         throw new BadMethodCallException('Class ' . get_class($this) . ' does not override the getFilter() function.');
+    }
+
+    /**
+     * This function is implemented in all subclasses.
+     */
+    public function getHTML()
+    {
+        throw new BadMethodCallException('Class ' . get_class($this) . ' does not override the getHTML() function.');
     }
 
     protected function save($remove = false)

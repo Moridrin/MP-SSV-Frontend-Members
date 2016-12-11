@@ -137,7 +137,7 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
             </div>
             <?php
         } else {
-            throw new Exception('Themes without MUI support are currently not supported by this plugin.');
+            throw new Exception('Themes without "materialize" support are currently not supported by this plugin.');
         }
 
         return ob_get_clean();

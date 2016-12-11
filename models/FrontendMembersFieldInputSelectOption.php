@@ -26,6 +26,14 @@ class FrontendMembersFieldInputSelectOption
 
     public function save($remove = false) { }
 
+    /**
+     * This function is implemented in all subclasses.
+     */
+    public function getHTML($selectedValue = null)
+    {
+        throw new BadMethodCallException('Class ' . get_class($this) . ' does not override the getHTML() function.');
+    }
+
     protected function replace()
     {
         global $wpdb;
