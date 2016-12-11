@@ -109,11 +109,8 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
      *
      * @return string the HTML element
      */
-    public
-    function getHTML(
-        $frontend_member = null,
-        $size = 150
-    ) {
+    public function getHTML($frontend_member = null, $size = 150)
+    {
         ob_start();
         if ($frontend_member == null) {
             $location      = "";
@@ -121,25 +118,43 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
         } else {
             $location = $frontend_member->getMeta($this->name);
         }
-        if (current_theme_supports('mui')) {
-            echo '<div class="mui-textfield">';
-        }
-        echo '<label>' . $this->title . '</label>';
-        if ($this->required == "yes" && $location == "") {
-            echo '<input type="file" id="' . $this->id . '" name="' . $this->name . '" class="' . $this->class . '" style="' . $this->style . '" required/>';
-        } else {
-            echo '<input type="file" id="' . $this->id . '" name="' . $this->name . '" class="' . $this->class . '" style="' . $this->style . '" />';
-        }
-        if ($this->preview == "yes" && $location != '') {
-            echo '<img id="' . $this->id . '_preview" src="' . esc_url($location) . '" style="padding-top: 10px;" height="' . $size . '" width="' . $size . '">';
-        }
-        if ($this->required == 'no' && $location != "") {
+        if (current_theme_supports('materialize')) {
             ?>
-            <br/>
-            <button class="btn waves-effect waves-light btn waves-effect waves-light--accent button-accent" type="button" id="<?php echo $this->id; ?>_remove" name="<?php echo $this->id; ?>_remove">Remove</button>
-            <script>
+            <div class="col s12">
+                <div class="row" style="position: relative; min-height: 75px;">
+                    <div class="col s9" style="position: absolute; bottom: 0;">
+                        <div class="file-field input-field">
+                            <div class="btn">
+                                <span>File</span>
+                                <?php if ($this->required == "yes" && $location == ""): ?>
+                                    <input type="file" name="<?= $this->name ?>" required>
+                                <?php else: ?>
+                                    <input type="file" name="<?= $this->name ?>">
+                                <?php endif; ?>
+                            </div>
+                            <div class="file-path-wrapper">
+                                <?php if ($this->required == "yes" && $location == ""): ?>
+                                    <input class="file-path validate" type="text" required/>
+                                <?php else: ?>
+                                    <input class="file-path validate" type="text"/>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col s3 right center-align" style="margin-bottom: 20px;">
+                        <?php if ($location != ''): ?>
+                            <?php if ($this->preview == 'yes' && $location != ''): ?>
+                                <img id="<?= $this->id ?>_preview" src="<?= esc_url($location) ?>" style="margin: 10px;" height="<?= $size ?>" width="<?= $size ?>">
+                            <?php endif; ?>
+                            <button class="btn waves-effect waves-light btn waves-effect waves-light--accent button-accent" type="button" id="<?php echo $this->id; ?>_remove" name="<?php echo $this->id; ?>_remove">Remove</button>
+                        <?php endif; ?>
+
+                    </div>
+                </div>
+            </div>
+            <script type="text/javascript">
                 var removeImageClickHandler = function (e) {
-                    $.ajax({
+                    jQuery.ajax({
                         type: "POST",
                         url: "<?php echo wp_nonce_url('/profile', 'ssv_remove_image_from_profile'); ?>",
                         data: {
@@ -148,9 +163,9 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
                         },
                         success: function (data) {
                             if (data.indexOf("image successfully removed success") >= 0) {
-                                $("#<?php echo $this->id; ?>_remove").remove();
+                                jQuery("#<?php echo $this->id; ?>_remove").remove();
                                 <?php if ($this->preview == 'yes') { ?>
-                                $("#<?php echo $this->id; ?>_preview").remove();
+                                jQuery("#<?php echo $this->id; ?>_preview").remove();
                                 <?php } ?>
                             }
                         },
@@ -161,16 +176,10 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
                     e.stopImmediatePropagation();
                     return false;
                 };
-                $('#<?php echo $this->id; ?>_remove').one('click', removeImageClickHandler);
+                jQuery('#<?php echo $this->id; ?>_remove').one('click', removeImageClickHandler);
             </script>
             <?php
         }
-        if (current_theme_supports('mui')) {
-            echo '</div>';
-        } else {
-            echo '<br/>';
-        }
-
         return ob_get_clean();
     }
 

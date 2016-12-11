@@ -122,11 +122,9 @@ class FrontendMembersFieldInputText extends FrontendMembersFieldInput
         } else {
             $value = $frontend_member->getMeta($this->name);
         }
-        if (current_theme_supports('mui')) {
+        if (current_theme_supports('materialize')) {
             ?>
-            <div class="mui-textfield <?php if ($this->placeholder == "") {
-                echo "mui-textfield--float-label";
-            } ?>">
+            <div class="input-field col s12">
                 <input type="text" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="<?php echo $value; ?>" <?php if (wp_get_current_user()->ID == 0 || !(new FrontendMember(wp_get_current_user()))->isBoard()) {
                     echo $this->display;
                 } ?>
@@ -139,7 +137,7 @@ class FrontendMembersFieldInputText extends FrontendMembersFieldInput
         } else {
             ?>
             <label><?php echo $this->title; ?></label>
-            <input type="text" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="<?php echo $value; ?>" <?php if (wp_get_current_user() == 0 || !(new FrontendMember(wp_get_current_user()))->isBoard()) {
+            <input type="text" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="<?php echo $value; ?>" <?php if (wp_get_current_user()->ID == 0 || !(new FrontendMember(wp_get_current_user()))->isBoard()) {
                 echo $this->display;
             } ?>
                    placeholder="<?php echo $this->placeholder; ?>" <?php if ($this->required == "yes") {

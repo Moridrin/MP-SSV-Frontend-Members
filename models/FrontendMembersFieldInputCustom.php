@@ -120,20 +120,20 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
     public function getHTML($frontend_member = null)
     {
         if ($frontend_member == null) {
-            $value         = isset($_POST[$this->name])? $_POST[$this->name] : $this->defaultValue;
+            $value         = isset($_POST[$this->name]) ? $_POST[$this->name] : $this->defaultValue;
             $this->display = 'normal';
         } else {
             $value = $frontend_member->getMeta($this->name);
         }
         $isBoard = (!is_user_logged_in() || !FrontendMember::get_current_user()->isBoard());
         ob_start();
-        if (current_theme_supports('mui')) {
+        if (current_theme_supports('materialize')) {
             ?>
-            <div class="mui-textfield">
+            <div class="col s12">
+                <label><?= $this->title ?></label>
                 <input type="<?= $this->input_type_custom ?>" id="<?= $this->id ?>" name="<?= $this->name ?>"
                        value="<?= $value ?>" <?= $isBoard ? $this->display : '' ?> placeholder="<?= $this->placeholder ?>"
                     <?= $this->required == "yes" ? "required" : "" ?> class="<?= $this->class ?>" style="<?php echo $this->style; ?>"/>
-                <label><?= $this->title ?></label>
             </div>
             <?php
         } else {

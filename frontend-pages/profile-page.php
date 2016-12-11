@@ -68,7 +68,6 @@ add_filter('the_content', 'mp_ssv_direct_debit_setup');
 function mp_ssv_profile_page_setup($content)
 {
     if (strpos($content, '[ssv-frontend-members-profile]') === false) {
-        ssv_print($content, 1);
         return $content;
     } elseif (!current_theme_supports('materialize')) {
         return (new Message('This functionality currently requires the theme to support "materialize".', Message::ERROR_MESSAGE))->getHTML();
@@ -145,7 +144,7 @@ function mp_ssv_profile_page_content($content)
 
         foreach ($tabs as $tab) {
             ?>
-            <div id="tab<?= esc_html($tab->id) ?>">
+            <div id="tab<?= esc_html($tab->id) ?>" class="col s12">
                 <form name="members_<?= esc_html($tab->title) ?>_form" id="member_<?= esc_html($tab->title) ?>_form" action="<?= esc_html($actionURL) ?>" method="post" enctype="multipart/form-data">
                     <?php
                     echo ssv_get_hidden(null, 'tab', $tab->id);
@@ -236,34 +235,34 @@ function mp_ssv_get_profile_page_tab_select($member, $tabs, $activeTabID)
     return ob_get_clean();
 }
 
-function ssv_save_members_profile()
+function mp_ssv_save_members_profile()
 {
     if (isset($_GET['user_id'])) {
-        $user = FrontendMember::get_by_id($_GET['user_id']);
+        $member = FrontendMember::get_by_id($_GET['user_id']);
     } else {
-        $user = FrontendMember::get_current_user();
+        $member = FrontendMember::get_current_user();
     }
     $filters = array('field_type' => 'input');
-    if (current_theme_supports('mui')) {
+    if (current_theme_supports('materialize')) {
         $items = FrontendMembersField::getItemsInTab($_POST['tab'], $filters);
     } else {
-        $items = FrontendMembersField::getAll($filters);
+        echo (new Message('Saving this profile requires a theme with "materialize" support.'))->getHTML();
     }
-    /** @var FrontendMembersFieldInput $item */
     foreach ($items as $item) {
+        /** @var FrontendMembersFieldInput $item */
         $value = null;
         if (isset($_POST[$item->name]) || isset($_POST[$item->name . '_reset'])) {
             $value = isset($_POST[$item->name]) ? $_POST[$item->name] : $_POST[$item->name . '_reset'];
         }
-        if ($item->isValueRequiredForMember($user) && $value == null) {
+        if ($item->isValueRequiredForMember($member) && $value == null) {
             $error                                 = new Message($item->title . ' is required but there was no value given.', Message::ERROR_MESSAGE);
             $_SESSION['field_errors'][$item->name] = $error;
-        } elseif (!$item->isEditable() && $value != null && $user->getMeta($item->name) != $value) {
+        } elseif (!$item->isEditable() && $value != null && $member->getMeta($item->name) != $value) {
             $error                                 = new Message('You are not allowed to edit ' . $item->title . '.', Message::NOTIFICATION_MESSAGE);
             $_SESSION['field_errors'][$item->name] = $error;
-        } elseif ($user->getMeta($item->name) != $value && $item->isEditable()) {
+        } elseif ($member->getMeta($item->name) != $value && $item->isEditable()) {
             if (!($item instanceof FrontendMembersFieldInputImage && $item->required && $value == null)) {
-                $update_response = $user->updateMeta($item->name, sanitize_text_field($value));
+                $update_response = $member->updateMeta($item->name, sanitize_text_field($value));
                 if ($update_response !== true) {
                     echo $update_response->htmlPrint();
                 }
@@ -278,25 +277,18 @@ function ssv_save_members_profile()
             }
             $file_location = wp_handle_upload($file, array('test_form' => false));
             if ($file_location && !isset($file_location['error'])) {
-                if ($user->getMeta($name) != '' && $user->getMeta($name) != $file_location['url']) {
-                    unlink($user->getMeta($name . '_path'));
-                    $user->updateMeta($name, $file_location["url"]);
-                    $user->updateMeta($name . '_path', $file_location["file"]);
-                } elseif ($user->getMeta($name) != $file_location['url']) {
-                    $user->updateMeta($name, $file_location["url"]);
-                    $user->updateMeta($name . '_path', $file_location["file"]);
+                if ($member->getMeta($name) != '' && $member->getMeta($name) != $file_location['url']) {
+                    unlink($member->getMeta($name . '_path'));
+                    $member->updateMeta($name, $file_location["url"]);
+                    $member->updateMeta($name . '_path', $file_location["file"]);
+                } elseif ($member->getMeta($name) != $file_location['url']) {
+                    $member->updateMeta($name, $file_location["url"]);
+                    $member->updateMeta($name . '_path', $file_location["file"]);
                 }
             }
         }
     }
-    do_action('ssv_frontend_member_saved', $user);
-//    /** @noinspection PhpIncludeInspection */
-//    require_once(ABSPATH . 'wp-admin/includes/plugin.php');
-//    if (is_plugin_active('ssv-mailchimp/ssv-mailchimp.php')) {
-//        ssv_update_mailchimp_member($user);
-//    }
+    do_action('mp_ssv_frontend_member_saved', $member);
 }
 
 add_filter('the_content', 'mp_ssv_profile_page_setup');
-
-?>

@@ -136,31 +136,20 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
         } else {
             $value = $frontend_member->getMeta($this->name);
         }
-        if (current_theme_supports('mui')) {
+        if (current_theme_supports('materialize')) {
             ?>
-            <div class="mui-select mui-textfield">
-                <label for="<?php echo esc_html($this->id); ?>"><?php echo esc_html($this->title); ?></label>
+            <div class="input-field col s12">
                 <select id="<?php echo esc_html($this->id); ?>" name="<?php echo esc_html($this->name); ?>" class="<?php echo esc_html($this->class); ?>" style="<?php echo $this->style; ?>">
-                    <?php foreach ($this->options as $option) {
-                        /* @var $option FrontendMembersFieldInputSelectRoleOption|FrontendMembersFieldInputSelectTextOption */
-                        echo $option->getHTML($value);
-                    }
-                    ?>
+                    <?php foreach ($this->options as $option): ?>
+                        <?php /* @var $option FrontendMembersFieldInputSelectRoleOption|FrontendMembersFieldInputSelectTextOption */ ?>
+                        <?php echo $option->getHTML($value); ?>
+                    <?php endforeach; ?>
                 </select>
+                <label for="<?php echo esc_html($this->id); ?>"><?php echo esc_html($this->title); ?></label>
             </div>
             <?php
         } else {
-            ?>
-            <label for="<?php echo esc_html($this->id); ?>"><?php echo esc_html($this->title); ?></label>
-            <select id="<?php echo esc_html($this->id); ?>" name="<?php echo esc_html($this->name); ?>" class="<?php echo esc_html($this->class); ?>" style="<?php echo $this->style; ?>">
-                <?php foreach ($this->options as $option) {
-                    /* @var $option FrontendMembersFieldInputSelectRoleOption|FrontendMembersFieldInputSelectTextOption */
-                    echo $option->getHTML($value);
-                }
-                ?>
-            </select>
-            <br/>
-            <?php
+            echo (new Message('The Select Input Field currently only works with a plugin supporting "materialize"'))->getHTML();
         }
 
         return ob_get_clean();
