@@ -122,12 +122,21 @@ class FrontendMembersFieldInputText extends FrontendMembersFieldInput
         } else {
             $value = $frontend_member->getMeta($this->name);
         }
+        $isBoard = (is_user_logged_in() && FrontendMember::get_current_user()->isBoard());
+
+        $id          = !empty($this->id) ? 'id="' . $this->id . '"' : '';
+        $name        = !empty($this->name) ? 'name="' . $this->name . '"' : '';
+        $class       = !empty($this->class) ? 'class="validate ' . $this->class . '"' : 'class="validate"';
+        $style       = !empty($this->style) ? 'style="' . $this->style . '"' : '';
+        $placeholder = !empty($this->placeholder) ? 'placeholder="' . $this->placeholder . '"' : '';
+        $value       = !empty($value) ? 'value="' . $value . '"' : '';
+        $display     = !$isBoard ? $this->display : '';
+        $required    = $this->required == "yes" && !$isBoard ? 'required="true" aria-required="true"' : '';
+
         if (current_theme_supports('materialize')) {
             ?>
             <div class="input-field col s12">
-                <input type="text" id="<?= $this->id ?>" name="<?= $this->name ?>" class="validate <?= $this->class ?>" style="<?php echo $this->style; ?>" value="<?= $value ?>"
-                    <?= (wp_get_current_user()->ID == 0 || !(new FrontendMember(wp_get_current_user()))->isBoard()) ? $this->display : '' ?>
-                       placeholder="<?= $this->placeholder ?>" <?= ($this->required == "yes") ? 'required="true" aria-required="true"' : '' ?>/>
+                <input type="text" <?= $id ?> <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $display ?> <?= $placeholder ?> <?= $required ?>/>
                 <label><?php echo $this->title; ?><?= $this->required == "yes" ? '*' : "" ?></label>
             </div>
             <?php

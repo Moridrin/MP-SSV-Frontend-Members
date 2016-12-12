@@ -125,15 +125,29 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
         } else {
             $value = $frontend_member->getMeta($this->name);
         }
-        $isBoard = (!is_user_logged_in() || !FrontendMember::get_current_user()->isBoard());
+        $isBoard = (is_user_logged_in() && FrontendMember::get_current_user()->isBoard());
+
+        $id          = !empty($this->id) ? 'id="' . $this->id . '"' : '';
+        $type        = !empty($this->input_type_custom) ? 'type="' . $this->input_type_custom . '"' : '';
+        $name        = !empty($this->name) ? 'name="' . $this->name . '"' : '';
+        $class       = !empty($this->class) ? 'class="validate ' . $this->class . '"' : 'class="validate"';
+        $style       = !empty($this->style) ? 'style="' . $this->style . '"' : '';
+        $placeholder = !empty($this->placeholder) ? 'placeholder="' . $this->placeholder . '"' : '';
+        $value       = !empty($value) ? 'value="' . $value . '"' : '';
+        $display     = !$isBoard ? $this->display : '';
+        $required    = $this->required == "yes" && !$isBoard ? 'required="true" aria-required="true"' : '';
+
         ob_start();
         if (current_theme_supports('materialize')) {
             ?>
-            <div class="col s12">
-                <label><?= $this->title ?><?= $this->required == "yes" ? '*' : "" ?></label>
-                <input type="<?= $this->input_type_custom ?>" id="<?= $this->id ?>" name="<?= $this->name ?>"
-                       value="<?= $value ?>" <?= $isBoard ? $this->display : '' ?> placeholder="<?= $this->placeholder ?>"
-                    <?= $this->required == "yes" ? 'required="true" aria-required="true"' : "" ?> class="validate <?= $this->class ?>" style="<?php echo $this->style; ?>"/>
+            <div class="input-field col s12">
+                <?php if ($this->input_type_custom == 'date') : ?>
+                    <label><?= $this->title ?><?= $this->required == "yes" ? '*' : "" ?></label>
+                <?php endif; ?>
+                <input <?= $type ?> <?= $id ?> <?= $name ?> <?= $value ?> <?= $placeholder ?> <?= $display ?> <?= $required ?> <?= $class ?> <?= $style ?>/>
+                <?php if ($this->input_type_custom != 'date') : ?>
+                    <label><?= $this->title ?><?= $this->required == "yes" ? '*' : "" ?></label>
+                <?php endif; ?>
             </div>
             <?php
         } else {
