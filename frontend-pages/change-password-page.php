@@ -14,63 +14,45 @@ function ssv_change_password_page_content($content)
     }
 
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_change_password')) {
-        $member = FrontendMember::get_current_user();
-        $current_password = $_POST['current_password'];
-        $new_password = $_POST['new_password'];
+        $member               = FrontendMember::get_current_user();
+        $current_password     = $_POST['current_password'];
+        $new_password         = $_POST['new_password'];
         $confirm_new_password = $_POST['confirm_new_password'];
         if (!$member->checkPassword($current_password)) {
             $message = new Message('Current Password Incorrect!', Message::ERROR_MESSAGE);
-            $content = $message->htmlPrint();
+            $content = $message->getHTML();
         } elseif ($new_password !== $confirm_new_password) {
             $message = new Message('Passwords do not match!', Message::ERROR_MESSAGE);
-            $content = $message->htmlPrint();
+            $content = $message->getHTML();
         } else {
             wp_set_password($new_password, $member->ID);
             $message = new Message('Passwords Successfully Changed!<br/>Please <a href="/login">login</a> again with your new password.', Message::NOTIFICATION_MESSAGE);
-            $content = $message->htmlPrint();
+            $content = $message->getHTML();
         }
     } else {
         $content = '';
     }
     ob_start();
-    if (current_theme_supports('mui')) {
+    if (current_theme_supports('materialize')) {
         ?>
         <!--suppress HtmlUnknownTarget -->
         <form name="change_password_form" id="change_password_form" action="/change-password" method="post">
-            <div class="mui-textfield mui-textfield--float-label">
-                <input type="password" name="current_password" id="current_password">
-                <label for="current_password">Current Password</label>
-            </div>
-            <div class="mui-textfield mui-textfield--float-label">
-                <input type="password" name="new_password" id="new_password">
-                <label for="new_password">New Password</label>
-            </div>
-            <div class="mui-textfield mui-textfield--float-label">
-                <input type="password" name="confirm_new_password" id="confirm_new_password">
-                <label for="confirm_new_password">Confirm New Password</label>
-            </div>
-            <?php wp_nonce_field('ssv_change_password'); ?>
-            <button class="btn waves-effect waves-light btn waves-effect waves-light--primary button-primary" type="submit" name="wp-submit" id="wp-submit">Change Password</button>
-        </form>
-        <?php
-    } else {
-        ?>
-        <!--suppress HtmlUnknownTarget -->
-        <form name="loginform" id="loginform" action="/wp-login.php" method="post">
-            <div class="mui-textfield mui-textfield--float-label">
-                <label for="current_password">Current Password</label>
-                <input type="password" name="current_password" id="current_password">
-            </div>
-            <div class="mui-textfield mui-textfield--float-label">
-                <label for="new_password">New Password</label>
-                <input type="password" name="new_password" id="new_password">
-            </div>
-            <div class="mui-textfield mui-textfield--float-label">
-                <label for="confirm_new_password">Confirm New Password</label>
-                <input type="password" name="confirm_new_password" id="confirm_new_password">
+            <div class="row">
+                <div class="input-field col s12">
+                    <input type="password" name="current_password" id="current_password">
+                    <label for="current_password">Current Password</label>
+                </div>
+                <div class="input-field col s12">
+                    <input type="password" name="new_password" id="new_password">
+                    <label for="new_password">New Password</label>
+                </div>
+                <div class="input-field col s12">
+                    <input type="password" name="confirm_new_password" id="confirm_new_password">
+                    <label for="confirm_new_password">Confirm New Password</label>
+                </div>
             </div>
             <?php wp_nonce_field('ssv_change_password'); ?>
-            <button class="btn waves-effect waves-light btn waves-effect waves-light--primary button-primary" type="submit" name="wp-submit" id="wp-submit">Change Password</button>
+            <button class="btn waves-effect waves-light" type="submit" name="wp-submit" id="wp-submit">Change Password</button>
         </form>
         <?php
     }

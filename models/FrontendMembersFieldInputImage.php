@@ -122,7 +122,7 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
             ?>
             <div class="col s12">
                 <div class="row" style="position: relative; min-height: 75px;">
-                    <div class="col s9" style="position: absolute; bottom: 0;">
+                    <div class="col <?= $location == '' ? 's12' : 's9' ?>" style="position: absolute; bottom: 0;">
                         <div class="file-field input-field">
                             <div class="btn">
                                 <span>File</span>
@@ -141,14 +141,14 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
                             </div>
                         </div>
                     </div>
-                    <div class="col s3 right center-align" style="margin-bottom: 20px;">
-                        <?php if ($location != ''): ?>
+                    <?php if ($location != ''): ?>
+                        <div class="col s3 right center-align" style="margin-bottom: 20px;">
                             <?php if ($this->preview == 'yes' && $location != ''): ?>
                                 <img id="<?= $this->id ?>_preview" src="<?= esc_url($location) ?>" style="margin: 10px;" height="<?= $size ?>" width="<?= $size ?>">
                             <?php endif; ?>
                             <button class="btn waves-effect waves-light btn waves-effect waves-light--accent button-accent" type="button" id="<?php echo $this->id; ?>_remove" name="<?php echo $this->id; ?>_remove">Remove</button>
-                        <?php endif; ?>
-                    </div>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
             <script type="text/javascript">

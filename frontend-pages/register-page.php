@@ -21,7 +21,7 @@ function ssv_register_page_setup($content)
         }
     }
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_create_members_profile')) {
-        $content = ssv_create_members_profile()->htmlPrint();
+        $content = ssv_create_members_profile()->getHTML();
         $content .= ssv_register_page_content();
     } else {
         $content = ssv_register_page_content();
@@ -43,21 +43,19 @@ function ssv_register_page_content()
         <?php
         foreach ($items as $item) {
             if (!$item instanceof FrontendMembersFieldTab) {
-                if (get_option('ssv_frontend_members_custom_register_page', 'false') != 'true' || $item->registration_page == 'yes') {
-                    /** @noinspection PhpUndefinedMethodInspection */
-                    echo $item->getHTML();
-                }
+                /** @var $item FrontendMembersFieldInput */
+                echo $item->getHTML();
             }
         }
         ?>
         <?php if (!is_user_logged_in() || (is_user_logged_in() && !FrontendMember::get_current_user()->isBoard())): ?>
-            <div class="mui-textfield mui-textfield--float-label">
-                <input id="password" type="password" name="password" class="mui--is-empty mui--is-dirty" required>
-                <label for="password">Password</label>
+            <div class="input-field col s12">
+                <input type="password" name="password" id="password">
+                <label for="password">Current Password</label>
             </div>
-            <div class="mui-textfield mui-textfield--float-label">
-                <input id="password_confirm" type="password" name="password_confirm" class="mui--is-empty mui--is-dirty" required>
-                <label for="password_confirm">Confirm Password</label>
+            <div class="input-field col s12">
+                <input type="password" name="password_confirm" id="password_confirm">
+                <label for="password_confirm">Current Password</label>
             </div>
             <?php if (get_option('ssv_frontend_members_recaptcha') == 'yes'): ?>
                 <?php $site_key = get_option('ssv_recaptcha_site_key'); ?>

@@ -270,7 +270,7 @@ function mp_ssv_save_members_profile()
             if (!($item instanceof FrontendMembersFieldInputImage && $item->required && $value == null)) {
                 $update_response = $member->updateMeta($item->name, sanitize_text_field($value));
                 if ($update_response !== true) {
-                    echo $update_response->htmlPrint();
+                    echo $update_response->getHTML();
                 }
             }
         }
