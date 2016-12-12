@@ -130,7 +130,7 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
                 <input type="hidden" id="<?= $this->id ?>" name="<?= $this->name ?>" value="no"/>
                 <p>
                     <input type="checkbox" id="field_<?= $this->id ?>" name="<?= $this->name ?>" value="yes" class="<?= $this->class ?>" style="<?= $this->style; ?>" <?= $checked ?>/>
-                    <label for="field_<?= $this->id ?>"><?= $userRoleName ?><?= $this->required == "yes" ? '*' : "" ?></label>
+                    <label for="field_<?= $this->id ?>"><?= $userRoleName ?></label>
                 </p>
             </div>
             <?php

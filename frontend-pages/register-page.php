@@ -36,7 +36,7 @@ function ssv_register_page_setup($content)
 function ssv_register_page_content()
 {
     ob_start();
-    $items = FrontendMembersField::getAll(array('registration_page' => 'yes'));
+    $items = FrontendMembersField::getAll(array('field_type' => '!tab', 'registration_page' => 'yes'));
     ?>
     <!--suppress HtmlUnknownTarget -->
     <form name="members_form" id="members_form" action="/register" method="post" enctype="multipart/form-data">
@@ -94,7 +94,7 @@ function ssv_create_members_profile()
             return new Message('You failed the reCaptcha. Are you a robot?', Message::ERROR_MESSAGE);
         }
     }
-    $items = FrontendMembersField::getAll(array('field_type' => 'input'));
+    $items = FrontendMembersField::getAll(array('field_type' => 'input', 'registration_page' => 'yes'));
     foreach ($items as $item) {
         /** @var FrontendMembersFieldInput $item */
         if ($item->isValueRequiredForMember() && empty($_POST[$item->name])) {

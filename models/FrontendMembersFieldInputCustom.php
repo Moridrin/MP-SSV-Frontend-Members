@@ -127,27 +127,27 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
         }
         $isBoard = (is_user_logged_in() && FrontendMember::get_current_user()->isBoard());
 
-        $id          = !empty($this->id) ? 'id="' . $this->id . '"' : '';
-        $type        = !empty($this->input_type_custom) ? 'type="' . $this->input_type_custom . '"' : '';
-        $name        = !empty($this->name) ? 'name="' . $this->name . '"' : '';
-        $class       = !empty($this->class) ? 'class="validate ' . $this->class . '"' : 'class="validate"';
-        $style       = !empty($this->style) ? 'style="' . $this->style . '"' : '';
-        $placeholder = !empty($this->placeholder) ? 'placeholder="' . $this->placeholder . '"' : '';
-        $value       = !empty($value) ? 'value="' . $value . '"' : '';
-        $display     = !$isBoard ? $this->display : '';
-        $required    = $this->required == "yes" && !$isBoard ? 'required="true" aria-required="true"' : '';
+        if ($this->input_type_custom == 'date') {
+            $class       = !empty($this->class) ? 'class="' . $this->class . '"' : '';
+            $placeholder = '';
+        } else {
+            $class       = !empty($this->class) ? 'class="validate ' . $this->class . '"' : 'class="validate"';
+            $placeholder = !empty($this->placeholder) ? 'placeholder="' . $this->placeholder . '"' : '';
+        }
+        $id       = !empty($this->id) ? 'id="' . $this->id . '"' : '';
+        $type     = !empty($this->input_type_custom) ? 'type="' . $this->input_type_custom . '"' : '';
+        $name     = !empty($this->name) ? 'name="' . $this->name . '"' : '';
+        $style    = !empty($this->style) ? 'style="' . $this->style . '"' : '';
+        $value    = !empty($value) ? 'value="' . $value . '"' : '';
+        $display  = !$isBoard ? $this->display : '';
+        $required = $this->required == "yes" && !$isBoard ? 'required' : '';
 
         ob_start();
         if (current_theme_supports('materialize')) {
             ?>
             <div class="input-field col s12">
-                <?php if ($this->input_type_custom == 'date') : ?>
-                    <label><?= $this->title ?><?= $this->required == "yes" ? '*' : "" ?></label>
-                <?php endif; ?>
                 <input <?= $type ?> <?= $id ?> <?= $name ?> <?= $value ?> <?= $placeholder ?> <?= $display ?> <?= $required ?> <?= $class ?> <?= $style ?>/>
-                <?php if ($this->input_type_custom != 'date') : ?>
-                    <label><?= $this->title ?><?= $this->required == "yes" ? '*' : "" ?></label>
-                <?php endif; ?>
+                <label><?= $this->title ?><?= $this->required == "yes" ? '*' : "" ?></label>
             </div>
             <?php
         } else {

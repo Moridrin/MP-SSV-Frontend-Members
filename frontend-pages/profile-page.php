@@ -75,7 +75,7 @@ function mp_ssv_profile_page_setup($content)
         return (new Message('You have no access to view this profile', Message::ERROR_MESSAGE))->getHTML();
     }
 
-    $_SESSION['field_errors'] = array();
+//    $_SESSION['field_errors'] = array();
 
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['remove_image']) && check_admin_referer('ssv_remove_image_from_profile')) {
         #region Remove Image
@@ -91,16 +91,16 @@ function mp_ssv_profile_page_setup($content)
         return '';
         #endregion
     } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_frontend_member_profile')) {
-        $content = mp_ssv_save_members_profile();
+        mp_ssv_save_members_profile();
     }
 
-    return mp_ssv_profile_page_content($content);
+    return mp_ssv_profile_page_content();
 }
 
 /**
  * @return string the content of the Profile Page.
  */
-function mp_ssv_profile_page_content($content)
+function mp_ssv_profile_page_content()
 {
     #region set variables
     if (isset($_GET['user_id'])) {
@@ -125,36 +125,71 @@ function mp_ssv_profile_page_content($content)
     ob_start();
     ?>
     <div class="row">
-        <?php #region tabs
-        ?>
-        <div class="col s12 m10">
-            <ul id="profile-menu" class="tabs">
-                <?php
-                foreach ($tabs as $tab) {
-                    /** @var FrontendMembersFieldTab $tab */
-                    echo $tab->getHTML($tab->id == $activeTabID);
-                }
-                ?>
-            </ul>
-        </div>
-        <div class="col s12 m2">
-            <?php if ($member->isCurrentUser()): ?>
-                <?php $url = mp_ssv_get_current_base_url() . '?logout=success'; ?>
-                <a class="btn waves-effect waves-light red right" href="<?= wp_logout_url($url) ?>">Logout</a>
-            <?php endif; ?>
-        </div>
         <?php
-        #endregion
+        if (count($tabs) > 0): ?>
+            <?php #region tabs ?>
+            <div class="col s12 m10">
+                <ul id="profile-menu" class="tabs">
+                    <?php
+                    foreach ($tabs as $tab) {
+                        /** @var FrontendMembersFieldTab $tab */
+                        echo $tab->getHTML($tab->id == $activeTabID);
+                    }
+                    ?>
+                </ul>
+            </div>
+            <div class="col s12 m2">
+                <?php if ($member->isCurrentUser()): ?>
+                    <?php $url = mp_ssv_get_current_base_url() . '?logout=success'; ?>
+                    <a class="btn waves-effect waves-light red right" href="<?= wp_logout_url($url) ?>">Logout</a>
+                <?php endif; ?>
+            </div>
+            <?php #endregion ?>
 
-        foreach ($tabs as $tab) {
-            ?>
-            <div id="tab<?= esc_html($tab->id) ?>" class="col s12">
-                <form name="members_<?= esc_html($tab->title) ?>_form" id="member_<?= esc_html($tab->title) ?>_form" action="<?= esc_html($actionURL) ?>" method="post" enctype="multipart/form-data">
+            <?php foreach ($tabs as $tab): ?>
+                <div id="tab<?= esc_html($tab->id) ?>" class="col s12">
+                    <form name="members_<?= esc_html($tab->title) ?>_form" id="member_<?= esc_html($tab->title) ?>_form" action="<?= esc_html($actionURL) ?>" method="post" enctype="multipart/form-data">
+                        <div class="row" style="padding: 10px;">
+                            <?php
+                            echo ssv_get_hidden(null, 'tab', $tab->id);
+                            $itemsInTab = FrontendMembersField::getItemsInTab($tab);
+                            foreach ($itemsInTab as $item) {
+                                /** @var FrontendMembersFieldInput $item */
+                                if (isset($item->name) && isset($_SESSION['field_errors'][$item->name])) {
+                                    /** @var Message $error */
+                                    $error = $_SESSION['field_errors'][$item->name];
+                                    echo $error->getHTML();
+                                }
+                                echo $item->getHTML($member);
+                            }
+                            ?>
+                            <?php
+                            if ($canEdit) {
+                                wp_nonce_field('ssv_save_frontend_member_profile');
+                                ?>
+                                <div class="col s12">
+                                    <button class="btn waves-effect waves-light btn waves-effect waves-light--primary button-primary" type="submit" name="submit" id="submit">Save</button>
+                                </div>
+                                <?php
+                            }
+                            ?>
+                        </div>
+                    </form>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="col s12 m2 offset-m10">
+                <?php if ($member->isCurrentUser()): ?>
+                    <?php $url = mp_ssv_get_current_base_url() . '?logout=success'; ?>
+                    <a class="btn waves-effect waves-light red right" href="<?= wp_logout_url($url) ?>">Logout</a>
+                <?php endif; ?>
+            </div>
+            <div id="all" class="col s12">
+                <form name="members_form" id="member_form" action="<?= esc_html($actionURL) ?>" method="post" enctype="multipart/form-data">
                     <div class="row" style="padding: 10px;">
                         <?php
-                        echo ssv_get_hidden(null, 'tab', $tab->id);
-                        $itemsInTab = FrontendMembersField::getItemsInTab($tab);
-                        foreach ($itemsInTab as $item) {
+                        $items = FrontendMembersField::getAll(array('registration_page' => 'no'));
+                        foreach ($items as $item) {
                             /** @var FrontendMembersFieldInput $item */
                             if (isset($item->name) && isset($_SESSION['field_errors'][$item->name])) {
                                 /** @var Message $error */
@@ -177,46 +212,9 @@ function mp_ssv_profile_page_content($content)
                     </div>
                 </form>
             </div>
-            <?php
-        }
-        ?>
+        <?php endif; ?>
     </div>
     <?php
-
-    return ob_get_clean();
-}
-
-/**
- * @param FrontendMember $member
- * @param bool           $can_edit
- *
- * @return string
- */
-function ssv_profile_page_content_single_page($member, $can_edit = false)
-{
-    ob_start();
-    $items = FrontendMembersField::getAll();
-    ?>
-    <!--suppress HtmlUnknownTarget -->
-    <form name="members_form" id="members_form" action="/profile" method="post" enctype="multipart/form-data">
-        <?php
-        foreach ($items as $item) {
-            if (!$item instanceof FrontendMembersFieldTab) {
-                /** @noinspection PhpUndefinedMethodInspection */
-                echo $item->getHTML($member);
-            }
-        }
-        if ($can_edit) {
-            wp_nonce_field('ssv_save_frontend_member_profile');
-            echo '<button class="btn waves-effect waves-light btn waves-effect waves-light--primary button-primary" type="submit" name="submit" id="submit">Save</button>';
-        }
-        ?>
-    </form>
-    <?php
-    if ($member->isCurrentUser()) {
-        $url = (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '?logout=success';
-        echo '<button type="button" class="btn waves-effect waves-light btn waves-effect waves-light--flat btn waves-effect waves-light--danger" href="' . wp_logout_url($url) . '" >Logout</button>';
-    }
 
     return ob_get_clean();
 }

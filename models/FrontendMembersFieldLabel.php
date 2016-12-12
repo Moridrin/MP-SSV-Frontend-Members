@@ -47,7 +47,7 @@ class FrontendMembersFieldLabel extends FrontendMembersField
         return parent::getOptionRowField($content);
     }
 
-    public function getHTML()
+    public function getHTML($var = null)
     {
         ob_start();
         ?><div class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>"><?php echo $this->text; ?></div><?php

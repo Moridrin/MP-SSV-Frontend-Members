@@ -83,7 +83,7 @@ class FrontendMembersFieldInput extends FrontendMembersField
     /**
      * This function is implemented in all subclasses.
      */
-    public function getHTML()
+    public function getHTML($var = null)
     {
         throw new BadMethodCallException('Class ' . get_class($this) . ' does not override the getHTML() function.');
     }

@@ -24,7 +24,7 @@ class FrontendMembersFieldHeader extends FrontendMembersField
     /**
      * @return string row that can be added to the profile page options table.
      */
-    public function getOptionRow()
+    public function getOptionRow($var = null)
     {
         ob_start();
         echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
@@ -44,7 +44,7 @@ class FrontendMembersFieldHeader extends FrontendMembersField
         return parent::getOptionRowField($content);
     }
 
-    public function getHTML()
+    public function getHTML($var = null)
     {
         ob_start();
         ?>

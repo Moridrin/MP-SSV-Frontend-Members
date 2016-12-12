@@ -71,7 +71,6 @@ class FrontendMembersField
         $table        = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
         $tabs         = array();
         $databaseRows = json_decode(json_encode($wpdb->get_results("SELECT * FROM $table WHERE field_type = 'tab' ORDER BY field_index ASC;")), true);
-        ssv_print("SELECT * FROM $table WHERE field_type = 'tab' ORDER BY field_index ASC;", 1);
         foreach ($databaseRows as $databaseRow) {
             $tabs[] = FrontendMembersFieldTab::fromDatabaseFields($databaseRow);
         }
@@ -388,7 +387,7 @@ class FrontendMembersField
     protected static function createField($index, $title, $type, $registrationPage = 'true', $class = '', $style = '')
     {
         global $wpdb;
-        $table           = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
+        $table         = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
         $maxInDatabase = $wpdb->get_var('SELECT MAX(id) FROM ' . $table . ';');
         if ($maxInDatabase == null) {
             $id = 0;

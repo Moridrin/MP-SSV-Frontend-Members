@@ -131,7 +131,7 @@ class FrontendMembersFieldInputText extends FrontendMembersFieldInput
         $placeholder = !empty($this->placeholder) ? 'placeholder="' . $this->placeholder . '"' : '';
         $value       = !empty($value) ? 'value="' . $value . '"' : '';
         $display     = !$isBoard ? $this->display : '';
-        $required    = $this->required == "yes" && !$isBoard ? 'required="true" aria-required="true"' : '';
+        $required = $this->required == "yes" && !$isBoard ? 'required' : '';
 
         if (current_theme_supports('materialize')) {
             ?>

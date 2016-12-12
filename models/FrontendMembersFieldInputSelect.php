@@ -146,7 +146,8 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
                         echo $option->getHTML($value);
                     }
                     ?>
-                </select><label for="<?php echo esc_html($this->id); ?>"><?php echo esc_html($this->title); ?><?= $this->required == "yes" ? '*' : "" ?></label>
+                </select>
+                <label for="<?php echo esc_html($this->id); ?>"><?php echo esc_html($this->title); ?></label>
             </div>
             <?php
         } else {

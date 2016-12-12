@@ -69,7 +69,7 @@ function ssv_include_custom_user_filter_fields()
     if (strpos($_SERVER['REQUEST_URI'], 'users.php') === false || get_option('ssv_frontend_members_custom_users_filters', 'under') == 'hide') {
         return;
     }
-    $fields = FrontendMembersField::getAll(array('field_type' => 'input'));
+    $fields = FrontendMembersField::getAll(array('field_type' => 'input', 'registration_page' => 'no'));
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         foreach ($fields as $field) {
             /** @var FrontendMembersFieldInput $field */
@@ -127,7 +127,7 @@ function ssv_custom_user_filters($query)
     }
     global $wpdb;
     $filtered = array();
-    $fields   = FrontendMembersField::getAll(array('field_type' => 'input'));
+    $fields   = FrontendMembersField::getAll(array('field_type' => 'input', 'registration_page' => 'no'));
     foreach ($fields as $field) {
         /** @var FrontendMembersFieldInput $field */
         if (isset($_SESSION['filter_' . $field->name]) && !in_array($field->name, $filtered)) {
