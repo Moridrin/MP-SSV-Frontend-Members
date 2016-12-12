@@ -23,7 +23,8 @@ class FrontendMembersFieldInputSelectTextOption extends FrontendMembersFieldInpu
         ?>
         <option value="<?php echo esc_html($this->value); ?>" <?php if ($this->value == $selectedValue) : echo "selected"; endif; ?>><?php echo esc_html($this->value); ?></option>
         <?php
-        return ob_get_clean();
+
+        return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }
 
     public function save($remove = false)

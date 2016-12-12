@@ -127,14 +127,14 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
                             <div class="btn">
                                 <span>File</span>
                                 <?php if ($this->required == "yes" && $location == ""): ?>
-                                    <input type="file" name="<?= $this->name ?>" required>
+                                    <input type="file" name="<?= $this->name ?>" required="true" aria-required="true">
                                 <?php else: ?>
                                     <input type="file" name="<?= $this->name ?>">
                                 <?php endif; ?>
                             </div>
                             <div class="file-path-wrapper">
                                 <?php if ($this->required == "yes" && $location == ""): ?>
-                                    <input class="file-path validate" type="text" required/>
+                                    <input class="file-path validate" type="text" required="true" aria-required="true"/>
                                 <?php else: ?>
                                     <input class="file-path validate" type="text"/>
                                 <?php endif; ?>
@@ -151,35 +151,38 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
                     <?php endif; ?>
                 </div>
             </div>
-            <script type="text/javascript">
-                var removeImageClickHandler = function (e) {
-                    jQuery.ajax({
-                        type: "POST",
-                        url: "<?php echo wp_nonce_url('/profile', 'ssv_remove_image_from_profile'); ?>",
-                        data: {
-                            remove_image: <?php echo $this->id; ?>,
-                            user_id: <?php echo $frontend_member->ID; ?>
-                        },
-                        success: function (data) {
-                            if (data.indexOf("image successfully removed success") >= 0) {
-                                jQuery("#<?php echo $this->id; ?>_remove").remove();
-                                <?php if ($this->preview == 'yes') { ?>
-                                jQuery("#<?php echo $this->id; ?>_preview").remove();
-                                <?php } ?>
+            <?php if ($location != ''): ?>
+                <script type="text/javascript">
+                    var removeImageClickHandler = function (e) {
+                        jQuery.ajax({
+                            type: "POST",
+                            url: "<?php echo wp_nonce_url('/profile', 'ssv_remove_image_from_profile'); ?>",
+                            data: {
+                                remove_image: <?= $this->id; ?>,
+                                user_id: <?= $frontend_member->ID; ?>
+                            },
+                            success: function (data) {
+                                if (data.indexOf("image successfully removed success") >= 0) {
+                                    jQuery("#<?php echo $this->id; ?>_remove").remove();
+                                    <?php if ($this->preview == 'yes') { ?>
+                                    jQuery("#<?php echo $this->id; ?>_preview").remove();
+                                    <?php } ?>
+                                }
+                            },
+                            error: function (data) {
+                                alert(data.responseText);
                             }
-                        },
-                        error: function (data) {
-                            alert(data.responseText);
-                        }
-                    });
-                    e.stopImmediatePropagation();
-                    return false;
-                };
-                jQuery('#<?php echo $this->id; ?>_remove').one('click', removeImageClickHandler);
-            </script>
+                        });
+                        e.stopImmediatePropagation();
+                        return false;
+                    };
+                    jQuery('#<?php echo $this->id; ?>_remove').one('click', removeImageClickHandler);
+                </script>
+            <?php endif; ?>
             <?php
         }
-        return ob_get_clean();
+
+        return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }
 
     public

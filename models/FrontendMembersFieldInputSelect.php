@@ -140,19 +140,20 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
             ?>
             <div class="input-field col s12">
                 <select id="<?php echo esc_html($this->id); ?>" name="<?php echo esc_html($this->name); ?>" class="<?php echo esc_html($this->class); ?>" style="<?php echo $this->style; ?>">
-                    <?php foreach ($this->options as $option): ?>
-                        <?php /* @var $option FrontendMembersFieldInputSelectRoleOption|FrontendMembersFieldInputSelectTextOption */ ?>
-                        <?php echo $option->getHTML($value); ?>
-                    <?php endforeach; ?>
-                </select>
-                <label for="<?php echo esc_html($this->id); ?>"><?php echo esc_html($this->title); ?></label>
+                    <?php
+                    foreach ($this->options as $option) {
+                        /* @var $option FrontendMembersFieldInputSelectRoleOption|FrontendMembersFieldInputSelectTextOption */
+                        echo $option->getHTML($value);
+                    }
+                    ?>
+                </select><label for="<?php echo esc_html($this->id); ?>"><?php echo esc_html($this->title); ?><?= $this->required == "yes" ? '*' : "" ?></label>
             </div>
             <?php
         } else {
             echo (new Message('The Select Input Field currently only works with a plugin supporting "materialize"'))->getHTML();
         }
 
-        return ob_get_clean();
+        return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }
 
     public function getOptionRow()

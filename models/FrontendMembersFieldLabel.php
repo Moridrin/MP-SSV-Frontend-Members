@@ -51,7 +51,8 @@ class FrontendMembersFieldLabel extends FrontendMembersField
     {
         ob_start();
         ?><div class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>"><?php echo $this->text; ?></div><?php
-        return ob_get_clean();
+
+        return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }
 
     public function save($remove = false)

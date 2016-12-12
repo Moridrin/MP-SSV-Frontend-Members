@@ -52,7 +52,8 @@ class FrontendMembersFieldHeader extends FrontendMembersField
             <h1 id="<?php echo $this->id; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>"><?php echo $this->title; ?></h1>
         </div>
         <?php
-        return ob_get_clean();
+
+        return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }
 
     public function save($remove = false)

@@ -125,29 +125,15 @@ class FrontendMembersFieldInputText extends FrontendMembersFieldInput
         if (current_theme_supports('materialize')) {
             ?>
             <div class="input-field col s12">
-                <input type="text" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="<?php echo $value; ?>" <?php if (wp_get_current_user()->ID == 0 || !(new FrontendMember(wp_get_current_user()))->isBoard()) {
-                    echo $this->display;
-                } ?>
-                       placeholder="<?php echo $this->placeholder; ?>" <?php if ($this->required == "yes") {
-                    echo "required";
-                } ?>/>
-                <label><?php echo $this->title; ?></label>
+                <input type="text" id="<?= $this->id ?>" name="<?= $this->name ?>" class="validate <?= $this->class ?>" style="<?php echo $this->style; ?>" value="<?= $value ?>"
+                    <?= (wp_get_current_user()->ID == 0 || !(new FrontendMember(wp_get_current_user()))->isBoard()) ? $this->display : '' ?>
+                       placeholder="<?= $this->placeholder ?>" <?= ($this->required == "yes") ? 'required="true" aria-required="true"' : '' ?>/>
+                <label><?php echo $this->title; ?><?= $this->required == "yes" ? '*' : "" ?></label>
             </div>
-            <?php
-        } else {
-            ?>
-            <label><?php echo $this->title; ?></label>
-            <input type="text" id="<?php echo $this->id; ?>" name="<?php echo $this->name; ?>" class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>" value="<?php echo $value; ?>" <?php if (wp_get_current_user()->ID == 0 || !(new FrontendMember(wp_get_current_user()))->isBoard()) {
-                echo $this->display;
-            } ?>
-                   placeholder="<?php echo $this->placeholder; ?>" <?php if ($this->required == "yes") {
-                echo "required";
-            } ?>/>
-            <br/>
             <?php
         }
 
-        return ob_get_clean();
+        return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }
 
     public function save($remove = false)

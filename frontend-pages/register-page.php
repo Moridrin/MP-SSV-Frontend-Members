@@ -73,15 +73,17 @@ function ssv_register_page_content()
 
 function ssv_create_members_profile()
 {
+    $isBoard = false;
     if (is_user_logged_in() && FrontendMember::get_current_user()->isBoard()) {
+        $isBoard = true;
         $password          = wp_generate_password();
         $_POST['password'] = $password;
         $email             = $_POST['email'];
-        $display_name      = $_POST['first_name'] . ' ' . $_POST['last_name'];
+        $displayName      = $_POST['first_name'] . ' ' . $_POST['last_name'];
     } elseif ($_POST['password'] != $_POST['password_confirm']) {
         return new Message('Password does not match', Message::ERROR_MESSAGE);
     }
-    if (isset($_POST['iban']) && !ssv_is_valid_iban($_POST['iban'])) {
+    if (empty($_POST['iban']) || !ssv_is_valid_iban($_POST['iban'])) {
         return new Message('Invalid IBAN', Message::ERROR_MESSAGE);
     }
     if (get_option('ssv_frontend_members_recaptcha') == 'yes') {
@@ -92,13 +94,19 @@ function ssv_create_members_profile()
             return new Message('You failed the reCaptcha. Are you a robot?', Message::ERROR_MESSAGE);
         }
     }
+    $items = FrontendMembersField::getAll(array('field_type' => 'input'));
+    foreach ($items as $item) {
+        /** @var FrontendMembersFieldInput $item */
+        if ($item->isValueRequiredForMember() && empty($_POST[$item->name])) {
+            return new Message($item->title . ' is required but there was no value given.', Message::ERROR_MESSAGE);
+        }
+    }
     $user = FrontendMember::registerFromPOST();
     if (get_class($user) == Message::class) {
         return $user;
     }
-    $items = FrontendMembersField::getAll(array('field_type' => 'input'));
-    /** @var FrontendMembersFieldInput $item */
     foreach ($items as $item) {
+        /** @var FrontendMembersFieldInput $item */
         if ($item->isValueRequiredForMember() && !isset($_POST[$item->name]) && !isset($_POST[$item->name . '_reset'])) {
             return new Message($item->title . ' is required but there was no value given.', Message::ERROR_MESSAGE);
         }
@@ -137,7 +145,7 @@ function ssv_create_members_profile()
         $to      = $email;
         $subject = 'Account registration';
         /** @noinspection PhpUndefinedVariableInspection */
-        $message = 'Hello ' . $display_name . ',<br/><br/>';
+        $message = 'Hello ' . $displayName . ',<br/><br/>';
         $message .= 'Your account for ' . get_bloginfo('name') . ' has been created.<br/>';
         $url = get_site_url() . '/login';
         $message .= 'You can sign in <a href="' . $url . '">here</a> with username: ' . $email . '<br/>';

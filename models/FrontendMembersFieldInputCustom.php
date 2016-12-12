@@ -130,17 +130,17 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
         if (current_theme_supports('materialize')) {
             ?>
             <div class="col s12">
-                <label><?= $this->title ?></label>
+                <label><?= $this->title ?><?= $this->required == "yes" ? '*' : "" ?></label>
                 <input type="<?= $this->input_type_custom ?>" id="<?= $this->id ?>" name="<?= $this->name ?>"
                        value="<?= $value ?>" <?= $isBoard ? $this->display : '' ?> placeholder="<?= $this->placeholder ?>"
-                    <?= $this->required == "yes" ? "required" : "" ?> class="<?= $this->class ?>" style="<?php echo $this->style; ?>"/>
+                    <?= $this->required == "yes" ? 'required="true" aria-required="true"' : "" ?> class="validate <?= $this->class ?>" style="<?php echo $this->style; ?>"/>
             </div>
             <?php
         } else {
             throw new Exception('Themes without "materialize" support are currently not supported by this plugin.');
         }
 
-        return ob_get_clean();
+        return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }
 
     public function save($remove = false)

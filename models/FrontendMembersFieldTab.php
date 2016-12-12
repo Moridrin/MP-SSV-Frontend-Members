@@ -70,7 +70,8 @@ class FrontendMembersFieldTab extends FrontendMembersField
             </a>
         </li>
         <?php
-        return ob_get_clean();
+
+        return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }
 
     public function getDivHeader($active = false)
