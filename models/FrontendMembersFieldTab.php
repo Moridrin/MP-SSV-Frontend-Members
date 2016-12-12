@@ -51,7 +51,7 @@ class FrontendMembersFieldTab extends FrontendMembersField
         }
         $content = ob_get_clean();
 
-        return parent::getOptionRowField($content, get_theme_support('mui'));
+        return parent::getOptionRowField($content, get_theme_support('materialize'));
     }
 
     /**
@@ -72,15 +72,6 @@ class FrontendMembersFieldTab extends FrontendMembersField
         <?php
 
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
-    }
-
-    public function getDivHeader($active = false)
-    {
-        if ($active) {
-            return '<div class="mui-tabs__pane mui--is-active" id="pane-' . $this->id . '">';
-        } else {
-            return '<div class="mui-tabs__pane" id="pane-' . $this->id . '">';
-        }
     }
 
     public function save($remove = false)

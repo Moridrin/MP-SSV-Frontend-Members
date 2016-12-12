@@ -71,8 +71,9 @@ class FrontendMembersField
         $table        = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
         $tabs         = array();
         $databaseRows = json_decode(json_encode($wpdb->get_results("SELECT * FROM $table WHERE field_type = 'tab' ORDER BY field_index ASC;")), true);
-        foreach ($databaseRows as $database_row) {
-            $tabs[] = FrontendMembersFieldTab::fromDatabaseFields($database_row);
+        ssv_print("SELECT * FROM $table WHERE field_type = 'tab' ORDER BY field_index ASC;", 1);
+        foreach ($databaseRows as $databaseRow) {
+            $tabs[] = FrontendMembersFieldTab::fromDatabaseFields($databaseRow);
         }
 
         return $tabs;
@@ -455,7 +456,7 @@ class FrontendMembersField
 
     /**
      * @param string $content is the extra content that it gets from it's child.
-     * @param bool   $visible defines if this option row should be displayed (used to hide tab rows for themes that do not support mui).
+     * @param bool   $visible defines if this option row should be displayed (used to hide tab rows for themes that do not support materialize).
      *
      * @return string a row that can be added to the profile page options table.
      */
@@ -465,10 +466,8 @@ class FrontendMembersField
         echo ssv_get_td(ssv_get_draggable_icon());
         echo ssv_get_hidden($this->id, 'registration_page', $this->registrationPage);
         echo ssv_get_td(ssv_get_text_input("Field Title", $this->id, $this->title));
-        if (get_theme_support('mui') && $_GET['tab'] != 'register_page') {
+        if (get_theme_support('materialize') && $_GET['tab'] != 'register_page') {
             echo ssv_get_td(ssv_get_select("Field Type", $this->id, $this->type, array("Tab", "Header", "Input", "Label"), array('onchange="ssv_type_changed(\'' . $this->id . '\')"')));
-        } else {
-            echo ssv_get_td(ssv_get_select("Field Type", $this->id, $this->type, array("Header", "Input", "Label"), array('onchange="ssv_type_changed(\'' . $this->id . '\')"')));
         }
         echo $content;
         if (get_option('ssv_frontend_members_view_class_column', 'true') == 'true') {

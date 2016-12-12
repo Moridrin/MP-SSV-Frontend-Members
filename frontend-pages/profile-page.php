@@ -113,10 +113,12 @@ function mp_ssv_profile_page_content($content)
     $canEdit = ($member == wp_get_current_user() || current_user_can('edit_user'));
     $member  = new FrontendMember($member);
     $tabs    = FrontendMembersField::getTabs();
-    if (isset($_POST['tab'])) {
-        $activeTabID = $_POST['tab'];
-    } else {
-        $activeTabID = $tabs[0];
+    if (count($tabs) > 0) {
+        if (isset($_POST['tab'])) {
+            $activeTabID = $_POST['tab'];
+        } else {
+            $activeTabID = $tabs[0];
+        }
     }
     #endregion
 
@@ -215,29 +217,6 @@ function ssv_profile_page_content_single_page($member, $can_edit = false)
         $url = (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '?logout=success';
         echo '<button type="button" class="btn waves-effect waves-light btn waves-effect waves-light--flat btn waves-effect waves-light--danger" href="' . wp_logout_url($url) . '" >Logout</button>';
     }
-
-    return ob_get_clean();
-}
-
-/**
- * @param FrontendMember $member is to define if the logout button should be displayed.
- *
- * @return string containing a mui-tabs__bar.
- */
-function mp_ssv_get_profile_page_tab_select($member, $tabs, $activeTabID)
-{
-    ob_start();
-    ?>
-    <ul id="profile-menu" class="mui-tabs__bar mui-tabs__bar--justified">
-        <?php foreach ($tabs as $tab): ?>
-            <?= $tab->getTabButton($tab->id == $activeTabID); ?>
-        <?php endforeach; ?>
-        <?php if ($member->isCurrentUser()): ?>
-            <?php $url = (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '?logout=success'; ?>
-            <li><a class="btn waves-effect waves-light btn waves-effect waves-light--flat btn waves-effect waves-light--danger" href="<?= wp_logout_url($url) ?>">Logout</a></li>
-        <?php endif; ?>
-    </ul>
-    <?php
 
     return ob_get_clean();
 }
