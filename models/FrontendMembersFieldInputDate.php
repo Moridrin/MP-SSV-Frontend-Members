@@ -16,6 +16,7 @@ class FrontendMembersFieldInputDate extends FrontendMembersFieldInput
     public $display;
     public $placeholder;
     public $defaultValue;
+    public $now;
 
     /**
      * FrontendMembersFieldInputCustom constructor.
@@ -26,8 +27,9 @@ class FrontendMembersFieldInputDate extends FrontendMembersFieldInput
      * @param string                    $display      is the way the input field is displayed (readonly, disabled or normal) default is normal.
      * @param string                    $placeholder  is the placeholder text that gives an example of what to enter.
      * @param string                    $defaultValue is the default input_type_custom that is already entered when you fill in the form.
+     * @param string                    $now          is true if the default value should be the current datetime.
      */
-    protected function __construct($field, $dateTimeType, $required, $display, $placeholder, $defaultValue)
+    protected function __construct($field, $dateTimeType, $required, $display, $placeholder, $defaultValue, $now)
     {
         parent::__construct($field, $field->input_type, $field->name);
         $this->dateTimeType = $dateTimeType;
@@ -35,6 +37,7 @@ class FrontendMembersFieldInputDate extends FrontendMembersFieldInput
         $this->display      = $display;
         $this->placeholder  = $placeholder;
         $this->defaultValue = $defaultValue ?: '';
+        $this->now          = $now;
     }
 
     /**
@@ -84,12 +87,12 @@ class FrontendMembersFieldInputDate extends FrontendMembersFieldInput
         }
         if (get_option('ssv_frontend_members_view_default_column', 'true') == 'true') {
             echo ssv_get_td(
-                ssv_get_text_input("Default Value", $this->id, $this->defaultValue, $this->dateTimeType, array('class="datetimepicker"')) .
-                ssv_get_checkbox("Now", $this->id, $this->defaultValue == 'today' ? 'yes' : 'no')
+                ssv_get_text_input("Default Value", $this->id, $this->defaultValue, 'text', array('class="' . $this->dateTimeType . 'picker"')) .
+                ssv_get_checkbox("Now", $this->id, $this->now)
             );
         } else {
             echo ssv_get_hidden($this->id, "Default Value", $this->defaultValue);
-            echo ssv_get_hidden($this->id, "Now", $this->defaultValue == 'today' ? 'yes' : 'no');
+            echo ssv_get_hidden($this->id, "Now", $this->now);
         }
         if (get_option('ssv_frontend_members_view_placeholder_column', 'true') == 'true') {
             echo ssv_get_td(ssv_get_text_input("Placeholder", $this->id, $this->placeholder));
@@ -124,8 +127,21 @@ class FrontendMembersFieldInputDate extends FrontendMembersFieldInput
     public function getHTML($frontend_member = null)
     {
         if ($frontend_member == null) {
-            $value         = isset($_POST[$this->name]) ? $_POST[$this->name] : $this->defaultValue;
-            $this->display = 'normal';
+            if ($this->now == 'yes') {
+                switch ($this->dateTimeType) {
+                    case 'datetime':
+                        $this->defaultValue = date('Y-m-d H:i');;
+                        break;
+                    case 'date':
+                        $this->defaultValue = date('Y-m-d');;
+                        break;
+                    case 'time':
+                        $this->defaultValue = date('H:i');;
+                        break;
+                }
+            }
+            $value              = isset($_POST[$this->name]) ? $_POST[$this->name] : $this->defaultValue;
+            $this->display      = 'normal';
         } else {
             $value = $frontend_member->getMeta($this->name);
         }
@@ -150,8 +166,8 @@ class FrontendMembersFieldInputDate extends FrontendMembersFieldInput
         if (current_theme_supports('materialize')) {
             ?>
             <div class="input-field col s12">
+                <label><?= $this->title ?><?= $this->required == "yes" ? '*' : "" ?></label><br/>
                 <input <?= $type ?> <?= $id ?> <?= $name ?> <?= $value ?> <?= $placeholder ?> <?= $display ?> <?= $required ?> <?= $class ?> <?= $style ?> title="<?= $this->title ?>"/>
-                <label><?= $this->title ?><?= $this->required == "yes" ? '*' : "" ?></label>
             </div>
             <?php
         } else {
@@ -189,6 +205,11 @@ class FrontendMembersFieldInputDate extends FrontendMembersFieldInput
         $wpdb->replace(
             $table,
             array("field_id" => $this->id, "meta_key" => "default_value", "meta_value" => $this->defaultValue),
+            array('%d', '%s', '%s')
+        );
+        $wpdb->replace(
+            $table,
+            array("field_id" => $this->id, "meta_key" => "now", "meta_value" => $this->now),
             array('%d', '%s', '%s')
         );
     }

@@ -191,7 +191,7 @@ class FrontendMembersField
                         $field = new FrontendMembersFieldInputCustom($field, $field->getMeta('input_type_custom'), $field->getMeta('required'), $field->getMeta('display'), $field->getMeta('placeholder'), $field->getMeta('default_value'));
                         break;
                     case "date":
-                        $field = new FrontendMembersFieldInputDate($field, $field->getMeta('input_type_custom'), $field->getMeta('required'), $field->getMeta('display'), $field->getMeta('placeholder'), $field->getMeta('default_value'));
+                        $field = new FrontendMembersFieldInputDate($field, $field->getMeta('input_type_custom'), $field->getMeta('required'), $field->getMeta('display'), $field->getMeta('placeholder'), $field->getMeta('default_value'), $field->getMeta('now'));
                         break;
                     case "image":
                         $field = new FrontendMembersFieldInputImage($field, $field->getMeta('required'), $field->getMeta('preview'));
@@ -329,7 +329,7 @@ class FrontendMembersField
                         $field = new FrontendMembersFieldInputCustom($field, $field->getMetaFromPOST('input_type_custom'), $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('placeholder'), $field->getMetaFromPOST('default_value'));
                         break;
                     case "date":
-                        $field = new FrontendMembersFieldInputDate($field, $field->getMetaFromPOST('input_type_custom'), $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('placeholder'), $field->getMetaFromPOST('default_value'));
+                        $field = new FrontendMembersFieldInputDate($field, $field->getMetaFromPOST('input_type_custom'), $field->getMetaFromPOST('required'), $field->getMetaFromPOST('display'), $field->getMetaFromPOST('placeholder'), $field->getMetaFromPOST('default_value'), $field->getMetaFromPOST('now'));
                         break;
                     case "image":
                         $field = new FrontendMembersFieldInputImage($field, $field->getMetaFromPOST('required'), $field->getMetaFromPOST('preview'));
@@ -473,6 +473,8 @@ class FrontendMembersField
         echo ssv_get_td(ssv_get_text_input("Field Title", $this->id, $this->title));
         if (get_theme_support('materialize') && $_GET['tab'] != 'register_page') {
             echo ssv_get_td(ssv_get_select("Field Type", $this->id, $this->type, array("Tab", "Header", "Input", "Label"), array('onchange="ssv_type_changed(\'' . $this->id . '\')"')));
+        } elseif (get_theme_support('materialize') && $_GET['tab'] == 'register_page') {
+            echo ssv_get_td(ssv_get_select("Field Type", $this->id, $this->type, array("Header", "Input", "Label"), array('onchange="ssv_type_changed(\'' . $this->id . '\')"')));
         }
         echo $content;
         if (get_option('ssv_frontend_members_view_class_column', 'true') == 'true') {

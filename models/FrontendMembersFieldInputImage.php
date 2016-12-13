@@ -144,7 +144,7 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
                     <?php if ($location != ''): ?>
                         <div class="col s3 right center-align" style="margin-bottom: 20px;">
                             <?php if ($this->preview == 'yes' && $location != ''): ?>
-                                <img id="<?= $this->id ?>_preview" src="<?= esc_url($location) ?>" style="margin: 10px;" height="<?= $size ?>" width="<?= $size ?>">
+                                <img id="<?= $this->id ?>_preview" src="<?= esc_url($location) ?>" style="margin: 10px;" height="<?= $size ?>" width="<?= $size ?>"><br/>
                             <?php endif; ?>
                             <button class="btn waves-effect waves-light btn waves-effect waves-light--accent button-accent" type="button" id="<?php echo $this->id; ?>_remove" name="<?php echo $this->id; ?>_remove">Remove</button>
                         </div>
