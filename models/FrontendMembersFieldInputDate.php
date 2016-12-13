@@ -19,14 +19,13 @@ class FrontendMembersFieldInputDate extends FrontendMembersFieldInput
 
     /**
      * FrontendMembersFieldInputCustom constructor.
-
      *
-*@param FrontendMembersFieldInput $field        is the parent field.
-     * @param string              $dateTimeType
-     * @param bool                $required     is true if this is a required input field.
-     * @param string              $display      is the way the input field is displayed (readonly, disabled or normal) default is normal.
-     * @param string              $placeholder  is the placeholder text that gives an example of what to enter.
-     * @param string              $defaultValue is the default input_type_custom that is already entered when you fill in the form.
+     * @param FrontendMembersFieldInput $field        is the parent field.
+     * @param string                    $dateTimeType
+     * @param bool                      $required     is true if this is a required input field.
+     * @param string                    $display      is the way the input field is displayed (readonly, disabled or normal) default is normal.
+     * @param string                    $placeholder  is the placeholder text that gives an example of what to enter.
+     * @param string                    $defaultValue is the default input_type_custom that is already entered when you fill in the form.
      */
     protected function __construct($field, $dateTimeType, $required, $display, $placeholder, $defaultValue)
     {
@@ -84,9 +83,13 @@ class FrontendMembersFieldInputDate extends FrontendMembersFieldInput
             echo ssv_get_hidden($this->id, "Display", $this->display);
         }
         if (get_option('ssv_frontend_members_view_default_column', 'true') == 'true') {
-            echo ssv_get_td(ssv_get_text_input("Default Value", $this->id, $this->defaultValue, $this->dateTimeType));
+            echo ssv_get_td(
+                ssv_get_text_input("Default Value", $this->id, $this->defaultValue, $this->dateTimeType, array('class="datetimepicker"')) .
+                ssv_get_checkbox("Now", $this->id, $this->defaultValue == 'today' ? 'yes' : 'no')
+            );
         } else {
             echo ssv_get_hidden($this->id, "Default Value", $this->defaultValue);
+            echo ssv_get_hidden($this->id, "Now", $this->defaultValue == 'today' ? 'yes' : 'no');
         }
         if (get_option('ssv_frontend_members_view_placeholder_column', 'true') == 'true') {
             echo ssv_get_td(ssv_get_text_input("Placeholder", $this->id, $this->placeholder));
