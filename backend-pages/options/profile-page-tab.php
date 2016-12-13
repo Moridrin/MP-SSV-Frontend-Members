@@ -151,6 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
     /** @noinspection PhpIncludeInspection */
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     $table = $wpdb->prefix . "ssv_frontend_members_fields";
+    /** @var array $max_database_index */
     $max_database_index = $wpdb->get_var("SELECT MAX(id) FROM $table");
     print("var id;\n");
     if (count($max_database_index) > 0) {
@@ -227,7 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
         $("#" + sender_id + "_field_style").parent().remove();
         if (type == "input") {
             $(tr).append(
-                '<?php echo ssv_get_td(ssv_get_select("Input Type", '\' + sender_id + \'', "text", array("Text", "Text Select", "Role Select", "Text Checkbox", "Role Checkbox", "Image"), array("onchange=\"ssv_input_type_changed(' + sender_id + ')\""), true, null, true, false)); ?>'
+                '<?php echo ssv_get_td(ssv_get_select("Input Type", '\' + sender_id + \'', "text", array("Text", "Text Select", "Role Select", "Text Checkbox", "Role Checkbox", "Image", "Date"), array("onchange=\"ssv_input_type_changed(' + sender_id + ')\""), true, null, true, false)); ?>'
             ).append(
                 '<?php echo ssv_get_td(ssv_get_text_input("Name", '\' + sender_id + \'', "", "text", array("required"), false)); ?>'
             ).append(
@@ -485,12 +486,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
                 );
             <?php endif; ?>
                 break;
+            case "date":
+                $(input_type_custom).append(
+                    '<div><?= ssv_get_td(ssv_get_select("", '\' + sender_id + \'', "normal", array("DateTime", "Date", "Time"), array(), false, null, false, false)); ?></div>'
+                );
+                $(tr).append(
+                    '<?php echo ssv_get_td(ssv_get_text_input("Name", '\' + sender_id + \'', "", "text", array("required"), false)); ?>'
+                ).append(
+                    '<?php echo ssv_get_td(ssv_get_checkbox("Required", '\' + sender_id + \'', "no", array(), false, false)); ?>'
+                );
+            <?php if (get_option('ssv_frontend_members_view_display__preview_column', 'true') == 'true'): ?>
+                $(tr).append(
+                    '<?php echo ssv_get_td(ssv_get_select("Display", '\' + sender_id + \'', "normal", array("Normal", "ReadOnly", "Disabled"), array(), false, null, true, false)); ?>'
+                );
+            <?php endif; ?>
+            <?php if (get_option('ssv_frontend_members_view_default_column', 'true') == 'true'): ?>
+                $(tr).append(
+                    '<?php echo ssv_get_td(ssv_get_text_input("Default Value", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
+                );
+            <?php endif; ?>
+            <?php if (get_option('ssv_frontend_members_view_placeholder_column', 'true') == 'true'): ?>
+                $(tr).append(
+                    '<?php echo ssv_get_td(ssv_get_text_input("Placeholder", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
+                );
+            <?php endif; ?>
+                break;
         }
+        <?php if (get_option('ssv_frontend_members_view_class_column', 'true') == 'true'): ?>
         $(tr).append(
             '<?php echo ssv_get_td(ssv_get_text_input("Field Class", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
-        ).append(
+        );
+        <?php endif; ?>
+        <?php if (get_option('ssv_frontend_members_view_style_column', 'true') == 'true'): ?>
+        $(tr).append(
             '<?php echo ssv_get_td(ssv_get_text_input("Field Style", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
         );
+        <?php endif; ?>
     }
 </script>
 <!-- Add Text Option. -->

@@ -8,10 +8,10 @@ if (!defined('ABSPATH')) {
  * Date: 23-4-2016
  * Time: 16:08
  */
-class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
+class FrontendMembersFieldInputDate extends FrontendMembersFieldInput
 {
 
-    public $input_type_custom;
+    public $dateTimeType;
     public $required;
     public $display;
     public $placeholder;
@@ -31,11 +31,11 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
     protected function __construct($field, $dateTimeType, $required, $display, $placeholder, $defaultValue)
     {
         parent::__construct($field, $field->input_type, $field->name);
-        $this->input_type_custom = $dateTimeType;
-        $this->required          = $required;
-        $this->display           = $display;
-        $this->placeholder       = $placeholder;
-        $this->defaultValue      = $defaultValue ?: '';
+        $this->dateTimeType = $dateTimeType;
+        $this->required     = $required;
+        $this->display      = $display;
+        $this->placeholder  = $placeholder;
+        $this->defaultValue = $defaultValue ?: '';
     }
 
     /**
@@ -84,7 +84,7 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
             echo ssv_get_hidden($this->id, "Display", $this->display);
         }
         if (get_option('ssv_frontend_members_view_default_column', 'true') == 'true') {
-            echo ssv_get_td(ssv_get_text_input("Default Value", $this->id, $this->defaultValue, $this->input_type_custom));
+            echo ssv_get_td(ssv_get_text_input("Default Value", $this->id, $this->defaultValue, $this->dateTimeType));
         } else {
             echo ssv_get_hidden($this->id, "Default Value", $this->defaultValue);
         }
@@ -95,7 +95,7 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
         }
         $content = ob_get_clean();
 
-        return parent::getOptionRowInput($content, $this->input_type_custom);
+        return parent::getOptionRowInput($content, $this->dateTimeType);
     }
 
     /**
@@ -128,7 +128,7 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
         }
         $isBoard = (is_user_logged_in() && FrontendMember::get_current_user()->isBoard());
 
-        if ($this->input_type_custom == 'date') {
+        if ($this->dateTimeType == 'date') {
             $class       = !empty($this->class) ? 'class="' . $this->class . '"' : '';
             $placeholder = '';
         } else {
@@ -136,7 +136,7 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
             $placeholder = !empty($this->placeholder) ? 'placeholder="' . $this->placeholder . '"' : '';
         }
         $id       = !empty($this->id) ? 'id="' . $this->id . '"' : '';
-        $type     = !empty($this->input_type_custom) ? 'type="' . $this->input_type_custom . '"' : '';
+        $type     = !empty($this->dateTimeType) ? 'type="' . $this->dateTimeType . '"' : '';
         $name     = !empty($this->name) ? 'name="' . $this->name . '"' : '';
         $style    = !empty($this->style) ? 'style="' . $this->style . '"' : '';
         $value    = !empty($value) ? 'value="' . $value . '"' : '';
@@ -165,7 +165,7 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
         $table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;
         $wpdb->replace(
             $table,
-            array("field_id" => $this->id, "meta_key" => "input_type_custom", "meta_value" => $this->input_type_custom),
+            array("field_id" => $this->id, "meta_key" => "input_type_custom", "meta_value" => $this->dateTimeType),
             array('%d', '%s', '%s')
         );
         $wpdb->replace(

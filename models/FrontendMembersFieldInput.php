@@ -9,6 +9,7 @@ if (!defined('ABSPATH')) {
  */
 
 require_once "FrontendMembersFieldInputCustom.php";
+require_once "FrontendMembersFieldInputDate.php";
 require_once "FrontendMembersFieldInputImage.php";
 require_once "FrontendMembersFieldInputRoleCheckbox.php";
 require_once "FrontendMembersFieldInputSelect.php";
@@ -65,7 +66,7 @@ class FrontendMembersFieldInput extends FrontendMembersField
     protected function getOptionRowInput($content, $input_type_custom = "")
     {
         ob_start();
-        echo ssv_get_td(ssv_get_select("Input Type", $this->id, $this->input_type, array("Text", "Text Select", "Role Select", "Text Checkbox", "Role Checkbox", "Image"), array('onchange="ssv_input_type_changed(\'' . $this->id . '\')"'), true, $input_type_custom));
+        echo ssv_get_td(ssv_get_select("Input Type", $this->id, $this->input_type, array("Text", "Text Select", "Role Select", "Text Checkbox", "Role Checkbox", "Image", "Date"), array('onchange="ssv_input_type_changed(\'' . $this->id . '\')"'), true, $input_type_custom));
         echo $content;
         $content = ob_get_clean();
 
