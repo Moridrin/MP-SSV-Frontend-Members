@@ -134,9 +134,9 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
                             </div>
                             <div class="file-path-wrapper">
                                 <?php if ($this->required == "yes" && $location == ""): ?>
-                                    <input class="file-path validate" type="text" required="true" aria-required="true"/>
+                                    <input class="file-path validate" type="text" required="true" aria-required="true" title="<?= $this->title ?>"/>
                                 <?php else: ?>
-                                    <input class="file-path validate" type="text"/>
+                                    <input class="file-path validate" type="text" title="<?= $this->title ?>"/>
                                 <?php endif; ?>
                             </div>
                         </div>
