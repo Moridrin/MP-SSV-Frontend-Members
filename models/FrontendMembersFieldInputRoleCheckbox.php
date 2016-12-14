@@ -77,7 +77,7 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
             echo ssv_get_hidden($this->id, "Display", $this->display);
         }
         if (get_option('ssv_frontend_members_view_default_column', 'true') == 'true') {
-            echo ssv_get_td(ssv_get_checkbox("Checked by Default", '\' + sender_id + \'', "no", array(), false, false));
+            echo ssv_get_td(ssv_get_checkbox("Checked by Default", $this->id, $this->defaultValue));
         }
         if (get_option('ssv_frontend_members_view_placeholder_column', 'true') == 'true') {
             echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
