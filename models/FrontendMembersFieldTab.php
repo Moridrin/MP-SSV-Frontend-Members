@@ -61,10 +61,10 @@ class FrontendMembersFieldTab extends FrontendMembersField
      */
     public function getHTML($active = false)
     {
-        $class = $active ? 'tab active' : 'tab';
+        $this->class = $active ? $this->class . ' active' : '';
         ob_start();
         ?>
-        <li class="<?= $class ?>">
+        <li class="tab">
             <a class="btn btn-flat <?= $this->class ?>" style="<?= $this->style ?>" href="#tab<?= $this->id ?>">
                 <?= $this->title ?>
             </a>

@@ -72,20 +72,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
                 <label>
                     <input type="checkbox" name="ssv_frontend_members_recaptcha" value="true" <?php if (get_option('ssv_frontend_members_recaptcha') == 'true') {
                         echo "checked";
-                    } ?>/>
+                    } ?> disabled/>
                 </label>
             </td>
         </tr>
         <tr>
             <th scope="row">reCAPTCHA Site Key</th>
             <td>
-                <input type="text" name="ssv_recaptcha_site_key" value="<?php echo get_option('ssv_recaptcha_site_key'); ?>" title="reCAPTCHA Site Key">
+                <input type="text" name="ssv_recaptcha_site_key" value="<?php echo get_option('ssv_recaptcha_site_key'); ?>" title="reCAPTCHA Site Key" disabled>
             </td>
         </tr>
         <tr>
             <th scope="row">reCAPTCHA Secret Key</th>
             <td>
-                <input type="text" name="ssv_recaptcha_secret_key" value="<?php echo get_option('ssv_recaptcha_secret_key'); ?>" title="reCAPTCHA Secret Key">
+                <input type="text" name="ssv_recaptcha_secret_key" value="<?php echo get_option('ssv_recaptcha_secret_key'); ?>" title="reCAPTCHA Secret Key" disabled>
             </td>
         </tr>
     </table>

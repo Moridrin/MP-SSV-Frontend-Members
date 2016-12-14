@@ -47,8 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
             <td>
                 <label>
                     <input type="checkbox" name="ssv_frontend_members_member_role_changed_email" value="true" <?php if (get_option('ssv_frontend_members_member_role_changed_email') == 'true') {
-                        echo "checked";
-                    } ?>/>
+                        echo "";
+                    } ?> disabled/>
                 </label>
             </td>
         </tr>

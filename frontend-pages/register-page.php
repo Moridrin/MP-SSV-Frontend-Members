@@ -156,6 +156,7 @@ function ssv_create_members_profile()
     }
     unset($_POST);
     $return_message = 'You\'ve successfully registered.<br/>Click <a href="/login">here</a> to sign in.';
+    do_action('mp_ssv_frontend_member_saved');
     return new Message($return_message, Message::NOTIFICATION_MESSAGE);
 }
 

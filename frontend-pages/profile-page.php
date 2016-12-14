@@ -75,8 +75,7 @@ function mp_ssv_profile_page_setup($content)
         return (new Message('You have no access to view this profile', Message::ERROR_MESSAGE))->getHTML();
     }
 
-//    $_SESSION['field_errors'] = array();
-
+    $_SESSION['field_errors'] = array();
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['remove_image']) && check_admin_referer('ssv_remove_image_from_profile')) {
         #region Remove Image
         global $wpdb;
@@ -155,12 +154,12 @@ function mp_ssv_profile_page_content()
                             $itemsInTab = FrontendMembersField::getItemsInTab($tab);
                             foreach ($itemsInTab as $item) {
                                 /** @var FrontendMembersFieldInput $item */
+                                echo $item->getHTML($member);
                                 if (isset($item->name) && isset($_SESSION['field_errors'][$item->name])) {
                                     /** @var Message $error */
                                     $error = $_SESSION['field_errors'][$item->name];
                                     echo $error->getHTML();
                                 }
-                                echo $item->getHTML($member);
                             }
                             ?>
                             <?php
@@ -241,7 +240,7 @@ function mp_ssv_save_members_profile()
             $error                                 = new Message($item->title . ' is required but there was no value given.', Message::ERROR_MESSAGE);
             $_SESSION['field_errors'][$item->name] = $error;
         } elseif (!$item->isEditable() && $value != null && $member->getMeta($item->name) != $value) {
-            $error                                 = new Message('You are not allowed to edit ' . $item->title . '.', Message::NOTIFICATION_MESSAGE);
+            $error                                 = new Message('You are not allowed to edit ' . $item->title . '.', Message::ERROR_MESSAGE);
             $_SESSION['field_errors'][$item->name] = $error;
         } elseif ($member->getMeta($item->name) != $value && $item->isEditable()) {
             if (!($item instanceof FrontendMembersFieldInputImage && $item->required && $value == null)) {
