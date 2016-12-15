@@ -100,22 +100,15 @@ function ssv_include_custom_user_filter_fields()
     }
     $filters .= '<br/><button type="submit" value="submit" class="button" style="margin-right: 6px;">Filter</button>';
     $filters .= '<button type="submit" name="clear_filters" value="clear_filters" class="button">Clear Filters</button>';
-    ?>
-    <script>
-        window.onload = function () {
-            jQuery(document).ready(function ($) {
-                var old_filter_area = $('.subsubsub');
-                old_filter_area.before('<h2 style="margin-bottom: 0;">Filters</h2>');
-                old_filter_area.after('<form name="filter_form" method="post"><div id="filter_area"></div></form>');
-                <?php if (get_option('ssv_frontend_members_custom_users_filters', 'under') == 'replace'): ?>
-                old_filter_area.remove();
-                <?php endif; ?>
-                var filter_area = $('#filter_area');
-                filter_area.html('<?php echo $filters; ?>');
-            });
-        };
-    </script>
-    <?php
+    wp_enqueue_script('userFiltersInit', plugins_url() . '/ssv-frontend-members/js/userFilters.js', array('jquery'));
+    wp_localize_script(
+        'userFiltersInit',
+        'variables',
+        array(
+            'filtersLocation' => get_option('ssv_frontend_members_custom_users_filters', 'under') == 'replace',
+            'filters'         => $filters,
+        )
+    );
 }
 
 add_action('admin_init', 'ssv_include_custom_user_filter_fields');
