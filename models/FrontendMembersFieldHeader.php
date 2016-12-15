@@ -22,6 +22,8 @@ class FrontendMembersFieldHeader extends FrontendMembersField
     }
 
     /**
+     * @param mixed $var is needed for some subclass implementations of this function.
+     *
      * @return string row that can be added to the profile page options table.
      */
     public function getOptionRow($var = null)
@@ -44,8 +46,10 @@ class FrontendMembersFieldHeader extends FrontendMembersField
         return parent::getOptionRowField($content);
     }
 
-    public function getHTML($var = null)
-    {
+    public function getHTML(
+        /** @noinspection PhpUnusedParameterInspection */
+        $var = null
+    ) {
         ob_start();
         ?>
         <div class="col s12">

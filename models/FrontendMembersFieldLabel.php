@@ -17,7 +17,7 @@ class FrontendMembersFieldLabel extends FrontendMembersField
      * FrontendMembersFieldLabel constructor.
      *
      * @param FrontendMembersField $field is the parent field.
-     * @param int                  $text is the main text in the label.
+     * @param int                  $text  is the main text in the label.
      */
     protected function __construct($field, $text)
     {
@@ -47,10 +47,13 @@ class FrontendMembersFieldLabel extends FrontendMembersField
         return parent::getOptionRowField($content);
     }
 
-    public function getHTML($var = null)
-    {
+    public function getHTML(
+        /** @noinspection PhpUnusedParameterInspection */
+        $var = null
+    ) {
         ob_start();
-        ?><div class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>"><?php echo $this->text; ?></div><?php
+        ?>
+        <div class="<?php echo $this->class; ?>" style="<?php echo $this->style; ?>"><?php echo $this->text; ?></div><?php
 
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }

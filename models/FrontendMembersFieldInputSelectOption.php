@@ -18,19 +18,25 @@ class FrontendMembersFieldInputSelectOption
 
     protected function __construct($id, $index, $parent_id, $value = "")
     {
-        $this->id = $id;
-        $this->index = $index;
+        $this->id        = $id;
+        $this->index     = $index;
         $this->parent_id = $parent_id;
-        $this->value = $value;
+        $this->value     = $value;
     }
 
-    public function save($remove = false) { }
+    public function save($remove = false)
+    {
+    }
 
     /**
      * This function is implemented in all subclasses.
+     *
+     * @param mixed $selectedValue is needed for some subclass implementations of this function.
      */
-    public function getHTML($selectedValue = null)
-    {
+    public function getHTML(
+        /** @noinspection PhpUnusedParameterInspection */
+        $selectedValue = null
+    ) {
         throw new BadMethodCallException('Class ' . get_class($this) . ' does not override the getHTML() function.');
     }
 
@@ -44,13 +50,13 @@ class FrontendMembersFieldInputSelectOption
                 'id'          => $this->id,
                 'field_index' => $this->index,
                 'field_type'  => 'group_option',
-                'field_title' => ''
+                'field_title' => '',
             ),
             array(
                 '%d',
                 '%d',
                 '%s',
-                '%s'
+                '%s',
             )
         );
         $table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;

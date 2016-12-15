@@ -73,9 +73,7 @@ function ssv_register_page_content()
 
 function ssv_create_members_profile()
 {
-    $isBoard = false;
     if (is_user_logged_in() && FrontendMember::get_current_user()->isBoard()) {
-        $isBoard = true;
         $password          = wp_generate_password();
         $_POST['password'] = $password;
         $email             = $_POST['email'];

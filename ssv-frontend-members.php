@@ -164,6 +164,7 @@ register_deactivation_hook(__FILE__, 'ssv_unregister_ssv_frontend_members');
  * @param int    $size        is the size of the requested avatar in px. Default this is 150.
  * @param null   $default     If the user does not have an avatar the default is returned.
  * @param string $alt         is the alt text of the <img> component.
+ * @param array  $args        is an array of extra arguments that can be given.
  *
  * @return string The <img> component of the avatar.
  */

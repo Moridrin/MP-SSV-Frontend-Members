@@ -83,9 +83,13 @@ class FrontendMembersFieldInput extends FrontendMembersField
 
     /**
      * This function is implemented in all subclasses.
+     *
+     * @param mixed $var is needed for some subclass implementations of this function.
      */
-    public function getHTML($var = null)
-    {
+    public function getHTML(
+        /** @noinspection PhpUnusedParameterInspection */
+        $var = null
+    ) {
         throw new BadMethodCallException('Class ' . get_class($this) . ' does not override the getHTML() function.');
     }
 

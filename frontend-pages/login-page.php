@@ -4,7 +4,6 @@ if (!defined('ABSPATH')) {
 }
 function mp_ssv_login_page_content($content)
 {
-    global $post;
     ob_start();
     if (strpos($content, '[ssv-frontend-members-login]') === false) {
         return $content;

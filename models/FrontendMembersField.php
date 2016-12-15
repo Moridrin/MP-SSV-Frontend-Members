@@ -365,7 +365,8 @@ class FrontendMembersField
     /**
      * This function gets the field metadata specified by the key.
      *
-     * @param string $key is the key defining what metadata should be returned.
+     * @param string $key               is the key defining what metadata should be returned.
+     * @param bool   $sanitizeTextField can be set to false if the text should not be sanitized.
      *
      * @return string the meta value linked to the given key.
      */

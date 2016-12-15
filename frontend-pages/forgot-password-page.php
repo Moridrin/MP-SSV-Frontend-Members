@@ -4,7 +4,6 @@ if (!defined('ABSPATH')) {
 }
 function ssv_forgot_password_page_content($content)
 {
-    global $post;
     ob_start();
     if (strpos($content, '[ssv-frontend-members-forgot-password]') === false) {
         return $content;
