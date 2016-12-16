@@ -115,13 +115,7 @@ class FrontendMembersFieldInputText extends FrontendMembersFieldInput
      */
     public function getHTML($frontend_member = null)
     {
-        ob_start();
-        if ($frontend_member == null) {
-            $value         = $this->defaultValue;
-            $this->display = 'normal';
-        } else {
-            $value = $frontend_member->getMeta($this->name);
-        }
+        $value   = $frontend_member == null ? $this->defaultValue : $frontend_member->getMeta($this->name);
         $isBoard = (is_user_logged_in() && FrontendMember::get_current_user()->isBoard());
 
         $id          = !empty($this->id) ? 'id="' . $this->id . '"' : '';
@@ -131,8 +125,9 @@ class FrontendMembersFieldInputText extends FrontendMembersFieldInput
         $placeholder = !empty($this->placeholder) ? 'placeholder="' . $this->placeholder . '"' : '';
         $value       = !empty($value) ? 'value="' . $value . '"' : '';
         $display     = !$isBoard ? $this->display : '';
-        $required = $this->required == "yes" && !$isBoard ? 'required' : '';
+        $required    = $this->required == "yes" && !$isBoard ? 'required' : '';
 
+        ob_start();
         if (current_theme_supports('materialize')) {
             ?>
             <div class="input-field col s12">

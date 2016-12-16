@@ -113,13 +113,7 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
      */
     public function getHTML($frontend_member = null)
     {
-        ob_start();
-        if ($frontend_member == null) {
-            $value         = null;
-            $this->display = 'normal';
-        } else {
-            $value = $frontend_member->getMeta($this->name);
-        }
+        $value   = $frontend_member == null ? $this->defaultValue : $frontend_member->getMeta($this->name);
         if (is_user_logged_in() && FrontendMember::get_current_user()->isBoard()) {
             $this->display = 'normal';
         }
@@ -127,6 +121,7 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
         $this->class  = $this->class ?: 'filled-in';
         $checked      = ($value == "yes" || ($value == null && $this->defaultValue == "yes")) ? 'checked' : '';
         $userRoleName = translate_user_role($wp_roles->roles[$this->role]['name']);
+        ob_start();
         if (current_theme_supports('materialize')) {
             ?>
             <div class="col s12">

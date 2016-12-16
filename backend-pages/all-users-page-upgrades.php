@@ -105,7 +105,7 @@ function ssv_include_custom_user_filter_fields()
         'userFiltersInit',
         'variables',
         array(
-            'filtersLocation' => get_option('ssv_frontend_members_custom_users_filters', 'under') == 'replace',
+            'filtersLocation' => get_option('ssv_frontend_members_custom_users_filters', 'under'),
             'filters'         => $filters,
         )
     );

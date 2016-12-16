@@ -120,12 +120,7 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
      */
     public function getHTML($frontend_member = null)
     {
-        if ($frontend_member == null) {
-            $value         = isset($_POST[$this->name]) ? $_POST[$this->name] : $this->defaultValue;
-            $this->display = 'normal';
-        } else {
-            $value = $frontend_member->getMeta($this->name);
-        }
+        $value   = $frontend_member == null ? $this->defaultValue : $frontend_member->getMeta($this->name);
         $isBoard = (is_user_logged_in() && FrontendMember::get_current_user()->isBoard());
 
         if ($this->input_type_custom == 'date') {

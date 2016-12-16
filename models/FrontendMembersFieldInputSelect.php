@@ -129,16 +129,11 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
      */
     public function getHTML($frontend_member = null)
     {
-        ob_start();
-        if ($frontend_member == null) {
-            $value         = "";
-            $this->display = 'normal';
-        } else {
-            $value = $frontend_member->getMeta($this->name);
-        }
+        $value   = $frontend_member == null ? "" : $frontend_member->getMeta($this->name);
         if (is_user_logged_in() && FrontendMember::get_current_user()->isBoard()) {
             $this->display = 'normal';
         }
+        ob_start();
         if (current_theme_supports('materialize')) {
             ?>
             <div class="input-field col s12">
