@@ -136,10 +136,13 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
         } else {
             $value = $frontend_member->getMeta($this->name);
         }
+        if (is_user_logged_in() && FrontendMember::get_current_user()->isBoard()) {
+            $this->display = 'normal';
+        }
         if (current_theme_supports('materialize')) {
             ?>
             <div class="input-field col s12">
-                <select id="<?php echo esc_html($this->id); ?>" name="<?php echo esc_html($this->name); ?>" class="<?php echo esc_html($this->class); ?>" style="<?php echo $this->style; ?>">
+                <select id="<?php echo esc_html($this->id); ?>" name="<?php echo esc_html($this->name); ?>" class="<?php echo esc_html($this->class); ?>" style="<?php echo $this->style; ?>" <?= $this->display ?>>
                     <?php
                     foreach ($this->options as $option) {
                         /* @var $option FrontendMembersFieldInputSelectRoleOption|FrontendMembersFieldInputSelectTextOption */

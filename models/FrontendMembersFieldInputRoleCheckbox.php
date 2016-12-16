@@ -72,7 +72,7 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
         echo ssv_get_td(ssv_get_role_select($this->id, "Role", $this->role));
         echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
         if (get_option('ssv_frontend_members_view_display__preview_column', 'true') == 'true') {
-            echo ssv_get_td(ssv_get_select("Display", $this->id, $this->display, array("Normal", "ReadOnly", "Disabled"), array()));
+            echo ssv_get_td(ssv_get_select("Display", $this->id, $this->display, array("Normal", "Disabled"), array()));
         } else {
             echo ssv_get_hidden($this->id, "Display", $this->display);
         }
@@ -120,6 +120,9 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
         } else {
             $value = $frontend_member->getMeta($this->name);
         }
+        if (is_user_logged_in() && FrontendMember::get_current_user()->isBoard()) {
+            $this->display = 'normal';
+        }
         global $wp_roles;
         $this->class  = $this->class ?: 'filled-in';
         $checked      = ($value == "yes" || ($value == null && $this->defaultValue == "yes")) ? 'checked' : '';
@@ -129,7 +132,7 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
             <div class="col s12">
                 <input type="hidden" id="<?= $this->id ?>" name="<?= $this->name ?>" value="no"/>
                 <p>
-                    <input type="checkbox" id="field_<?= $this->id ?>" name="<?= $this->name ?>" value="yes" class="<?= $this->class ?>" style="<?= $this->style; ?>" <?= $checked ?>/>
+                    <input type="checkbox" id="field_<?= $this->id ?>" name="<?= $this->name ?>" value="yes" class="<?= $this->class ?>" style="<?= $this->style; ?>" <?= $checked ?> <?= $this->display ?>/>
                     <label for="field_<?= $this->id ?>"><?= $userRoleName ?></label>
                 </p>
             </div>

@@ -109,7 +109,7 @@ function mp_ssv_profile_page_content()
         $member    = FrontendMember::get_current_user();
         $actionURL = '/profile/';
     }
-    $canEdit = ($member == wp_get_current_user() || current_user_can('edit_user'));
+    $canEdit = ($member->ID == wp_get_current_user()->ID || current_user_can('edit_user'));
     $member  = new FrontendMember($member);
     $tabs    = FrontendMembersField::getTabs();
     if (count($tabs) > 0) {

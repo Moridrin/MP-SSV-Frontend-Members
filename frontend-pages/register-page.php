@@ -77,7 +77,7 @@ function ssv_create_members_profile()
         $password          = wp_generate_password();
         $_POST['password'] = $password;
         $email             = $_POST['email'];
-        $displayName      = $_POST['first_name'] . ' ' . $_POST['last_name'];
+        $displayName       = $_POST['first_name'] . ' ' . $_POST['last_name'];
     } elseif ($_POST['password'] != $_POST['password_confirm']) {
         return new Message('Password does not match', Message::ERROR_MESSAGE);
     }
@@ -135,9 +135,6 @@ function ssv_create_members_profile()
     $headers = "From: $to" . "\r\n";
     add_filter('wp_mail_content_type', create_function('', 'return "text/html";'));
     wp_mail($to, $subject, $message, $headers);
-    if (is_plugin_active('ssv-mailchimp/ssv-mailchimp.php')) {
-        ssv_update_mailchimp_member($user);
-    }
     if (is_user_logged_in() && FrontendMember::get_current_user()->isBoard()) {
         /** @noinspection PhpUndefinedVariableInspection */
         $to      = $email;
