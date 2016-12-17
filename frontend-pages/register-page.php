@@ -81,14 +81,6 @@ function ssv_create_members_profile()
     if (empty($_POST['iban']) || !ssv_is_valid_iban($_POST['iban'])) {
         return new Message('Invalid IBAN', Message::ERROR_MESSAGE);
     }
-    if (get_option('ssv_frontend_members_recaptcha')) {
-        $secretKey    = get_option('ssv_recaptcha_secret_key');
-        $response     = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=" . $secretKey . "&response=" . $_POST['g-recaptcha-response']);
-        $responseKeys = json_decode($response, true);
-        if (intval($responseKeys["success"]) !== 1) {
-            return new Message('You failed the reCaptcha. Are you a robot?', Message::ERROR_MESSAGE);
-        }
-    }
     $items = FrontendMembersField::getAll(array('field_type' => 'input', 'registration_page' => 'yes'));
     foreach ($items as $item) {
         /** @var FrontendMembersFieldInput $item */

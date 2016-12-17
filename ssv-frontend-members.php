@@ -183,13 +183,9 @@ function ssv_frontend_members_avatar($avatar, $id_or_email, $size = 150, $defaul
     } else {
         $user = get_user_by('email', $id_or_email);
     }
-    $class = isset($args['class']) ? $args['class'] : '';
 
     if ($user && is_object($user)) {
-        $custom_avatar = esc_url(get_user_meta($user->ID, 'profile_picture', true));
-        if (isset($custom_avatar) && !empty($custom_avatar)) {
-            $avatar = "<img alt='{$alt}' src='{$custom_avatar}' class='avatar avatar-{$size} photo {$class}' height='{$size}' width='{$size}' />";
-        }
+        $args['url'] = esc_url(get_user_meta($user->ID, 'profile_picture', true));
     }
 
     return $avatar ?: $default;

@@ -3,13 +3,12 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function ssv_custom_user_column_values($val, $column_name, $user_id)
+function mp_ssv_custom_user_column_values($val, $column_name, $user_id)
 {
     $frontendMember = FrontendMember::get_by_id($user_id);
     if ($column_name == 'ssv_member') {
         $username_block = '';
         $username_block .= get_avatar($frontendMember->ID, 32, '', '', array('extra_attr' => 'style="float: left; margin-right: 5px; margin-top: 1px;"'));
-//        $username_block .= '<img style="float: left; margin-right: 10px; margin-top: 1px;" class="avatar avatar-32 photo" src="' . esc_url($frontendMember->getMeta('profile_picture')) . '" height="32" width="32"/>';
         $username_block .= '<strong>' . $frontendMember->getProfileLink('_blank') . '</strong><br/>';
         $directDebitPDF  = $frontendMember->getProfileURL() . '&view=directDebitPDF';
         $editURL         = 'user-edit.php?user_id=' . $frontendMember->ID . '&wp_http_referer=%2Fwp-admin%2Fusers.php';
@@ -22,9 +21,9 @@ function ssv_custom_user_column_values($val, $column_name, $user_id)
     return $val;
 }
 
-add_filter('manage_users_custom_column', 'ssv_custom_user_column_values', 10, 3);
+add_filter('manage_users_custom_column', 'mp_ssv_custom_user_column_values', 10, 3);
 
-function ssv_custom_user_columns($column_headers)
+function mp_ssv_custom_user_columns($column_headers)
 {
     unset($column_headers);
     $column_headers['cb'] = '<input type="checkbox" />';
@@ -49,7 +48,7 @@ function ssv_custom_user_columns($column_headers)
     $selected_columns = json_decode(get_option('ssv_frontend_members_user_columns'));
     $selected_columns = $selected_columns ?: array();
     foreach ($selected_columns as $column) {
-        $sql   = 'SELECT field_id FROM ' . FRONTEND_MEMBERS_FIELD_META_TABLE_NAME . ' WHERE meta_key = "name" AND meta_value = "' . $column . '"';
+        $sql   = 'SELECT field_id FROM ' . FRONTEND_MEMBERS_FIELD_META_TABLE_NAME . ' WHERE meta_key = "name" AND meta_value = "' . $column . '" limit 1';
         $sql   = 'SELECT field_title FROM ' . FRONTEND_MEMBERS_FIELDS_TABLE_NAME . ' WHERE id = (' . $sql . ')';
         $title = $wpdb->get_var($sql);
         if (ssv_starts_with($column, 'wp_')) {
@@ -62,9 +61,30 @@ function ssv_custom_user_columns($column_headers)
     return $column_headers;
 }
 
-add_action('manage_users_columns', 'ssv_custom_user_columns');
+add_action('manage_users_columns', 'mp_ssv_custom_user_columns');
 
-function ssv_include_custom_user_filter_fields()
+function mp_ssv_custom_sortable_user_columns($columns) {
+    global $wpdb;
+    $selected_columns = json_decode(get_option('ssv_frontend_members_user_columns'));
+    $selected_columns = $selected_columns ?: array();
+    foreach ($selected_columns as $column) {
+        $sql   = 'SELECT field_id FROM ' . FRONTEND_MEMBERS_FIELD_META_TABLE_NAME . ' WHERE meta_key = "name" AND meta_value = "' . $column . '" limit 1';
+        $sql   = 'SELECT field_title FROM ' . FRONTEND_MEMBERS_FIELDS_TABLE_NAME . ' WHERE id = (' . $sql . ')';
+        $title = $wpdb->get_var($sql);
+        if (ssv_starts_with($column, 'wp_')) {
+            $column                              = str_replace('wp_', '', $column);
+            $columns[strtolower($column)] = $column;
+        } else {
+            $columns['ssv_' . $column] = $title;
+        }
+    }
+    return $columns;
+}
+
+
+add_filter('manage_users_sortable_columns', 'mp_ssv_custom_sortable_user_columns');
+
+function mp_ssv_include_custom_user_filter_fields()
 {
     if (strpos($_SERVER['REQUEST_URI'], 'users.php') === false || get_option('ssv_frontend_members_custom_users_filters', 'under') == 'hide') {
         return;
@@ -111,9 +131,9 @@ function ssv_include_custom_user_filter_fields()
     );
 }
 
-add_action('admin_init', 'ssv_include_custom_user_filter_fields');
+add_action('admin_init', 'mp_ssv_include_custom_user_filter_fields');
 
-function ssv_custom_user_filters($query)
+function mp_ssv_custom_user_filters($query)
 {
     if (strpos($_SERVER['REQUEST_URI'], 'users.php') === false) {
         return $query;
@@ -176,4 +196,4 @@ function ssv_custom_user_filters($query)
     return $query;
 }
 
-add_filter('pre_user_query', 'ssv_custom_user_filters');
+add_filter('pre_user_query', 'mp_ssv_custom_user_filters');
