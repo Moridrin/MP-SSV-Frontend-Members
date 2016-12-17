@@ -22,7 +22,6 @@ function ssv_register_page_setup($content)
     }
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_create_members_profile')) {
         $content = ssv_create_members_profile()->getHTML();
-        $content .= ssv_register_page_content();
     } else {
         $content = ssv_register_page_content();
     }
@@ -36,7 +35,9 @@ function ssv_register_page_setup($content)
 function ssv_register_page_content()
 {
     ob_start();
-    $items = FrontendMembersField::getAll(array('field_type' => '!tab', 'registration_page' => 'yes'));
+    $args                      = array('field_type' => '!tab');
+    $args['registration_page'] = get_option('ssv_frontend_members_custom_register_page') ? 'yes' : 'no';
+    $items                     = FrontendMembersField::getAll($args);
     ?>
     <!--suppress HtmlUnknownTarget -->
     <form name="members_form" id="members_form" action="/register" method="post" enctype="multipart/form-data">
@@ -57,10 +58,6 @@ function ssv_register_page_content()
                 <input type="password" name="password_confirm" id="password_confirm">
                 <label for="password_confirm">Current Password</label>
             </div>
-            <?php if (get_option('ssv_frontend_members_recaptcha') == 'yes'): ?>
-                <?php $site_key = get_option('ssv_recaptcha_site_key'); ?>
-                <div class="g-recaptcha" data-sitekey="<?php echo $site_key; ?>"></div>
-            <?php endif; ?>
         <?php endif; ?>
         <input type="hidden" name="register" value="yes"/>
         <button class="btn waves-effect waves-light btn waves-effect waves-light--primary" type="submit" name="submit" id="submit">Register</button>
@@ -84,7 +81,7 @@ function ssv_create_members_profile()
     if (empty($_POST['iban']) || !ssv_is_valid_iban($_POST['iban'])) {
         return new Message('Invalid IBAN', Message::ERROR_MESSAGE);
     }
-    if (get_option('ssv_frontend_members_recaptcha') == 'yes') {
+    if (get_option('ssv_frontend_members_recaptcha')) {
         $secretKey    = get_option('ssv_recaptcha_secret_key');
         $response     = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=" . $secretKey . "&response=" . $_POST['g-recaptcha-response']);
         $responseKeys = json_decode($response, true);

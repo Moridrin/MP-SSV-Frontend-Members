@@ -70,15 +70,15 @@ class FrontendMembersFieldInputTextCheckbox extends FrontendMembersFieldInput
         ob_start();
         echo ssv_get_td(ssv_get_text_input("Name", $this->id, $this->name, 'text', array('required')));
         echo ssv_get_td(ssv_get_checkbox("Required", $this->id, $this->required));
-        if (get_option('ssv_frontend_members_view_display__preview_column', 'true') == 'true') {
+        if (get_option('ssv_frontend_members_view_display_preview_column', true)) {
             echo ssv_get_td(ssv_get_select("Display", $this->id, $this->display, array("Normal", "Disabled"), array()));
         } else {
             echo ssv_get_hidden($this->id, "Display", $this->display);
         }
-        if (get_option('ssv_frontend_members_view_default_column', 'true') == 'true') {
+        if (get_option('ssv_frontend_members_view_default_column', true)) {
             echo ssv_get_td(ssv_get_checkbox("Checked by Default", $this->id, $this->defaultValue));
         }
-        if (get_option('ssv_frontend_members_view_placeholder_column', 'true') == 'true') {
+        if (get_option('ssv_frontend_members_view_placeholder_column', true)) {
             echo ssv_get_td('<div class="' . $this->id . '_empty"></div>');
         }
         $content = ob_get_clean();

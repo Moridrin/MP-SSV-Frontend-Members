@@ -478,12 +478,12 @@ class FrontendMembersField
             echo ssv_get_td(ssv_get_select("Field Type", $this->id, $this->type, array("Header", "Input", "Label"), array('onchange="ssv_type_changed(\'' . $this->id . '\')"')));
         }
         echo $content;
-        if (get_option('ssv_frontend_members_view_class_column', 'true') == 'true') {
+        if (get_option('ssv_frontend_members_view_class_column', true)) {
             echo ssv_get_td(ssv_get_text_input('Field Class', $this->id, $this->class));
         } else {
             echo ssv_get_hidden($this->id, 'Field Class', $this->class);
         }
-        if (get_option('ssv_frontend_members_view_style_column', 'true') == 'true') {
+        if (get_option('ssv_frontend_members_view_style_column', true)) {
             echo ssv_get_td(ssv_get_text_input('Field Style', $this->id, $this->style));
         } else {
             echo ssv_get_hidden($this->id, 'Field Style', $this->style);

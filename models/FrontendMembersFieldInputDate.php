@@ -80,12 +80,12 @@ class FrontendMembersFieldInputDate extends FrontendMembersFieldInput
         ob_start();
         echo ssv_get_td(ssv_get_text_input("Name", $this->id, $this->name, 'text', array('required')));
         echo ssv_get_td(ssv_get_checkbox("Required", $this->id, $this->required));
-        if (get_option('ssv_frontend_members_view_display__preview_column', 'true') == 'true') {
+        if (get_option('ssv_frontend_members_view_display_preview_column', true)) {
             echo ssv_get_td(ssv_get_select("Display", $this->id, $this->display, array("Normal", "Disabled"), array()));
         } else {
             echo ssv_get_hidden($this->id, "Display", $this->display);
         }
-        if (get_option('ssv_frontend_members_view_default_column', 'true') == 'true') {
+        if (get_option('ssv_frontend_members_view_default_column', true)) {
             echo ssv_get_td(
                 ssv_get_text_input("Default Value", $this->id, $this->defaultValue, 'text', array('class="' . $this->dateTimeType . 'picker"')) .
                 ssv_get_checkbox("Now", $this->id, $this->now)
@@ -94,7 +94,7 @@ class FrontendMembersFieldInputDate extends FrontendMembersFieldInput
             echo ssv_get_hidden($this->id, "Default Value", $this->defaultValue);
             echo ssv_get_hidden($this->id, "Now", $this->now);
         }
-        if (get_option('ssv_frontend_members_view_placeholder_column', 'true') == 'true') {
+        if (get_option('ssv_frontend_members_view_placeholder_column', true)) {
             echo ssv_get_td(ssv_get_text_input("Placeholder", $this->id, $this->placeholder));
         } else {
             echo ssv_get_hidden($this->id, "Placeholder", $this->placeholder);

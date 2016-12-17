@@ -23,7 +23,7 @@ function ssv_frontend_members_settings_page()
             <a href="?page=<?php echo __FILE__; ?>&tab=profile_page" class="nav-tab <?php if ($active_tab == "profile_page") {
                 echo "nav-tab-active";
             } ?>">Profile Page</a>
-            <?php if (get_option('ssv_frontend_members_custom_register_page', 'false') == 'true'): ?>
+            <?php if (get_option('ssv_frontend_members_custom_register_page', false)): ?>
                 <a href="?page=<?php echo __FILE__; ?>&tab=register_page" class="nav-tab <?php if ($active_tab == "register_page") {
                     echo "nav-tab-active";
                 } ?>">Register Page</a>
@@ -34,8 +34,9 @@ function ssv_frontend_members_settings_page()
             <a href="?page=<?php echo __FILE__; ?>&tab=email" class="nav-tab <?php if ($active_tab == "email") {
                 echo "nav-tab-active";
             } ?>">Email</a>
-            <a href="http://studentensurvival.com/ssv/ssv-frontend-members/" target="_blank" class="nav-tab">Help <img src="<?php echo plugin_dir_url(__DIR__); ?>../general/images/link-new-tab.png" width="14px"
-                                                                                                                       style="vertical-align:middle"></a>
+            <a href="http://studentensurvival.com/ssv/ssv-frontend-members/" target="_blank" class="nav-tab">
+                Help <img src="<?php echo plugin_dir_url(__DIR__); ?>../general/images/link-new-tab.png" width="14px" style="vertical-align:middle">
+            </a>
         </h2>
         <?php
         switch ($active_tab) {

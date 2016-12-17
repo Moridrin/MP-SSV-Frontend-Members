@@ -32,13 +32,13 @@ class FrontendMembersFieldLabel extends FrontendMembersField
     {
         ob_start();
         $colspan = 3;
-        if (get_option('ssv_frontend_members_view_display__preview_column', 'true') == 'true') {
+        if (get_option('ssv_frontend_members_view_display_preview_column', true)) {
             $colspan++;
         }
-        if (get_option('ssv_frontend_members_view_default_column', 'true') == 'true') {
+        if (get_option('ssv_frontend_members_view_default_column', true)) {
             $colspan++;
         }
-        if (get_option('ssv_frontend_members_view_placeholder_column', 'true') == 'true') {
+        if (get_option('ssv_frontend_members_view_placeholder_column', true)) {
             $colspan++;
         }
         echo ssv_get_td(ssv_get_text_area("Text", $this->id, $this->text, "text", array("required"), false), $colspan);

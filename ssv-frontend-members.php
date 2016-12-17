@@ -120,14 +120,14 @@ function ssv_register_ssv_frontend_members()
     update_option('change_password_post_id', $change_password_post_id);
 
     /* Options */
-    update_option('ssv_frontend_members_custom_register_page', 'false');
+    update_option('ssv_frontend_members_custom_register_page', false);
     update_option('ssv_frontend_members_default_member_role', 'subscriber');
     update_option('ssv_frontend_members_board_role', 'administrator');
     update_option('ssv_frontend_members_main_column', 'plugin_default');
     update_option('ssv_frontend_members_user_columns', json_encode(array('wp_Role', 'wp_Posts')));
     update_option('ssv_frontend_members_member_admin', get_option('admin_email'));
-    update_option('ssv_frontend_members_new_member_registration_email', 'true');
-    update_option('ssv_frontend_members_member_role_changed_email', 'true');
+    update_option('ssv_frontend_members_new_member_registration_email', true);
+    update_option('ssv_frontend_members_member_role_changed_email', true);
 }
 
 register_activation_hook(__FILE__, 'ssv_register_ssv_frontend_members');

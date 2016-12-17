@@ -12,16 +12,8 @@ if (!current_user_can('manage_options')) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_frontend_members_email_options')) {
     global $options;
     update_option('ssv_frontend_members_member_admin', sanitize_text_field($_POST['ssv_frontend_members_member_admin']));
-    if (isset($_POST['ssv_frontend_members_new_member_registration_email'])) {
-        update_option('ssv_frontend_members_new_member_registration_email', 'true');
-    } else {
-        update_option('ssv_frontend_members_new_member_registration_email', 'false');
-    }
-    if (isset($_POST['ssv_frontend_members_member_role_changed_email'])) {
-        update_option('ssv_frontend_members_member_role_changed_email', 'true');
-    } else {
-        update_option('ssv_frontend_members_member_role_changed_email', 'false');
-    }
+    update_option('ssv_frontend_members_new_member_registration_email', filter_var($_POST['ssv_frontend_members_new_member_registration_email'], FILTER_VALIDATE_BOOLEAN));
+    update_option('ssv_frontend_members_member_role_changed_email', filter_var($_POST['ssv_frontend_members_member_role_changed_email'], FILTER_VALIDATE_BOOLEAN));
 }
 ?>
 <form method="post" action="#">
