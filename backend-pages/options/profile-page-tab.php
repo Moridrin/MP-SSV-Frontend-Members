@@ -29,19 +29,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
     $table = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
     $wpdb->delete(
         $table,
+        array(
+            'registration_page' => $_GET['tab'] == 'register_page' ? 'yes' : 'no',
+            'profile_type'      => $_GET['profile_type'],
+        ),
         array("registration_page" => 'yes'),
         array('%s')
     );
     $modifyIndex = $wpdb->get_var("SELECT MAX(id) FROM $table") + 1;
 
     //Duplicate Profile Fields
-    $fields = self::getAll(array('registration_page' => 'no'));
+    $register_page = strpos($_POST['profile'], 'register_') !== false ? 'yes' : 'no';
+    $profile_type = str_replace(strpos($_POST['profile'], 'register_') !== false ? 'register_' : 'profile_', '', $_POST['profile']);
+    $fields = FrontendMembersField::getAll(
+        array(
+            'registration_page' => $register_page,
+            'profile_type'      => $profile_type,
+        )
+    );
+    ssv_print(count($fields), 1);
     foreach ($fields as $field) {
-        if ($field instanceof FrontendMembersFieldTab) {
-            continue;
-        }
         $field->id += $modifyIndex;
-        $field->registration_page = 'yes';
+        $field->registration_page = $register_page;
+        $field->profile_type = $profile_type;
         if (isset($field->options)) {
             foreach ($field->options as $option) {
                 /** @var FrontendMembersFieldInputSelectOption | FrontendMembersFieldInputSelectRoleOption | FrontendMembersFieldInputSelectTextOption $option */
@@ -53,7 +63,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
         $field->save();
     }
 }
+$profile_types = get_option('ssv_frontend_members_registration_types', array());
+$active_tab    = "general";
+if (isset($_GET['profile_type'])) {
+    $active_tab = $_GET['profile_type'];
+}
 ?>
+<div class="wrap">
+    <h2 class="nav-tab-wrapper">
+        <?php foreach ($profile_types as $role): ?>
+            <a href="?page=Frontend Members Options&tab=<?= $_GET['tab'] ?>&profile_type=<?= $role ?>" class="nav-tab <?= $active_tab == $role ? 'nav-tab-active' : '' ?>"><?= $role ?></a>
+        <?php endforeach; ?>
+    </h2>
+</div>
 <!--suppress JSUnusedLocalSymbols -->
 <h1>Columns to Display</h1>
 <form id="ssv-frontend-members-option-columns" name="ssv-frontend-members-option-columns" method="post" action="#">
@@ -80,23 +102,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
     ?>
 </form>
 <h1>Fields</h1>
-<?php if ($_GET['tab'] == 'register_page'): ?>
-    <form id="ssv-frontend-members-import-options" name="ssv-frontend-members-import-options" method="post" action="#">
-        <input type="hidden" name="form" value="import_options"/>
-        <?php wp_nonce_field('ssv_save_frontend_members_profile_page_import_options'); ?>
-        <input type="submit" name="submit" id="submit" value="Import From Profile">
-    </form>
-<?php endif; ?>
+<form id="ssv-frontend-members-import-options" name="ssv-frontend-members-import-options" method="post" action="#">
+    <input type="hidden" name="form" value="import_options"/>
+    <input type="hidden" name="form" value="import_options"/>
+    <select name="profile">
+        <?php foreach ($profile_types as $profile_type): ?>
+            <option value="profile_<?= $profile_type ?>">Profile Page <?= $profile_type ?></option>
+        <?php endforeach; ?>
+        <?php foreach ($profile_types as $profile_type): ?>
+            <option value="register_<?= $profile_type ?>">Register Page <?= $profile_type ?></option>
+        <?php endforeach; ?>
+    </select>
+    <?php wp_nonce_field('ssv_save_frontend_members_profile_page_import_options'); ?>
+    <input type="submit" name="submit" id="submit" value="Import">
+</form>
 <form id="ssv-frontend-members-options" name="ssv-frontend-members-options" method="post" action="#">
     <input type="hidden" name="form" value="fields"/>
     <table id="fields_container" style="width: 100%; border-spacing: 10px 0; margin-bottom: 20px; margin-top: 20px; border-collapse: collapse;">
         <tbody class="sortable">
         <?php
-        if ($_GET['tab'] == 'register_page') {
-            $fields = FrontendMembersField::getAll(array('registration_page' => 'yes'));
-        } else {
-            $fields = FrontendMembersField::getAll(array('registration_page' => 'no'));
-        }
+        $fields = FrontendMembersField::getAll(
+            array(
+                'registration_page' => $_GET['tab'] == 'register_page' ? 'yes' : 'no',
+                'profile_type'      => $_GET['profile_type'],
+            )
+        );
         foreach ($fields as $field) {
             /* @var $field FrontendMembersField */
             echo $field->getOptionRow();

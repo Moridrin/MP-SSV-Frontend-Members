@@ -15,7 +15,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
     update_option('ssv_frontend_members_default_member_role', sanitize_text_field($_POST['ssv_frontend_members_default_member_role']));
     update_option('ssv_frontend_members_board_role', sanitize_text_field($_POST['ssv_frontend_members_board_role']));
     update_option('ssv_frontend_members_custom_users_filters', sanitize_text_field($_POST['ssv_frontend_members_custom_users_filters']));
+    update_option('ssv_frontend_members_registration_types', $_POST['ssv_frontend_members_registration_types']);
 }
+
 ?>
 <form method="post" action="#">
     <table class="form-table">
@@ -51,6 +53,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
                     <option value="hide" <?= get_option('ssv_frontend_members_custom_users_filters', 'under') == 'hide' ? 'selected' : '' ?>>Hide</option>
                     <option value="replace" <?= get_option('ssv_frontend_members_custom_users_filters', 'under') == 'replace' ? 'selected' : '' ?>>Replace User Role Links</option>
                     <option value="under" <?= get_option('ssv_frontend_members_custom_users_filters', 'under') == 'under' ? 'selected' : '' ?>>Under User Role Links</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">Different Registration Types</th>
+            <td>
+                <?php $roles = get_editable_roles(); ?>
+                <?php $selected = get_option('ssv_frontend_members_registration_types', array()); ?>
+                <input type="hidden" name="ssv_frontend_members_registration_types" value="">
+                <select name="ssv_frontend_members_registration_types[]" size=<?= count($roles) ?> multiple>
+                    <?php foreach ($roles as $ID => $role): ?>
+                        <option value="<?= $ID ?>" <?= in_array($ID, $selected) ? 'selected' : '' ?>><?= $role['name'] ?></option>
+                    <?php endforeach; ?>
                 </select>
             </td>
         </tr>

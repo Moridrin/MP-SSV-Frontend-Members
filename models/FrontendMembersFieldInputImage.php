@@ -185,10 +185,8 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }
 
-    public
-    function save(
-        $remove = false
-    ) {
+    public function save($remove = false)
+    {
         parent::save($remove);
         global $wpdb;
         $table = FRONTEND_MEMBERS_FIELD_META_TABLE_NAME;

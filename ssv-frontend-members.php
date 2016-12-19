@@ -65,6 +65,7 @@ function ssv_register_ssv_frontend_members()
 			field_type varchar(30) NOT NULL,
 			field_title varchar(30),
 			registration_page VARCHAR(5),
+			profile_type VARCHAR(50),
 			field_class VARCHAR(255),
 			field_style VARCHAR(255)
 		) $charset_collate;";

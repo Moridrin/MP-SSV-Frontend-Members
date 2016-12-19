@@ -32,7 +32,7 @@ class FrontendMembersFieldInput extends FrontendMembersField
      */
     protected function __construct($field, $input_type, $name)
     {
-        parent::__construct($field->id, $field->index, $field->type, $field->title, $field->registrationPage, $field->class, $field->style);
+        parent::__construct($field->id, $field->index, $field->type, $field->title, $field->registrationPage, $field->profile_type, $field->class, $field->style);
         $this->input_type = $input_type;
         $this->name       = $name;
     }
@@ -93,7 +93,7 @@ class FrontendMembersFieldInput extends FrontendMembersField
         throw new BadMethodCallException('Class ' . get_class($this) . ' does not override the getHTML() function.');
     }
 
-    protected function save($remove = false)
+    public function save($remove = false)
     {
         $remove = parent::save($remove);
         global $wpdb;

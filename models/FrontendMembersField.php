@@ -19,6 +19,7 @@ class FrontendMembersField
     public $type;
     public $title;
     public $registrationPage;
+    public $profile_type;
     public $class;
     public $style;
     protected $index;
@@ -31,16 +32,18 @@ class FrontendMembersField
      * @param string $type             is the type of FrontendMembersField.
      * @param string $title            is the title of this FrontendMembersField.
      * @param string $registrationPage is true if this field should be displayed on the registration page.
+     * @param string $profile_type     is the string of the profile type.
      * @param string $class            is a string of classes added to the field.
      * @param string $style            is a string of styles added to the field.
      */
-    protected function __construct($id, $index, $type, $title, $registrationPage, $class, $style)
+    protected function __construct($id, $index, $type, $title, $registrationPage, $profile_type, $class, $style)
     {
         $this->id               = $id;
         $this->index            = $index;
         $this->type             = $type;
         $this->title            = $title;
         $this->registrationPage = $registrationPage;
+        $this->profile_type     = $profile_type;
         $this->class            = $class;
         $this->style            = $style;
     }
@@ -51,13 +54,13 @@ class FrontendMembersField
     public static function createStartData()
     {
         if (current_theme_supports('materialize')) {
-            (new FrontendMembersFieldTab(new FrontendMembersField(0, 0, 'tab', 'General', 'no', '', '')))->save();
+            (new FrontendMembersFieldTab(new FrontendMembersField(0, 0, 'tab', 'General', 'no', 'subscriber', '', '')))->save();
         }
-        (new FrontendMembersFieldHeader(new FrontendMembersField(1, 1, 'header', 'Account', 'no', '', '')))->save();
-        (new FrontendMembersFieldInputText(new FrontendMembersFieldInput(new FrontendMembersField(2, 2, 'input', 'Email', 'no', '', ''), 'text', 'email'), 'no', 'normal', '', ''))->save();
-        (new FrontendMembersFieldHeader(new FrontendMembersField(3, 3, 'header', 'Personal Info', 'no', '', '')))->save();
-        (new FrontendMembersFieldInputText(new FrontendMembersFieldInput(new FrontendMembersField(4, 4, 'input', 'First Name', 'no', '', ''), 'text', 'first_name'), 'no', 'normal', '', ''))->save();
-        (new FrontendMembersFieldInputText(new FrontendMembersFieldInput(new FrontendMembersField(5, 5, 'input', 'Last Name', 'no', '', ''), 'text', 'last_name'), 'no', 'normal', '', ''))->save();
+        (new FrontendMembersFieldHeader(new FrontendMembersField(1, 1, 'header', 'Account', 'no', 'subscriber', '', '')))->save();
+        (new FrontendMembersFieldInputText(new FrontendMembersFieldInput(new FrontendMembersField(2, 2, 'input', 'Email', 'no', 'subscriber', '', ''), 'text', 'email'), 'no', 'normal', '', ''))->save();
+        (new FrontendMembersFieldHeader(new FrontendMembersField(3, 3, 'header', 'Personal Info', 'no', 'subscriber', '', '')))->save();
+        (new FrontendMembersFieldInputText(new FrontendMembersFieldInput(new FrontendMembersField(4, 4, 'input', 'First Name', 'no', 'subscriber', '', ''), 'text', 'first_name'), 'no', 'normal', '', ''))->save();
+        (new FrontendMembersFieldInputText(new FrontendMembersFieldInput(new FrontendMembersField(5, 5, 'input', 'Last Name', 'no', 'subscriber', '', ''), 'text', 'last_name'), 'no', 'normal', '', ''))->save();
     }
 
     /**
@@ -236,6 +239,7 @@ class FrontendMembersField
             stripslashes($database_fields['field_type']),
             stripslashes($database_fields['field_title']),
             stripslashes($database_fields['registration_page']),
+            stripslashes($database_fields['profile_type']),
             stripslashes($database_fields['field_class']),
             stripslashes($database_fields['field_style'])
         );
@@ -304,6 +308,7 @@ class FrontendMembersField
             sanitize_text_field($variables["field_type"]),
             sanitize_text_field($variables["field_title"]),
             sanitize_text_field(isset($variables["registration_page"]) ? $variables["registration_page"] : 'no'),
+            sanitize_text_field($variables["profile_type"]),
             sanitize_text_field(isset($variables["field_class"]) ? $variables["field_class"] : ''),
             sanitize_text_field(isset($variables["field_style"]) ? $variables["field_style"] : '')
         );
@@ -386,12 +391,13 @@ class FrontendMembersField
      * @param string $title            is the title of this component.
      * @param string $type             specifies the type of field. Either "tab", "header", "input" or "group_option".
      * @param string $registrationPage is set to false if the field should not be displayed on the registration page.
+     * @param string $profile_type
      * @param string $class            is a string that is added to the class field.
      * @param string $style            is a string that is added to the style field.
      *
      * @return FrontendMembersField the just created instance.
      */
-    protected static function createField($index, $title, $type, $registrationPage = 'true', $class = '', $style = '')
+    protected static function createField($index, $title, $type, $registrationPage = 'true', $profile_type = 'subscriber', $class = '', $style = '')
     {
         global $wpdb;
         $table         = FRONTEND_MEMBERS_FIELDS_TABLE_NAME;
@@ -409,6 +415,7 @@ class FrontendMembersField
                 'field_type'        => $type,
                 'field_title'       => $title,
                 'registration_page' => $registrationPage,
+                'profile_type' => $profile_type,
                 'field_class'       => $class,
                 'field_style'       => $style,
             ),
@@ -420,7 +427,7 @@ class FrontendMembersField
             )
         );
 
-        return new FrontendMembersField($id, $index, $type, $title, $registrationPage, $class, $style);
+        return new FrontendMembersField($id, $index, $type, $title, $registrationPage, $profile_type, $class, $style);
     }
 
     /**
@@ -492,7 +499,7 @@ class FrontendMembersField
         return ssv_get_tr($this->id, ob_get_clean(), $visible);
     }
 
-    protected function save($remove = false)
+    public function save($remove = false)
     {
         global $wpdb;
         if (strlen($this->title) <= 0) {

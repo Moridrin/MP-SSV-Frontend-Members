@@ -18,7 +18,7 @@ class FrontendMembersFieldTab extends FrontendMembersField
      */
     protected function __construct($field)
     {
-        parent::__construct($field->id, $field->index, $field->type, $field->title, $field->registrationPage, $field->class, $field->style);
+        parent::__construct($field->id, $field->index, $field->type, $field->title, $field->registrationPage, $field->profile_type, $field->class, $field->style);
     }
 
     /**
