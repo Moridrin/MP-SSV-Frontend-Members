@@ -19,7 +19,7 @@ class FrontendMembersField
     public $type;
     public $title;
     public $registrationPage;
-    public $profile_type;
+    public $profileType;
     public $class;
     public $style;
     protected $index;
@@ -32,18 +32,18 @@ class FrontendMembersField
      * @param string $type             is the type of FrontendMembersField.
      * @param string $title            is the title of this FrontendMembersField.
      * @param string $registrationPage is true if this field should be displayed on the registration page.
-     * @param string $profile_type     is the string of the profile type.
+     * @param string $profileType      is the string of the profile type.
      * @param string $class            is a string of classes added to the field.
      * @param string $style            is a string of styles added to the field.
      */
-    protected function __construct($id, $index, $type, $title, $registrationPage, $profile_type, $class, $style)
+    protected function __construct($id, $index, $type, $title, $registrationPage, $profileType, $class, $style)
     {
         $this->id               = $id;
         $this->index            = $index;
         $this->type             = $type;
         $this->title            = $title;
         $this->registrationPage = $registrationPage;
-        $this->profile_type     = $profile_type;
+        $this->profileType      = $profileType;
         $this->class            = $class;
         $this->style            = $style;
     }
@@ -415,7 +415,7 @@ class FrontendMembersField
                 'field_type'        => $type,
                 'field_title'       => $title,
                 'registration_page' => $registrationPage,
-                'profile_type' => $profile_type,
+                'profile_type'      => $profile_type,
                 'field_class'       => $class,
                 'field_style'       => $style,
             ),
@@ -478,6 +478,7 @@ class FrontendMembersField
         ob_start();
         echo ssv_get_td(ssv_get_draggable_icon());
         echo ssv_get_hidden($this->id, 'registration_page', $this->registrationPage);
+        echo ssv_get_hidden($this->id, 'profile_type', $this->profileType);
         echo ssv_get_td(ssv_get_text_input("Field Title", $this->id, $this->title));
         if (get_theme_support('materialize') && $_GET['tab'] != 'register_page') {
             echo ssv_get_td(ssv_get_select("Field Type", $this->id, $this->type, array("Tab", "Header", "Input", "Label"), array('onchange="ssv_type_changed(\'' . $this->id . '\')"')));
@@ -526,6 +527,7 @@ class FrontendMembersField
                         "field_type"        => $this->type,
                         "field_title"       => $this->title,
                         "registration_page" => $this->registrationPage,
+                        "profile_type"      => $this->profileType,
                         "field_class"       => $this->class,
                         "field_style"       => $this->style,
                     ),
@@ -542,6 +544,7 @@ class FrontendMembersField
                         "field_type"        => $this->type,
                         "field_title"       => $this->title,
                         "registration_page" => $this->registrationPage,
+                        "profile_type"      => $this->profileType,
                         "field_class"       => $this->class,
                         "field_style"       => $this->style,
                     ),
