@@ -84,15 +84,30 @@ if (isset($_GET['profile_type'])) {
                 <td><label><input type="checkbox" checked disabled/>Title</label></td>
                 <td><label><input type="checkbox" checked disabled/>Input Type</label></td>
                 <td><label><input type="checkbox" checked disabled/>Required/Options</label></td>
-                <td><label><input type="checkbox" name="ssv_frontend_members_view_default_column" value="yes" <?= get_option('ssv_frontend_members_view_default_column') ? 'checked' : '' ?>/>Default</label></td>
-                <td><label><input type="checkbox" name="ssv_frontend_members_view_class_column" value="yes" <?= get_option('ssv_frontend_members_view_class_column') ? 'checked' : '' ?> />Class</label></td>
+                <td>
+                    <input type="hidden" name="ssv_frontend_members_view_default_column" value="no"/>
+                    <label><input type="checkbox" name="ssv_frontend_members_view_default_column" value="yes" <?= get_option('ssv_frontend_members_view_default_column') ? 'checked' : '' ?>/>Default</label>
+                </td>
+                <td>
+                    <input type="hidden" name="ssv_frontend_members_view_class_column" value="no"/>
+                    <label><input type="checkbox" name="ssv_frontend_members_view_class_column" value="yes" <?= get_option('ssv_frontend_members_view_class_column') ? 'checked' : '' ?>/>Class</label>
+                </td>
             </tr>
             <tr>
                 <td><label><input type="checkbox" checked disabled/>Field Type</label></td>
                 <td><label><input type="checkbox" checked disabled/>Name</label></td>
-                <td><label><input type="checkbox" name="ssv_frontend_members_view_display_column" value="yes" <?= get_option('ssv_frontend_members_view_display_column') ? 'checked' : '' ?>/>Display</label></td>
-                <td><label><input type="checkbox" name="ssv_frontend_members_view_placeholder_column" value="yes" <?= get_option('ssv_frontend_members_view_placeholder_column') ? 'checked' : '' ?>/>Placeholder</label></td>
-                <td><label><input type="checkbox" name="ssv_frontend_members_view_style_column" value="yes" <?= get_option('ssv_frontend_members_view_style_column') ? 'checked' : '' ?>/>Style</label></td>
+                <td>
+                    <input type="hidden" name="ssv_frontend_members_view_display_column" value="no"/>
+                    <label><input type="checkbox" name="ssv_frontend_members_view_display_column" value="yes" <?= get_option('ssv_frontend_members_view_display_column') ? 'checked' : '' ?>/>Display</label>
+                </td>
+                <td>
+                    <input type="hidden" name="ssv_frontend_members_view_placeholder_column" value="no"/>
+                    <label><input type="checkbox" name="ssv_frontend_members_view_placeholder_column" value="yes" <?= get_option('ssv_frontend_members_view_placeholder_column') ? 'checked' : '' ?>/>Placeholder</label>
+                </td>
+                <td>
+                    <input type="hidden" name="ssv_frontend_members_view_style_column" value="no"/>
+                    <label><input type="checkbox" name="ssv_frontend_members_view_style_column" value="yes" <?= get_option('ssv_frontend_members_view_style_column') ? 'checked' : '' ?>/>Style</label>
+                </td>
             </tr>
         </table>
         <?php
@@ -156,6 +171,7 @@ if (isset($_GET['profile_type'])) {
     <!-- Add new Field -->
     <script>
         var $ = jQuery.noConflict();
+        var id;
         <?php
         global $wpdb;
         /** @noinspection PhpIncludeInspection */
@@ -163,7 +179,6 @@ if (isset($_GET['profile_type'])) {
         $table = $wpdb->prefix . "ssv_frontend_members_fields";
         /** @var array $max_database_index */
         $max_database_index = $wpdb->get_var("SELECT MAX(id) FROM $table");
-        print("var id;\n");
         if (count($max_database_index) > 0) {
             echo "id = " . $max_database_index . ";\n";
         } else {
@@ -171,6 +186,7 @@ if (isset($_GET['profile_type'])) {
         }
         $new_field_content = ssv_get_td(ssv_get_draggable_icon());
         $new_field_content .= ssv_get_hidden('\' + id + \'', "Registration Page", $_GET['tab'] == 'register_page' ? 'yes' : 'no');
+        $new_field_content .= ssv_get_hidden('\' + id + \'', "Profile Type", $_GET['profile_type']);
         $new_field_content .= ssv_get_td(ssv_get_text_input("Field Title", '\' + id + \'', "", "text", array("required"), false));
         if ($_GET['tab'] == 'register_page') {
             $new_field_content .= ssv_get_td(ssv_get_select("Field Type", '\' + id + \'', "input", array("Header", "Input", "Label"), array("onchange=\"ssv_type_changed(' + id + ')\""), false, null, true, false));
