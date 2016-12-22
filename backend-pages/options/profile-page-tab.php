@@ -6,6 +6,8 @@ if (!current_user_can('manage_options')) {
     ?><p>You are unauthorized to view or edit this page.</p><?php
     return;
 }
+$profile_types = get_option('ssv_frontend_members_registration_types', array());
+$profileType = isset($_GET['profile_type']) ? $_GET['profile_type'] : $profile_types[0];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_admin_referer('ssv_save_frontend_members_profile_page_options')) {
     $index = 0;
@@ -31,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
         $table,
         array(
             'registration_page' => $_GET['tab'] == 'register_page' ? 'yes' : 'no',
-            'profile_type'      => $_GET['profile_type'],
+            'profile_type'      => $profileType,
         ),
         array('%s')
     );
@@ -39,17 +41,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
 
     //Duplicate Profile Fields
     $register_page = strpos($_POST['profile'], 'register_') !== false ? 'yes' : 'no';
-    $profile_type  = str_replace(strpos($_POST['profile'], 'register_') !== false ? 'register_' : 'profile_', '', $_POST['profile']);
+    $profileType  = str_replace(strpos($_POST['profile'], 'register_') !== false ? 'register_' : 'profile_', '', $_POST['profile']);
     $fields        = FrontendMembersField::getAll(
         array(
             'registration_page' => $register_page,
-            'profile_type'      => $profile_type,
+            'profile_type'      => $profileType,
         )
     );
     foreach ($fields as $field) {
         $field->id += $modifyIndex;
         $field->registrationPage = $_GET['tab'] == 'register_page' ? 'yes' : 'no';
-        $field->profileType       = $_GET['profile_type'];
+        $field->profileType       = $profileType;
         if (isset($field->options)) {
             foreach ($field->options as $option) {
                 /** @var FrontendMembersFieldInputSelectOption | FrontendMembersFieldInputSelectRoleOption | FrontendMembersFieldInputSelectTextOption $option */
@@ -61,20 +63,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
         $field->save();
     }
 }
-$profile_types = get_option('ssv_frontend_members_registration_types', array());
-$active_tab    = "";
-if (isset($_GET['profile_type'])) {
-    $active_tab = $_GET['profile_type'];
-}
 ?>
     <div class="wrap">
         <h2 class="nav-tab-wrapper">
             <?php foreach ($profile_types as $role): ?>
-                <a href="?page=Frontend Members Options&tab=<?= $_GET['tab'] ?>&profile_type=<?= $role ?>" class="nav-tab <?= $active_tab == $role ? 'nav-tab-active' : '' ?>"><?= $role ?></a>
+                <a href="?page=Frontend Members Options&tab=<?= $_GET['tab'] ?>&profile_type=<?= $role ?>" class="nav-tab <?= $profileType == $role ? 'nav-tab-active' : '' ?>"><?= $role ?></a>
             <?php endforeach; ?>
         </h2>
     </div>
-<?php if (isset($_GET['profile_type'])): ?>
+<?php if (isset($profileType)): ?>
     <!--suppress JSUnusedLocalSymbols -->
     <h1>Columns to Display</h1>
     <form id="ssv-frontend-members-option-columns" name="ssv-frontend-members-option-columns" method="post" action="#">
@@ -138,7 +135,7 @@ if (isset($_GET['profile_type'])) {
             $fields = FrontendMembersField::getAll(
                 array(
                     'registration_page' => $_GET['tab'] == 'register_page' ? 'yes' : 'no',
-                    'profile_type'      => $_GET['profile_type'],
+                    'profile_type'      => $profileType,
                 )
             );
             foreach ($fields as $field) {
@@ -186,7 +183,7 @@ if (isset($_GET['profile_type'])) {
         }
         $new_field_content = ssv_get_td(ssv_get_draggable_icon());
         $new_field_content .= ssv_get_hidden('\' + id + \'', "Registration Page", $_GET['tab'] == 'register_page' ? 'yes' : 'no');
-        $new_field_content .= ssv_get_hidden('\' + id + \'', "Profile Type", $_GET['profile_type']);
+        $new_field_content .= ssv_get_hidden('\' + id + \'', "Profile Type", $profileType);
         $new_field_content .= ssv_get_td(ssv_get_text_input("Field Title", '\' + id + \'', "", "text", array("required"), false));
         if ($_GET['tab'] == 'register_page') {
             $new_field_content .= ssv_get_td(ssv_get_select("Field Type", '\' + id + \'', "input", array("Header", "Input", "Label"), array("onchange=\"ssv_type_changed(' + id + ')\""), false, null, true, false));
