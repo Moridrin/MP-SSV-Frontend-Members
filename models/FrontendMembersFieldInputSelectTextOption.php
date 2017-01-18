@@ -12,7 +12,7 @@ require_once "FrontendMembersFieldInputSelectOption.php";
 
 class FrontendMembersFieldInputSelectTextOption extends FrontendMembersFieldInputSelectOption
 {
-    public function __construct($id, $index, $parent_id, $value = "")
+    public function __construct($id, $index, $parent_id, $value = '')
     {
         parent::__construct($id, $index, $parent_id, $value);
     }

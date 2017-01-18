@@ -98,7 +98,7 @@ class FrontendMembersFieldInputRoleCheckbox extends FrontendMembersFieldInput
         $value = isset($_SESSION['filter_' . $this->name]) ? $_SESSION['filter_' . $this->name] : '';
         ?>
         <select id="<?php echo esc_html($this->id); ?>" name="filter_<?php echo esc_html($this->name); ?>" title="<?php echo esc_html($this->title); ?>">
-            <option value="">[<?php echo esc_html($this->title); ?>]</option>
+            <option value=''>[<?php echo esc_html($this->title); ?>]</option>
             <option value="yes" <?= $value == 'yes' ? 'selected' : '' ?>>Selected</option>
             <option value="no" <?= $value == 'no' ? 'selected' : '' ?>>Not Selected</option>
         </select>

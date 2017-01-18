@@ -143,7 +143,7 @@ class FrontendMembersFieldInputCustom extends FrontendMembersFieldInput
             ?>
             <div class="input-field col s12">
                 <input <?= $type ?> <?= $id ?> <?= $name ?> <?= $value ?> <?= $placeholder ?> <?= $display ?> <?= $required ?> <?= $class ?> <?= $style ?> title="<?= $this->title ?>"/>
-                <label><?= $this->title ?><?= $this->required == "yes" ? '*' : "" ?></label>
+                <label><?= $this->title ?><?= $this->required == "yes" ? '*' : '' ?></label>
             </div>
             <?php
         } else {

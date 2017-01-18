@@ -129,7 +129,7 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
      */
     public function getHTML($frontend_member = null)
     {
-        $value   = $frontend_member == null ? "" : $frontend_member->getMeta($this->name);
+        $value = $frontend_member == null ? '' : $frontend_member->getMeta($this->name);
         if (is_user_logged_in() && FrontendMember::get_current_user()->isBoard()) {
             $this->display = 'normal';
         }
@@ -172,7 +172,7 @@ class FrontendMembersFieldInputSelect extends FrontendMembersFieldInput
         ob_start();
         ?>
         <select id="<?php echo esc_html($this->id); ?>" name="filter_<?php echo esc_html($this->name); ?>">
-            <option value="">[<?php echo esc_html($this->title); ?>]</option>
+            <option value=''>[<?php echo esc_html($this->title); ?>]</option>
             <?php foreach ($this->options as $option) {
                 /* @var $option FrontendMembersFieldInputSelectRoleOption|FrontendMembersFieldInputSelectTextOption */
                 echo $option->getHTML(isset($_SESSION['filter_' . $this->name]) ? $_SESSION['filter_' . $this->name] : '');

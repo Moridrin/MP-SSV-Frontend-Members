@@ -14,8 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
     foreach ($_POST as $name => $val) {
         if (strpos($name, "_field_title") !== false) {
             $index++;
-            $_POST[str_replace("_field_title", "", $name) . "_field_index"] = $index; //Set field_index
-            $field                                                          = FrontendMembersField::fromPOST(str_replace("_field_title", "", $name));
+            $_POST[str_replace("_field_title", '', $name) . "_field_index"] = $index; //Set field_index
+            $field                                                          = FrontendMembersField::fromPOST(str_replace("_field_title", '', $name));
             $field->save();
         }
     }
@@ -184,14 +184,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
         $new_field_content = ssv_get_td(ssv_get_draggable_icon());
         $new_field_content .= ssv_get_hidden('\' + id + \'', "Registration Page", $_GET['tab'] == 'register_page' ? 'yes' : 'no');
         $new_field_content .= ssv_get_hidden('\' + id + \'', "Profile Type", $profileType);
-        $new_field_content .= ssv_get_td(ssv_get_text_input("Field Title", '\' + id + \'', "", "text", array("required"), false));
+            $new_field_content .= ssv_get_td(ssv_get_text_input("Field Title", '\' + id + \'', '', "text", array("required"), false));
         if ($_GET['tab'] == 'register_page') {
-            $new_field_content .= ssv_get_td(ssv_get_select("Field Type", '\' + id + \'', "input", array("Header", "Input", "Label"), array("onchange=\"ssv_type_changed(' + id + ')\""), false, null, true, false));
+            $new_field_content .= ssv_get_td(
+                ssv_get_select(
+                    "Field Type", '\' + id + \'', "input", array("Header", "Input", "Label"), array("onchange=\"ssv_type_changed(' + id + ')\''), false, null, true, false));
         } else {
-            $new_field_content .= ssv_get_td(ssv_get_select("Field Type", '\' + id + \'', "input", array("Tab", "Header", "Input", "Label"), array("onchange=\"ssv_type_changed(' + id + ')\""), false, null, true, false));
+            $new_field_content .= ssv_get_td(ssv_get_select("Field Type", '\' + id + \'', "input", array("Tab", "Header", "Input", "Label"), array("onchange = \"ssv_type_changed(' + id + ')\''), false, null, true, false));
         }
-        $new_field_content .= ssv_get_td(ssv_get_select("Input Type", '\' + id + \'', "text", array("Text", "Text Select", "Role Select", "Text Checkbox", "Role Checkbox", "Image"), array("onchange=\"ssv_input_type_changed(' + id + ')\""), true, null, true, false));
-        $new_field_content .= ssv_get_td(ssv_get_text_input("Name", '\' + id + \'', "", "text", array("required"), false));
+        $new_field_content .= ssv_get_td(ssv_get_select("Input Type", '\' + id + \'', "text", array("Text", "Text Select", "Role Select", "Text Checkbox", "Role Checkbox", "Image"), array("onchange = \"ssv_input_type_changed(' + id + ')\''), true, null, true, false));
+        $new_field_content .= ssv_get_td(ssv_get_text_input("Name", '\' + id + \'', '', "text", array("required"), false));
         $new_field_content .= ssv_get_td(ssv_get_checkbox("Required", '\' + id + \'', "no", array(), false, false));
         if (get_option('ssv_frontend_members_view_display_column', true)) {
             $new_field_content .= ssv_get_td(ssv_get_select("Display", '\' + id + \'', "normal", array("Normal", "ReadOnly", "Disabled"), array(), false, null, true, false));
@@ -251,9 +253,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
             $("#" + sender_id + "_field_style").parent().remove();
             if (type == "input") {
                 $(tr).append(
-                    '<?php echo ssv_get_td(ssv_get_select("Input Type", '\' + sender_id + \'', "text", array("Text", "Text Select", "Role Select", "Text Checkbox", "Role Checkbox", "Image", "Date"), array("onchange=\"ssv_input_type_changed(' + sender_id + ')\""), true, null, true, false)); ?>'
+                    '<?php echo ssv_get_td(
+                        ssv_get_select(
+                            "Input Type", '\' + sender_id + \'', "text", array("Text", "Text Select", "Role Select", "Text Checkbox", "Role Checkbox", "Image", "Date"), array("onchange=\"ssv_input_type_changed(' + sender_id + ')\''), true, null, true, false)); ?>'
                 ).append(
-                    '<?php echo ssv_get_td(ssv_get_text_input("Name", '\' + sender_id + \'', "", "text", array("required"), false)); ?>'
+                    '<?php echo ssv_get_td(ssv_get_text_input("Name", '\' + sender_id + \'', '', "text", array("required"), false)); ?>'
                 ).append(
                     '<?php echo ssv_get_td(ssv_get_checkbox("Required", '\' + sender_id + \'', "no", array(), false, false)); ?>'
                 );
@@ -264,12 +268,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
                 <?php endif; ?>
                 <?php if (get_option('ssv_frontend_members_view_default_column', true)): ?>
                 $(tr).append(
-                    '<?php echo ssv_get_td(ssv_get_text_input("Default Value", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
+                    '<?php echo ssv_get_td(ssv_get_text_input("Default Value", '\' + sender_id + \'', '', 'text', array(), false)); ?>'
                 );
                 <?php endif; ?>
                 <?php if (get_option('ssv_frontend_members_view_placeholder_column', true)): ?>
                 $(tr).append(
-                    '<?php echo ssv_get_td(ssv_get_text_input("Placeholder", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
+                    '<?php echo ssv_get_td(ssv_get_text_input("Placeholder", '\' + sender_id + \'', '', 'text', array(), false)); ?>'
                 );
                 <?php endif; ?>
             } else if (type == 'label') {
@@ -286,7 +290,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
                 }
                 ?>
                 $(tr).append(
-                    '<?php echo ssv_get_td(ssv_get_text_area("Text", '\' + sender_id + \'', "", "text", array("required"), false), $colspan); ?>'
+                    '<?php echo ssv_get_td(ssv_get_text_area("Text", '\' + sender_id + \'', '', "text", array("required"), false), $colspan); ?>'
                 );
             } else {
                 $(tr).append(
@@ -314,12 +318,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
             }
             <?php if (get_option('ssv_frontend_members_view_class_column', true)): ?>
             $(tr).append(
-                '<?php echo ssv_get_td(ssv_get_text_input("Field Class", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
+                '<?php echo ssv_get_td(ssv_get_text_input("Field Class", '\' + sender_id + \'', '', 'text', array(), false)); ?>'
             );
             <?php endif; ?>
             <?php if (get_option('ssv_frontend_members_view_style_column', true)): ?>
             $(tr).append(
-                '<?php echo ssv_get_td(ssv_get_text_input("Field Style", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
+                '<?php echo ssv_get_td(ssv_get_text_input("Field Style", '\' + sender_id + \'', '', 'text', array(), false)); ?>'
             );
             <?php endif; ?>
         }
@@ -350,7 +354,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
             switch (input_type) {
                 case "text_select":
                     $(tr).append(
-                        '<?php echo ssv_get_td(ssv_get_text_input("Name", '\' + sender_id + \'', "", "text", array("required"), false)); ?>'
+                        '<?php echo ssv_get_td(ssv_get_text_input("Name", '\' + sender_id + \'', '', "text", array("required"), false)); ?>'
                     ).append(
                         '<?php echo ssv_get_td(ssv_get_options('\' + sender_id + \'', array(), "text", array(), false)); ?>'
                     );
@@ -374,7 +378,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
                     break;
                 case "role_select":
                     $(tr).append(
-                        '<?php echo ssv_get_td(ssv_get_text_input("Name", '\' + sender_id + \'', "", "text", array("required"), false)); ?>'
+                        '<?php echo ssv_get_td(ssv_get_text_input("Name", '\' + sender_id + \'', '', "text", array("required"), false)); ?>'
                     ).append(
                         '<?php echo ssv_get_td(ssv_get_options('\' + sender_id + \'', array(), "role", array(), false)); ?>'
                     );
@@ -396,7 +400,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
                     break;
                 case "text_checkbox":
                     $(tr).append(
-                        '<?php echo ssv_get_td(ssv_get_text_input("Name", '\' + sender_id + \'', "", "text", array("required"), false)); ?>'
+                        '<?php echo ssv_get_td(ssv_get_text_input("Name", '\' + sender_id + \'', '', "text", array("required"), false)); ?>'
                     ).append(
                         '<?php echo ssv_get_td(ssv_get_checkbox("Required", '\' + sender_id + \'', "no", array(), false, false)); ?>'
                     );
@@ -419,7 +423,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
                     break;
                 case "role_checkbox":
                     $(tr).append(
-                        '<?php echo ssv_get_td(ssv_get_role_select('\' + sender_id + \'', "Role", "", true, array(), false)); ?>'
+                        '<?php echo ssv_get_td(ssv_get_role_select('\' + sender_id + \'', "Role", '', true, array(), false)); ?>'
                     ).append(
                         '<?php echo ssv_get_td('<div class="\' + sender_id + \'_empty"></div>'); ?>'
                     );
@@ -442,7 +446,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
                     break;
                 case "image":
                     $(tr).append(
-                        '<?php echo ssv_get_td(ssv_get_text_input("Name", '\' + sender_id + \'', "", "text", array("required"), false)); ?>'
+                        '<?php echo ssv_get_td(ssv_get_text_input("Name", '\' + sender_id + \'', '', "text", array("required"), false)); ?>'
                     ).append(
                         '<?php echo ssv_get_td(ssv_get_checkbox("Required", '\' + sender_id + \'', "no", array(), false, false)); ?>'
                     );
@@ -464,7 +468,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
                     break;
                 case "text":
                     $(tr).append(
-                        '<?php echo ssv_get_td(ssv_get_text_input("Name", '\' + sender_id + \'', "", "text", array("required"), false)); ?>'
+                        '<?php echo ssv_get_td(ssv_get_text_input("Name", '\' + sender_id + \'', '', "text", array("required"), false)); ?>'
                     ).append(
                         '<?php echo ssv_get_td(ssv_get_checkbox("Required", '\' + sender_id + \'', "no", array(), false, false)); ?>'
                     );
@@ -475,21 +479,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
                 <?php endif; ?>
                 <?php if (get_option('ssv_frontend_members_view_default_column', true)): ?>
                     $(tr).append(
-                        '<?php echo ssv_get_td(ssv_get_text_input("Default Value", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
+                        '<?php echo ssv_get_td(ssv_get_text_input("Default Value", '\' + sender_id + \'', '', 'text', array(), false)); ?>'
                     );
                 <?php endif; ?>
                 <?php if (get_option('ssv_frontend_members_view_placeholder_column', true)): ?>
                     $(tr).append(
-                        '<?php echo ssv_get_td(ssv_get_text_input("Placeholder", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
+                        '<?php echo ssv_get_td(ssv_get_text_input("Placeholder", '\' + sender_id + \'', '', 'text', array(), false)); ?>'
                     );
                 <?php endif; ?>
                     break;
                 case "custom":
                     $(input_type_custom).append(
-                        '<div><?php echo ssv_get_text_input("", '\' + sender_id + \'_input_type_custom', "", "text", array("required"), false); ?></div>'
+                        '<div><?php echo ssv_get_text_input('', '\' + sender_id + \'_input_type_custom', '', "text", array("required"), false); ?></div>'
                     );
                     $(tr).append(
-                        '<?php echo ssv_get_td(ssv_get_text_input("Name", '\' + sender_id + \'', "", "text", array("required"), false)); ?>'
+                        '<?php echo ssv_get_td(ssv_get_text_input("Name", '\' + sender_id + \'', '', "text", array("required"), false)); ?>'
                     ).append(
                         '<?php echo ssv_get_td(ssv_get_checkbox("Required", '\' + sender_id + \'', "no", array(), false, false)); ?>'
                     );
@@ -500,21 +504,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
                 <?php endif; ?>
                 <?php if (get_option('ssv_frontend_members_view_default_column', true)): ?>
                     $(tr).append(
-                        '<?php echo ssv_get_td(ssv_get_text_input("Default Value", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
+                        '<?php echo ssv_get_td(ssv_get_text_input("Default Value", '\' + sender_id + \'', '', 'text', array(), false)); ?>'
                     );
                 <?php endif; ?>
                 <?php if (get_option('ssv_frontend_members_view_placeholder_column', true)): ?>
                     $(tr).append(
-                        '<?php echo ssv_get_td(ssv_get_text_input("Placeholder", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
+                        '<?php echo ssv_get_td(ssv_get_text_input("Placeholder", '\' + sender_id + \'', '', 'text', array(), false)); ?>'
                     );
                 <?php endif; ?>
                     break;
                 case "date":
                     $(input_type_custom).append(
-                        '<div><?= ssv_get_td(ssv_get_select("", '\' + sender_id + \'', "normal", array("DateTime", "Date", "Time"), array(), false, null, false, false)); ?></div>'
+                        '<div><?= ssv_get_td(ssv_get_select('', '\' + sender_id + \'', "normal", array("DateTime", "Date", "Time"), array(), false, null, false, false)); ?></div>'
                     );
                     $(tr).append(
-                        '<?php echo ssv_get_td(ssv_get_text_input("Name", '\' + sender_id + \'', "", "text", array("required"), false)); ?>'
+                        '<?php echo ssv_get_td(ssv_get_text_input("Name", '\' + sender_id + \'', '', "text", array("required"), false)); ?>'
                     ).append(
                         '<?php echo ssv_get_td(ssv_get_checkbox("Required", '\' + sender_id + \'', "no", array(), false, false)); ?>'
                     );
@@ -525,24 +529,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
                 <?php endif; ?>
                 <?php if (get_option('ssv_frontend_members_view_default_column', true)): ?>
                     $(tr).append(
-                        '<?php echo ssv_get_td(ssv_get_text_input("Default Value", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
+                        '<?php echo ssv_get_td(ssv_get_text_input("Default Value", '\' + sender_id + \'', '', 'text', array(), false)); ?>'
                     );
                 <?php endif; ?>
                 <?php if (get_option('ssv_frontend_members_view_placeholder_column', true)): ?>
                     $(tr).append(
-                        '<?php echo ssv_get_td(ssv_get_text_input("Placeholder", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
+                        '<?php echo ssv_get_td(ssv_get_text_input("Placeholder", '\' + sender_id + \'', '', 'text', array(), false)); ?>'
                     );
                 <?php endif; ?>
                     break;
             }
             <?php if (get_option('ssv_frontend_members_view_class_column', true)): ?>
             $(tr).append(
-                '<?php echo ssv_get_td(ssv_get_text_input("Field Class", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
+                '<?php echo ssv_get_td(ssv_get_text_input("Field Class", '\' + sender_id + \'', '', 'text', array(), false)); ?>'
             );
             <?php endif; ?>
             <?php if (get_option('ssv_frontend_members_view_style_column', true)): ?>
             $(tr).append(
-                '<?php echo ssv_get_td(ssv_get_text_input("Field Style", '\' + sender_id + \'', "", 'text', array(), false)); ?>'
+                '<?php echo ssv_get_td(ssv_get_text_input("Field Style", '\' + sender_id + \'', '', 'text', array(), false)); ?>'
             );
             <?php endif; ?>
         }
@@ -555,7 +559,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
             id++;
             var li = document.getElementById(sender_id + "_add_option").parentElement;
             $(li).before(
-                '<li><?php echo ssv_get_option('\' + sender_id + \'', array('id' => '\' + id + \'', 'type' => 'text', 'value' => ""), array(), false); ?></li>'
+                '<li><?php echo ssv_get_option('\' + sender_id + \'', array('id' => '\' + id + \'', 'type' => 'text', 'value' => ''), array(), false); ?></li>'
             );
         }
     </script>
@@ -568,7 +572,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form'] == 'fields' && check_
             id++;
             <?php $object_name = '\' + sender_id + \'' . "_option" . '\' + id + \''; ?>
             $(li).before(
-                '<li><?php echo ssv_get_role_select($object_name, "option", "", false, array(), false); ?></li>'
+                '<li><?php echo ssv_get_role_select($object_name, "option", '', false, array(), false); ?></li>'
             );
         }
     </script>

@@ -46,7 +46,7 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
             return $this->required == "yes";
         } else {
             $location = $frontend_member->getMeta($this->name);
-            return $this->required == "yes" && $location == "";
+            return $this->required == "yes" && $location == '';
         }
     }
 
@@ -95,7 +95,7 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
         $value = isset($_SESSION['filter_' . $this->name]) ? $_SESSION['filter_' . $this->name] : '';
         ?>
         <select id="<?php echo esc_html($this->id); ?>" name="filter_<?php echo esc_html($this->name); ?>" title="<?php echo esc_html($this->title); ?>">
-            <option value="">[<?php echo esc_html($this->title); ?>]</option>
+            <option value=''>[<?php echo esc_html($this->title); ?>]</option>
             <option value="yes" <?= $value == 'yes' ? 'selected' : '' ?>><?php echo esc_html("Has ") . esc_html($this->title); ?></option>
             <option value="no" <?= $value == 'no' ? 'selected' : '' ?>><?php echo esc_html("Doesn't have ") . esc_html($this->title); ?></option>
         </select>
@@ -113,7 +113,7 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
     {
         ob_start();
         if ($frontend_member == null) {
-            $location      = "";
+            $location      = '';
             $this->preview = "no";
         } else {
             $location = $frontend_member->getMeta($this->name);
@@ -126,14 +126,14 @@ class FrontendMembersFieldInputImage extends FrontendMembersFieldInput
                         <div class="file-field input-field">
                             <div class="btn">
                                 <span>File</span>
-                                <?php if ($this->required == "yes" && $location == ""): ?>
+                                <?php if ($this->required == "yes" && $location == ''): ?>
                                     <input type="file" name="<?= $this->name ?>" required="true" aria-required="true">
                                 <?php else: ?>
                                     <input type="file" name="<?= $this->name ?>">
                                 <?php endif; ?>
                             </div>
                             <div class="file-path-wrapper">
-                                <?php if ($this->required == "yes" && $location == ""): ?>
+                                <?php if ($this->required == "yes" && $location == ''): ?>
                                     <input class="file-path validate" type="text" required="true" aria-required="true" title="<?= $this->title ?>"/>
                                 <?php else: ?>
                                     <input class="file-path validate" type="text" title="<?= $this->title ?>"/>

@@ -17,8 +17,8 @@ function ssv_frontend_members_content_filters($content)
             $counter++;
         }
     }
-    $content = str_replace('[ssv_loop_committees]', "", $content);
-    $content = str_replace('[/ssv_loop_committees]', "", $content);
+    $content = str_replace('[ssv_loop_committees]', '', $content);
+    $content = str_replace('[/ssv_loop_committees]', '', $content);
     if (is_user_logged_in()) {
         $content = ssv_members_filter($content);
     }
@@ -31,7 +31,7 @@ function ssv_members_filter($content)
     foreach ($users as $user) {
         $search_term = $user->user_firstname . " " . $user->user_lastname;
         $search_replace = '<a href="/profile/?user_id=' . $user->ID . '">' . $user->user_firstname . ' ' . $user->user_lastname . '</a>';
-        if (!is_null($search_term) && isset($search_term) && $search_term != "" && $search_term != " ") {
+        if (!is_null($search_term) && isset($search_term) && $search_term != '' && $search_term != " ") {
             $content = str_replace('="' . $search_term . '"', '#TMP_REPLACE#', $content);
             $content = str_replace($search_term, $search_replace, $content);
             $content = str_replace('#TMP_REPLACE#', '="' . $search_term . '"', $content);
@@ -47,7 +47,7 @@ function ssv_loop_committees($looping_string)
         require_once(ABSPATH . '/wp-admin/includes/user.php');
     }
     $roles = get_editable_roles();
-    $replacingString = "";
+    $replacingString = '';
     foreach ($roles as $role_name => $role_info) {
         if (strpos($role_name, "committee")) {
             $loop_instance = $looping_string;

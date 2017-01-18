@@ -170,7 +170,7 @@ register_deactivation_hook(__FILE__, 'ssv_unregister_ssv_frontend_members');
  *
  * @return string The <img> component of the avatar.
  */
-function ssv_frontend_members_avatar($avatar, $id_or_email, $size = 150, $default = null, $alt = "", $args = array())
+function ssv_frontend_members_avatar($avatar, $id_or_email, $size = 150, $default = null, $alt = '', $args = array())
 {
     $user = false;
 

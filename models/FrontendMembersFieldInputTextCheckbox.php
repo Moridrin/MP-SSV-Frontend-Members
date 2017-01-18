@@ -97,7 +97,7 @@ class FrontendMembersFieldInputTextCheckbox extends FrontendMembersFieldInput
         $value = isset($_SESSION['filter_' . $this->name]) ? $_SESSION['filter_' . $this->name] : '';
         ?>
         <select id="<?php echo esc_html($this->id); ?>" name="filter_<?php echo esc_html($this->name); ?>" title="<?php echo esc_html($this->title); ?>" onchange="this.form.submit();">
-            <option value="">[<?php echo esc_html($this->title); ?>]</option>
+            <option value=''>[<?php echo esc_html($this->title); ?>]</option>
             <option value="yes" <?= $value == 'yes' ? 'selected' : '' ?>>Selected</option>
             <option value="no" <?= $value == 'no' ? 'selected' : '' ?>>Not Selected</option>
         </select>
@@ -125,7 +125,7 @@ class FrontendMembersFieldInputTextCheckbox extends FrontendMembersFieldInput
                 <input type="hidden" id="<?= $this->id ?>" name="<?= $this->name ?>" value="no"/>
                 <p>
                     <input type="checkbox" id="field_<?= $this->id ?>" name="<?= $this->name ?>" value="yes" class="<?= $this->class ?>" style="<?= $this->style; ?>" <?= $checked ?> <?= $this->display ?>/>
-                    <label for="field_<?= $this->id ?>"><?= $this->title ?><?= $this->required == "yes" ? '*' : "" ?></label>
+                    <label for="field_<?= $this->id ?>"><?= $this->title ?><?= $this->required == "yes" ? '*' : '' ?></label>
                 </p>
             </div>
             <?php

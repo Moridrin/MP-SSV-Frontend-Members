@@ -166,7 +166,7 @@ class FrontendMembersFieldInputDate extends FrontendMembersFieldInput
         if (current_theme_supports('materialize')) {
             ?>
             <div class="input-field col s12">
-                <label><?= $this->title ?><?= $this->required == "yes" ? '*' : "" ?></label><br/>
+                <label><?= $this->title ?><?= $this->required == "yes" ? '*' : '' ?></label><br/>
                 <input <?= $type ?> <?= $id ?> <?= $name ?> <?= $value ?> <?= $placeholder ?> <?= $display ?> <?= $required ?> <?= $class ?> <?= $style ?> title="<?= $this->title ?>"/>
             </div>
             <?php

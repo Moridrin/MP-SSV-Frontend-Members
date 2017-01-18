@@ -132,7 +132,7 @@ class FrontendMembersField
         }
         foreach ($fieldFilters as $filter => $value) {
             if (substr($value, 0, 1) == "!") {
-                $sql .= " AND " . $filter . " != '" . str_replace("!", "", $value) . "'";
+                $sql .= " AND " . $filter . " != '" . str_replace("!", '', $value) . "'";
             } else {
                 $sql .= " AND " . $filter . " = '" . $value . "'";
             }

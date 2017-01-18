@@ -132,7 +132,7 @@ class FrontendMembersFieldInputText extends FrontendMembersFieldInput
             ?>
             <div class="input-field col s12">
                 <input type="text" <?= $id ?> <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $display ?> <?= $placeholder ?> <?= $required ?> title="<?= $this->title ?>"/>
-                <label><?php echo $this->title; ?><?= $this->required == "yes" ? '*' : "" ?></label>
+                <label><?php echo $this->title; ?><?= $this->required == "yes" ? '*' : '' ?></label>
             </div>
             <?php
         }

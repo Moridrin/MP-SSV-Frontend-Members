@@ -34,7 +34,7 @@ class FrontendMembersFieldInputSelectRole extends FrontendMembersFieldInputSelec
         $index   = 0;
         foreach ($variables as $name => $value) {
             if (strpos($name, "_option") !== false) {
-                $id        = str_replace("option", "", str_replace("_", "", $name));
+                $id        = str_replace("option", '', str_replace("_", '', $name));
                 $options[] = new FrontendMembersFieldInputSelectRoleOption($id, $index, $this->id, $value);
                 $index++;
             }

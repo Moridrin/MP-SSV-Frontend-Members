@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer('ssv_save_fronte
             <td>
                 <?php $roles = get_editable_roles(); ?>
                 <?php $selected = get_option('ssv_frontend_members_registration_types', array()); ?>
-                <input type="hidden" name="ssv_frontend_members_registration_types" value="">
+                <input type="hidden" name="ssv_frontend_members_registration_types" value=''>
                 <select name="ssv_frontend_members_registration_types[]" size=<?= count($roles) ?> multiple>
                     <?php foreach ($roles as $ID => $role): ?>
                         <option value="<?= $ID ?>" <?= in_array($ID, $selected) ? 'selected' : '' ?>><?= $role['name'] ?></option>

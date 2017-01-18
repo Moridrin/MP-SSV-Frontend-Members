@@ -16,7 +16,7 @@ class FrontendMembersFieldInputSelectOption
     public $parent_id;
     public $value;
 
-    protected function __construct($id, $index, $parent_id, $value = "")
+    protected function __construct($id, $index, $parent_id, $value = '')
     {
         $this->id        = $id;
         $this->index     = $index;
