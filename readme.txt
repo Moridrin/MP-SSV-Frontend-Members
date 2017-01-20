@@ -1,17 +1,17 @@
-=== SSV Frontend Members ===
+=== SSV Users ===
 Contributors: moridrin
-Tags: ssv, ssv, members, user management, moridrin, frontend members, sportvereniging, sports club,
+Tags: ssv, ssv, members, user management, moridrin, Users, sportvereniging, sports club,
 Requires at least: 3.0.1
 Tested up to: 4.6
 Stable tag: 4.6
 License: WTFPL
 License URI: http://www.wtfpl.net/txt/copying/
 
-SSV Frontend Members is a plugin that allows you to manage members of a Students Sports Club the way you want to.
+SSV Users is a plugin that allows you to manage members of a Students Sports Club the way you want to.
 
 == Description ==
 
-SSV Frontend Members is a plugin that allows you to manage members of a Students Sports Club the way you want to. With this plugin you can:
+SSV Users is a plugin that allows you to manage members of a Students Sports Club the way you want to. With this plugin you can:
  - Have a frontend registration and login page
  - Customize member data fields,
  - Easy manage, view and edit member profiles.
@@ -22,7 +22,7 @@ This plugin is fully compatible with the SSV library which can add functionality
 
 1. Upload the plugin files to the `/wp-content/plugins/ssv-frontend-members` directory, or install the plugin through the WordPress plugins screen directly.
 1. Activate the plugin through the 'Plugins' screen in WordPress
-1. Use the SSV Options->Frontend Members screen to configure the plugin
+1. Use the SSV Options->Users screen to configure the plugin
 1. (Make your instructions match the desired user flow for activating and installing your plugin. Include any steps that might be needed for explanatory purposes)
 
 == Frequently Asked Questions ==
