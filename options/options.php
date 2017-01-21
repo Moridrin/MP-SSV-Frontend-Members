@@ -6,18 +6,6 @@ function ssv_users_add_sub_menu()
 
 function ssv_users_options_page_content()
 {
-    if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_OPTIONS)) {
-        if (isset($_POST['reset'])) {
-            SSV_Users::CLEAN_INSTALL();
-//            SSV_Users::resetOptions();
-        } else {
-            update_option(SSV_Events::OPTION_DEFAULT_REGISTRATION_STATUS, $_POST['default_registration_status']);
-            update_option(SSV_Events::OPTION_REGISTRATION_MESSAGE, $_POST['registration_message']);
-            update_option(SSV_Events::OPTION_CANCELLATION_MESSAGE, $_POST['cancellation_message']);
-            update_option(SSV_Events::OPTION_EMAIL_AUTHOR, filter_var($_POST['email_on_registration'], FILTER_VALIDATE_BOOLEAN));
-            update_option(SSV_Events::OPTION_EMAIL_ON_REGISTRATION_STATUS_CHANGED, filter_var($_POST['email_on_registration_status_changed'], FILTER_VALIDATE_BOOLEAN));
-        }
-    }
     $active_tab = "general";
     if (isset($_GET['tab'])) {
         $active_tab = $_GET['tab'];
@@ -27,10 +15,6 @@ function ssv_users_options_page_content()
         <h1>Users Options</h1>
         <h2 class="nav-tab-wrapper">
             <a href="?page=<?= $_GET['page'] ?>&tab=general" class="nav-tab <?= $active_tab == 'general' ? 'nav-tab-active' : '' ?>">General</a>
-            <a href="?page=<?= $_GET['page'] ?>&tab=profile_page" class="nav-tab <?= $active_tab == 'profile_page' ? 'nav-tab-active' : '' ?>">Profile Page</a>
-            <?php if (get_option(SSV_Users::OPTION_CUSTOM_REGISTER_PAGE, false)): ?>
-                <a href="?page=<?= $_GET['page'] ?>&tab=register_page" class="nav-tab <?= $active_tab == 'register_page' ? 'nav-tab-active' : '' ?>">Register Page</a>
-            <?php endif; ?>
             <a href="?page=<?= $_GET['page'] ?>&tab=users_page_columns" class="nav-tab <?= $active_tab == 'users_page_columns' ? 'nav-tab-active' : '' ?>">Users Page Columns</a>
             <a href="?page=<?= $_GET['page'] ?>&tab=email" class="nav-tab <?= $active_tab == 'email' ? 'nav-tab-active' : '' ?>">Email</a>
             <a href="http://2016.bosso.nl/ssv-users/" target="_blank" class="nav-tab">
@@ -40,6 +24,7 @@ function ssv_users_options_page_content()
         <?php
         switch ($active_tab) {
             case "general":
+                require_once "general.php";
                 break;
             case "profile_page":
             case "register_page":
