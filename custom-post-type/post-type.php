@@ -23,7 +23,15 @@ function ssv_users_page_fields()
 {
     global $post;
     $fieldIDs = get_post_meta($post->ID, 'user_page_field_ids', true);
-    $id       = is_array($fieldIDs) && count($fieldIDs) > 0 ? max($fieldIDs) + 1 : 0;
+    $fields = array();
+    if (is_array($fieldIDs)) {
+        foreach ($fieldIDs as $id) {
+            $fields[] = Field::fromJSON(get_post_meta($post->ID, 'user_page_fields_' . $id, true));
+        }
+        $id = Field::getMaxID($fields) + 1;
+    } else {
+        $id = 0;
+    }
     SSV_General::getCustomFieldsContainer('user_page_fields', $id, true);
     if (is_array($fieldIDs)) {
         ?>
@@ -77,15 +85,14 @@ function mp_ssv_user_pages_set_content($content)
 {
     global $post;
     $fieldIDs = get_post_meta($post->ID, 'user_page_field_ids', true);
+    $fields   = array();
+    foreach ($fieldIDs as $id) {
+        $field    = get_post_meta($post->ID, 'user_page_fields_' . $id, true);
+        $fields[] = Field::fromJSON($field);
+    }
     ?>
     <form action="<?= get_permalink() ?>" method="POST">
-        <?php
-        foreach ($fieldIDs as $id) {
-            $field = get_post_meta($post->ID, 'user_page_fields_' . $id, true);
-            $field = Field::fromJSON($field);
-            echo $field->getHTML();
-        }
-        ?>
+        <?= Field::getFormFields($fields); ?>
         <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary">Save</button
         <?php SSV_General::formSecurityFields(SSV_Events::ADMIN_REFERER_REGISTRATION, false, false); ?>
     </form>

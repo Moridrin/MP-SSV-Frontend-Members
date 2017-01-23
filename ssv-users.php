@@ -112,7 +112,7 @@ function mp_ssv_users_register_plugin()
 {
     /* Pages */
     $register_post = array(
-        'post_content' => '[ssv-frontend-members-register]',
+        'post_content' => '[ssv-users-custom-fields]',
         'post_name'    => 'register',
         'post_title'   => 'Register',
         'post_status'  => 'publish',
@@ -120,7 +120,7 @@ function mp_ssv_users_register_plugin()
     );
     wp_insert_post($register_post);
     $login_post    = array(
-        'post_content' => '[ssv-frontend-members-login]',
+        'post_content' => '[ssv-users-custom-fields]',
         'post_name'    => 'login',
         'post_title'   => 'Login',
         'post_status'  => 'publish',
@@ -129,7 +129,7 @@ function mp_ssv_users_register_plugin()
     $login_post_id = wp_insert_post($login_post);
     update_option(SSV_Users::OPTION_LOGIN_POST_ID, $login_post_id);
     $profile_post = array(
-        'post_content' => '[ssv-frontend-members-profile]',
+        'post_content' => '[ssv-users-custom-fields]',
         'post_name'    => 'profile',
         'post_title'   => 'My Profile',
         'post_status'  => 'publish',
@@ -137,7 +137,7 @@ function mp_ssv_users_register_plugin()
     );
     wp_insert_post($profile_post);
     $change_password_post    = array(
-        'post_content' => '[ssv-frontend-members-change-password]',
+        'post_content' => '[ssv-users-custom-fields]',
         'post_name'    => 'change-password',
         'post_title'   => 'Change Password',
         'post_status'  => 'publish',
