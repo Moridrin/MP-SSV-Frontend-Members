@@ -12,9 +12,12 @@ if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_OPTIONS)) {
     } else {
         update_option(SSV_Users::OPTION_DEFAULT_MEMBER_ROLE, SSV_General::sanitize($_POST['default_member_role']));
         update_option(SSV_Users::OPTION_BOARD_ROLE, SSV_General::sanitize($_POST['board_role']));
-        update_option(SSV_Users::OPTION_CUSTOM_USERS_FILTER, SSV_General::sanitize($_POST['custom_users_filters']));
-//        update_option(SSV_Users::OPTION_MAIN_COLUMN, $_POST['default_registration_status']);
-//        update_option(SSV_Users::OPTION_USER_COLUMNS, $_POST['default_registration_status']);
+        //Users Page Columns
+        update_option(SSV_Users::OPTION_CUSTOM_USER_FILTER_LOCATION, SSV_General::sanitize($_POST['custom_users_filters']));
+        update_option(SSV_Users::OPTION_USERS_PAGE_MAIN_COLUMN, SSV_General::sanitize($_POST['users_page_main_column']));
+        update_option(SSV_Users::OPTION_USER_COLUMNS, json_encode(isset($_POST['user_columns']) ? $_POST['user_columns'] : ''));
+        update_option(SSV_Users::OPTION_CUSTOM_USER_FILTERS, json_encode(isset($_POST['custom_user_filters']) ? $_POST['custom_user_filters'] : ''));
+        //Email
 //        update_option(SSV_Users::OPTION_MEMBER_ADMIN, $_POST['default_registration_status']);
 //        update_option(SSV_Users::OPTION_NEW_MEMBER_REGISTRATION_EMAIL, $_POST['default_registration_status']);
 //        update_option(SSV_Users::OPTION_MEMBER_ROLE_CHANGED_EMAIL, $_POST['default_registration_status']);
@@ -43,9 +46,9 @@ if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_OPTIONS)) {
             <th scope="row">Custom Users Filters</th>
             <td>
                 <select name="custom_users_filters" title="Board Role">
-                    <option value="hide" <?= get_option(SSV_Users::OPTION_CUSTOM_USERS_FILTER, 'under') == 'hide' ? 'selected' : '' ?>>Hide</option>
-                    <option value="replace" <?= get_option(SSV_Users::OPTION_CUSTOM_USERS_FILTER, 'under') == 'replace' ? 'selected' : '' ?>>Replace User Role Links</option>
-                    <option value="under" <?= get_option(SSV_Users::OPTION_CUSTOM_USERS_FILTER, 'under') == 'under' ? 'selected' : '' ?>>Under User Role Links</option>
+                    <option value="hide" <?= get_option(SSV_Users::OPTION_CUSTOM_USER_FILTER_LOCATION, 'under') == 'hide' ? 'selected' : '' ?>>Hide</option>
+                    <option value="replace" <?= get_option(SSV_Users::OPTION_CUSTOM_USER_FILTER_LOCATION, 'under') == 'replace' ? 'selected' : '' ?>>Replace User Role Links</option>
+                    <option value="under" <?= get_option(SSV_Users::OPTION_CUSTOM_USER_FILTER_LOCATION, 'under') == 'under' ? 'selected' : '' ?>>Under User Role Links</option>
                 </select>
             </td>
         </tr>
@@ -62,31 +65,17 @@ if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_OPTIONS)) {
             <th scope="row">Columns to Display</th>
             <td>
                 <?php
-                $selected   = json_decode(get_option('ssv_frontend_members_user_columns'));
+                $selected   = json_decode(get_option(SSV_Users::OPTION_USER_COLUMNS));
                 $selected   = $selected ?: array();
-                $fieldNames = SSV_Users::getAllFieldNames();
+                $fieldNames = SSV_Users::getInputFieldNames();
                 ?>
-                <select size="<?= count($fieldNames) + 3 ?>" name="ssv_frontend_members_user_columns[]" multiple title="Columns to Display">
-                    <?php
-                    foreach ($fieldNames as $fieldName) {
-                        echo '<option value="' . $fieldName . '" ';
-                        if (in_array($fieldName, $selected)) {
-                            echo 'selected';
-                        }
-                        echo '>' . $fieldName . '</option>';
-                    }
-                    echo '<option value="blank" disabled>--- WP Defaults ---</option>';
-                    echo '<option value="wp_Role" ';
-                    if (in_array('wp_Role', $selected)) {
-                        echo 'selected';
-                    }
-                    echo '>Role</option>';
-                    echo '<option value="wp_Posts" ';
-                    if (in_array('wp_Posts', $selected)) {
-                        echo 'selected';
-                    }
-                    echo '>Posts</option>';
-                    ?>
+                <select size="<?= count($fieldNames) + 3 ?>" name="user_columns[]" multiple title="Columns to Display">
+                    <?php foreach ($fieldNames as $fieldName): ?>
+                        <option value="<?= $fieldName ?>" <?= in_array($fieldName, $selected) ? 'selected' : '' ?>><?= $fieldName ?></option>
+                    <?php endforeach; ?>
+                    <option value="blank" disabled>--- WP Defaults ---</option>
+                    <option value="wp_Role" <?= in_array('wp_Role', $selected) ? 'selected' : '' ?>>Role</option>
+                    <option value="wp_Posts" <?= in_array('wp_Posts', $selected) ? 'selected' : '' ?>>Posts</option>
                 </select>
             </td>
         </tr>
@@ -94,20 +83,14 @@ if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_OPTIONS)) {
             <th scope="row">Filters</th>
             <td>
                 <?php
-                $selected   = json_decode(get_option('ssv_frontend_members_user_filters'));
+                $selected   = json_decode(get_option(SSV_Users::OPTION_CUSTOM_USER_FILTERS));
                 $selected   = $selected ?: array();
-                $fieldNames = FrontendMembersField::getAllFieldNames();
+                $fieldNames = SSV_Users::getInputFieldNames();
                 ?>
-                <select size="<?= count($fieldNames) ?>" name="ssv_frontend_members_user_filters[]" multiple title="Filters">
-                    <?php
-                    foreach ($fieldNames as $fieldName) {
-                        echo '<option value="' . $fieldName . '" ';
-                        if (in_array($fieldName, $selected)) {
-                            echo 'selected';
-                        }
-                        echo '>' . $fieldName . '</option>';
-                    }
-                    ?>
+                <select size="<?= count($fieldNames) ?>" name="custom_user_filters[]" multiple title="Filters">
+                    <?php foreach ($fieldNames as $fieldName): ?>
+                        <option value="<?= $fieldName ?>" <?= in_array($fieldName, $selected) ? 'selected' : '' ?>><?= $fieldName ?></option>
+                    <?php endforeach; ?>
                 </select>
             </td>
         </tr>

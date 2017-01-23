@@ -22,6 +22,8 @@ if (!defined('ABSPATH')) {
 require_once 'general/general.php';
 
 require_once 'options/options.php';
+
+require_once 'custom-post-type/post-type.php';
 #endregion
 
 #region SSV_Users class
@@ -36,13 +38,14 @@ class SSV_Users
 
     const HOOK_NEW_MEMBER = 'ssv_users__hook_new_registration';
 
-    const OPTION_REGISTER_POST_ID = 'ssv_users__register_post_id';
+    const CUSTOM_FIELDS_TAG = '[ssv-users-custom-fields]';
+
     const OPTION_LOGIN_POST_ID = 'ssv_users__login_post_id';
-    const OPTION_PROFILE_POST_ID = 'ssv_users__profile_post_id';
     const OPTION_CHANGE_PASSWORD_POST_ID = 'ssv_users__change_password_post_id';
     const OPTION_DEFAULT_MEMBER_ROLE = 'ssv_users__default_member_role';
     const OPTION_BOARD_ROLE = 'ssv_users__board_role';
-    const OPTION_CUSTOM_USERS_FILTER = 'ssv_users__custom_users_filters';
+    const OPTION_CUSTOM_USER_FILTER_LOCATION = 'ssv_users__custom_user_filter_location';
+    const OPTION_CUSTOM_USER_FILTERS = 'ssv_users__custom_users_filters';
     const OPTION_USERS_PAGE_MAIN_COLUMN = 'ssv_users__main_column';
     const OPTION_USER_COLUMNS = 'ssv_users__user_columns';
     const OPTION_MEMBER_ADMIN = 'ssv_users__member_admin';
@@ -61,7 +64,7 @@ class SSV_Users
     {
         update_option(self::OPTION_DEFAULT_MEMBER_ROLE, 'subscriber');
         update_option(self::OPTION_BOARD_ROLE, 'administrator');
-        update_option(self::OPTION_CUSTOM_USERS_FILTER, 'under');
+        update_option(self::OPTION_CUSTOM_USER_FILTERS, 'under');
         update_option(self::OPTION_USERS_PAGE_MAIN_COLUMN, 'plugin_default');
         update_option(self::OPTION_USER_COLUMNS, json_encode(array('wp_Role', 'wp_Posts')));
         update_option(self::OPTION_MEMBER_ADMIN, get_option('admin_email'));
@@ -80,8 +83,25 @@ class SSV_Users
     /**
      * @return string[]
      */
-    public static function getAllFieldNames()
+    public static function getInputFieldNames()
     {
+        global $wpdb;
+        $customFieldsTag = self::CUSTOM_FIELDS_TAG;
+        $results         = $wpdb->get_results("SELECT * FROM wp_posts WHERE post_content LIKE '%$customFieldsTag%'");
+        $fieldNames      = array();
+        foreach ($results as $key => $row) {
+            $fieldIDs = get_post_meta($row->ID, 'user_page_field_ids', true);
+            $fieldIDs = is_array($fieldIDs) ? $fieldIDs : array();
+            foreach ($fieldIDs as $id) {
+                $field = get_post_meta($row->ID, 'user_page_fields_' . $id, true);
+                $field = Field::fromJSON($field);
+                if ($field instanceof InputField) {
+                    /** @var InputField $field */
+                    $fieldNames[$field->name] = $field->name;
+                }
+            }
+        }
+        return $fieldNames;
     }
 }
 
@@ -91,15 +111,14 @@ class SSV_Users
 function mp_ssv_users_register_plugin()
 {
     /* Pages */
-    $register_post    = array(
+    $register_post = array(
         'post_content' => '[ssv-frontend-members-register]',
         'post_name'    => 'register',
         'post_title'   => 'Register',
         'post_status'  => 'publish',
         'post_type'    => 'page',
     );
-    $register_post_id = wp_insert_post($register_post);
-    update_option(SSV_Users::OPTION_REGISTER_POST_ID, $register_post_id);
+    wp_insert_post($register_post);
     $login_post    = array(
         'post_content' => '[ssv-frontend-members-login]',
         'post_name'    => 'login',
@@ -109,15 +128,14 @@ function mp_ssv_users_register_plugin()
     );
     $login_post_id = wp_insert_post($login_post);
     update_option(SSV_Users::OPTION_LOGIN_POST_ID, $login_post_id);
-    $profile_post    = array(
+    $profile_post = array(
         'post_content' => '[ssv-frontend-members-profile]',
         'post_name'    => 'profile',
         'post_title'   => 'My Profile',
         'post_status'  => 'publish',
         'post_type'    => 'page',
     );
-    $profile_post_id = wp_insert_post($profile_post);
-    update_option(SSV_Users::OPTION_PROFILE_POST_ID, $profile_post_id);
+    wp_insert_post($profile_post);
     $change_password_post    = array(
         'post_content' => '[ssv-frontend-members-change-password]',
         'post_name'    => 'change-password',
@@ -137,9 +155,13 @@ register_activation_hook(__FILE__, 'mp_ssv_users_register_plugin');
 #region Unregister
 function mp_ssv_users_unregister()
 {
-    wp_delete_post(get_option(SSV_Users::OPTION_REGISTER_POST_ID), true);
+    global $wpdb;
+    $customFieldsTag = SSV_Users::CUSTOM_FIELDS_TAG;
+    $results         = $wpdb->get_results("SELECT * FROM wp_posts WHERE post_content LIKE '%$customFieldsTag%'");
+    foreach ($results as $key => $row) {
+        wp_delete_post($row->ID);
+    }
     wp_delete_post(get_option(SSV_Users::OPTION_LOGIN_POST_ID), true);
-    wp_delete_post(get_option(SSV_Users::OPTION_PROFILE_POST_ID), true);
     wp_delete_post(get_option(SSV_Users::OPTION_CHANGE_PASSWORD_POST_ID), true);
 }
 
