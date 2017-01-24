@@ -90,11 +90,12 @@ function mp_ssv_user_pages_set_content($content)
         $field    = get_post_meta($post->ID, 'user_page_fields_' . $id, true);
         $fields[] = Field::fromJSON($field);
     }
+    ob_start();
     ?>
     <form action="<?= get_permalink() ?>" method="POST">
         <?= Field::getFormFields($fields); ?>
         <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary">Save</button
-        <?php SSV_General::formSecurityFields(SSV_Events::ADMIN_REFERER_REGISTRATION, false, false); ?>
+        <?php SSV_General::formSecurityFields(SSV_Users::ADMIN_REFERER_REGISTRATION, false, false); ?>
     </form>
     <?php
     return str_replace(SSV_Users::CUSTOM_FIELDS_TAG, ob_get_clean(), $content);

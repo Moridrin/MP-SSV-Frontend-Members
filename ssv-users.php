@@ -17,7 +17,6 @@
 if (!defined('ABSPATH')) {
     exit;
 }
-
 #region Require Once
 require_once 'general/general.php';
 
