@@ -21,7 +21,7 @@ add_action('add_meta_boxes', 'mp_ssv_users_meta_boxes');
 
 function ssv_users_page_fields()
 {
-    SSV_General::getCustomFieldsContainer(true);
+    echo SSV_General::getCustomFieldsEditor(true);
 }
 
 #endregion
@@ -64,40 +64,17 @@ add_action('save_post', 'mp_ssv_user_pages_save_meta');
 #region Set Content
 function mp_ssv_user_pages_set_content($content)
 {
-    if (isset($_GET['member'])) {
-        $user = User::getByID($_GET['member']);
-    } else {
-        $user = User::getCurrent();
+    if (strpos($content, SSV_Users::PROFILE_FIELDS_TAG) !== false) {
+        require_once 'profile-fields.php';
+        $fields = Field::fromMeta();
+        $fields = $fields ?: array();
+        mp_ssv_user_save_profile_fields($fields, $_POST);
+        $content = mp_ssv_user_get_profile_fields($content, $fields);
+    } elseif (strpos($content, SSV_Users::REGISTER_FIELDS_TAG) !== false) {
+        require_once 'registration-fields.php';
+        $content = mp_ssv_user_get_registration_fields($content);
     }
-    $fields = Field::getFromMeta();
-    foreach ($fields as $field) {
-        if ($field instanceof TabField) {
-            foreach ($field->fields as $childField) {
-                if ($childField instanceof InputField) {
-                    $childField->value = $user->getMeta($childField->name);
-                }
-            }
-        } elseif ($field instanceof InputField) {
-            $field->value = $user->getMeta($field->name);
-        }
-    }
-    ob_start();
-    ?>
-    <form action="<?= get_permalink() ?>" method="POST">
-        <?= Field::getFormFromFields($fields); ?>
-        <!--        <div class="input-field">-->
-        <!--            <input type="password" id="password" name="password" class="validate invalid" required="">-->
-        <!--            <label for="password" class="">Password*</label>-->
-        <!--        </div>-->
-        <!--        <div class="input-field">-->
-        <!--            <input type="password" id="confirm_password" name="confirm_password" class="validate" required="">-->
-        <!--            <label for="confirm_password">Confirm Password*</label>-->
-        <!--        </div>-->
-        <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary">Save</button
-        <?php SSV_General::formSecurityFields(SSV_Users::ADMIN_REFERER_PROFILE, false, false); ?>
-    </form>
-    <?php
-    return str_replace(SSV_Users::PROFILE_FIELDS_TAG, ob_get_clean(), $content);
+    return $content;
 }
 
 add_filter('the_content', 'mp_ssv_user_pages_set_content');

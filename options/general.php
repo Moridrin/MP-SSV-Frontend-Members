@@ -95,5 +95,5 @@ if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_OPTIONS)) {
             </td>
         </tr>
     </table>
-    <?php SSV_General::formSecurityFields(SSV_Users::ADMIN_REFERER_OPTIONS); ?>
+    <?php SSV_General::getFormSecurityFields(SSV_Users::ADMIN_REFERER_OPTIONS); ?>
 </form>
