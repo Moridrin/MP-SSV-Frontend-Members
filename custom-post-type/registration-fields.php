@@ -7,23 +7,55 @@
  */
 
 /**
- * @param $content
- *
- * @return string
+ * @param $fields
  */
-function mp_ssv_user_get_registration_fields($content)
+function mp_ssv_user_save_registration_fields($fields, $values)
+{
+    if (empty($values)) {
+        return;
+    }
+
+    if (isset($_GET['member'])) {
+        $user = User::getByID($_GET['member']);
+    } else {
+        $user = User::getCurrent();
+    }
+
+    $tabID = -1;
+    if (isset($values['tab'])) {
+        $tabID = $values['tab'];
+    }
+
+    foreach ($fields as $field) {
+        if ($field instanceof TabField && $tabID == $field->id) {
+            foreach ($field->fields as $childField) {
+                if ($childField instanceof InputField && $user != null && isset($values[$childField->name])) {
+                    $user->updateMeta($childField->name, $values[$childField->name]);
+                }
+            }
+        } elseif ($field instanceof InputField && $user != null && isset($values[$field->name])) {
+            $user->updateMeta($field->name, $values[$field->name]);
+        }
+    }
+}
+
+/**
+ * @param $content
+ * @param $fields
+ *
+*@return string
+ */
+function mp_ssv_user_get_registration_fields($content, $fields)
 {
     if (isset($_GET['member'])) {
         $user = User::getByID($_GET['member']);
     } else {
         $user = User::getCurrent();
     }
-    $fields = Field::fromMeta();
-    $fields = $fields ?: array();
     foreach ($fields as $field) {
         if ($field instanceof TabField) {
             foreach ($field->fields as $childField) {
-                if ($childField instanceof InputField) {
+                if ($childField instanceof InputField && $user != null) {
                     $childField->value = $user->getMeta($childField->name);
                 }
             }
@@ -31,19 +63,6 @@ function mp_ssv_user_get_registration_fields($content)
             $field->value = $user->getMeta($field->name);
         }
     }
-    ob_start();
-    ?>
-    <form action="<?= get_permalink() ?>" method="POST">
-        <?= Field::getFormFromFields($fields); ?>
-        <div class="input-field">
-            <input type="password" id="password" name="password" class="validate invalid" required="">
-            <label for="password" class="">Password*</label>
-        </div>
-        <div class="input-field">
-            <input type="password" id="confirm_password" name="confirm_password" class="validate" required="">
-            <label for="confirm_password">Confirm Password*</label>
-        </div>
-        <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary">Save</button
-    <?php
-    return str_replace(SSV_Users::REGISTER_FIELDS_TAG, ob_get_clean(), $content);
+    $html = SSV_General::getCustomFieldsHTML($fields, SSV_Users::ADMIN_REFERER_REGISTRATION);
+    return str_replace(SSV_Users::REGISTER_FIELDS_TAG, $html, $content);
 }
