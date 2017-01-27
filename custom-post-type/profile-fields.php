@@ -59,7 +59,6 @@ function mp_ssv_user_save_fields($fields, $values)
     }
     if (empty($messages) || $user->isBoard()) {
         $user->update($inputFields);
-        SSV_General::var_export($inputFields, 1);
         $messages[] = new Message('Profile Updated.', Message::NOTIFICATION_MESSAGE);
     }
     return $messages;

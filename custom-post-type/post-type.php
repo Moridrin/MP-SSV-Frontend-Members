@@ -23,7 +23,9 @@ add_action('add_meta_boxes', 'mp_ssv_users_meta_boxes');
 
 function ssv_users_page_fields()
 {
-    echo SSV_General::getCustomFieldsEditor(true);
+    global $post;
+    $allowTabs = strpos($post->post_content, SSV_Users::PROFILE_FIELDS_TAG) !== false;
+    echo SSV_General::getCustomFieldsEditor($allowTabs);
 }
 
 #endregion
@@ -72,6 +74,7 @@ function mp_ssv_user_pages_set_content($content)
         require_once 'profile-fields.php';
     } elseif (strpos($content, SSV_Users::REGISTER_FIELDS_TAG) !== false) {
         require_once 'registration-fields.php';
+        $fields = array_merge(User::getDefaultFields(), $fields);
     } else {
         return $content;
     }
