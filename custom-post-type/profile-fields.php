@@ -14,6 +14,9 @@
  */
 function mp_ssv_user_save_fields($fields, $values)
 {
+    if (!SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_PROFILE)) {
+        return array();
+    }
     if (empty($values) || !is_user_logged_in()) {
         return array(new Message('No values to save', Message::NOTIFICATION_MESSAGE));
     }
@@ -56,6 +59,7 @@ function mp_ssv_user_save_fields($fields, $values)
     }
     if (empty($messages) || $user->isBoard()) {
         $user->update($inputFields);
+        SSV_General::var_export($inputFields, 1);
         $messages[] = new Message('Profile Updated.', Message::NOTIFICATION_MESSAGE);
     }
     return $messages;
@@ -71,18 +75,16 @@ function mp_ssv_user_get_fields($content, $fields)
 {
     if (isset($_GET['member'])) {
         $user = User::getByID($_GET['member']);
-    } else {
-        $user = User::getCurrent();
-    }
-    foreach ($fields as $field) {
-        if ($field instanceof TabField) {
-            foreach ($field->fields as $childField) {
-                if ($childField instanceof InputField && $user != null) {
-                    $childField->value = $user->getMeta($childField->name);
+        foreach ($fields as $field) {
+            if ($field instanceof TabField) {
+                foreach ($field->fields as $childField) {
+                    if ($childField instanceof InputField && $user != null) {
+                        $childField->value = $user->getMeta($childField->name);
+                    }
                 }
+            } elseif ($field instanceof InputField && $user != null) {
+                $field->value = $user->getMeta($field->name);
             }
-        } elseif ($field instanceof InputField && $user != null) {
-            $field->value = $user->getMeta($field->name);
         }
     }
     $html = SSV_General::getCustomFieldsHTML($fields, SSV_Users::ADMIN_REFERER_PROFILE);

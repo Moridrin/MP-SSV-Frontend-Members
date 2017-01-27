@@ -12,7 +12,9 @@
 function mp_ssv_users_meta_boxes()
 {
     global $post;
-    if (strpos($post->post_content, SSV_Users::PROFILE_FIELDS_TAG) !== false) {
+    $containsProfileTag      = strpos($post->post_content, SSV_Users::PROFILE_FIELDS_TAG) !== false;
+    $containsRegistrationTag = strpos($post->post_content, SSV_Users::REGISTER_FIELDS_TAG) !== false;
+    if ($containsProfileTag || $containsRegistrationTag) {
         add_meta_box('ssv_users_page_fields', 'Fields', 'ssv_users_page_fields', 'page', 'advanced', 'default');
     }
 }
@@ -73,8 +75,8 @@ function mp_ssv_user_pages_set_content($content)
     } else {
         return $content;
     }
-    $messages     = mp_ssv_user_save_fields($fields, $_POST);
     $messagesHTML = '';
+    $messages = mp_ssv_user_save_fields($fields, $_POST);
     foreach ($messages as $message) {
         $messagesHTML .= $message->getHTML();
     }
