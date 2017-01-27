@@ -12,7 +12,7 @@
  *
  * @return Message[]
  */
-function mp_ssv_user_save_profile_fields($fields, $values)
+function mp_ssv_user_save_fields($fields, $values)
 {
     if (empty($values) || !is_user_logged_in()) {
         return array(new Message('No values to save', Message::NOTIFICATION_MESSAGE));
@@ -34,34 +34,31 @@ function mp_ssv_user_save_profile_fields($fields, $values)
     }
 
     $inputFields = array();
-    $errors      = array();
+    $messages = array();
     foreach ($fields as $field) {
         if ($field instanceof TabField && $tabID == $field->id) {
             foreach ($field->fields as $childField) {
                 if ($childField instanceof InputField) {
                     $childField->setValue($values);
-                    if ($childField->isValid()) {
-                        $inputFields[] = $childField;
-                    } else {
-                        $errors[] = $childField->isValid();
+                    $inputFields[] = $childField;
+                    if ($childField->isValid() !== true) {
+                        $messages = array_merge($messages, $childField->isValid());
                     }
                 }
             }
         } elseif ($field instanceof InputField) {
             $field->setValue($values);
-            if ($field->isValid()) {
-                $inputFields[] = $field;
-            } else {
-                $errors[] = $field->isValid();
+            $inputFields[] = $field;
+            if ($field->isValid() !== true) {
+                $messages = array_merge($messages, $field->isValid());
             }
         }
     }
-    if (!empty($errors)) {
-        return $errors;
-    } else {
+    if (empty($messages) || $user->isBoard()) {
         $user->update($inputFields);
-        return array(new Message('Profile Updated.', Message::NOTIFICATION_MESSAGE));
+        $messages[] = new Message('Profile Updated.', Message::NOTIFICATION_MESSAGE);
     }
+    return $messages;
 }
 
 /**
@@ -70,7 +67,7 @@ function mp_ssv_user_save_profile_fields($fields, $values)
  *
  * @return string
  */
-function mp_ssv_user_get_profile_fields($content, $fields)
+function mp_ssv_user_get_fields($content, $fields)
 {
     if (isset($_GET['member'])) {
         $user = User::getByID($_GET['member']);

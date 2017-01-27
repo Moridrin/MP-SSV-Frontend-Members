@@ -64,16 +64,21 @@ add_action('save_post', 'mp_ssv_user_pages_save_meta');
 #region Set Content
 function mp_ssv_user_pages_set_content($content)
 {
+    $fields = Field::fromMeta();
+    $fields = $fields ?: array();
     if (strpos($content, SSV_Users::PROFILE_FIELDS_TAG) !== false) {
         require_once 'profile-fields.php';
-        $fields = Field::fromMeta();
-        $fields = $fields ?: array();
-        mp_ssv_user_save_profile_fields($fields, $_POST);
-        $content = mp_ssv_user_get_profile_fields($content, $fields);
     } elseif (strpos($content, SSV_Users::REGISTER_FIELDS_TAG) !== false) {
         require_once 'registration-fields.php';
-        $content = mp_ssv_user_get_registration_fields($content);
+    } else {
+        return $content;
     }
+    $messages     = mp_ssv_user_save_fields($fields, $_POST);
+    $messagesHTML = '';
+    foreach ($messages as $message) {
+        $messagesHTML .= $message->getHTML();
+    }
+    $content = $messagesHTML . mp_ssv_user_get_fields($content, $fields);
     return $content;
 }
 
