@@ -72,19 +72,8 @@ function mp_ssv_user_save_fields($fields, $values)
  */
 function mp_ssv_user_get_fields($content, $fields)
 {
-    if (isset($_GET['member'])) {
-        $user = User::getByID($_GET['member']);
-        foreach ($fields as $field) {
-            if ($field instanceof TabField) {
-                foreach ($field->fields as $childField) {
-                    if ($childField instanceof InputField && $user != null) {
-                        $childField->value = $user->getMeta($childField->name);
-                    }
-                }
-            } elseif ($field instanceof InputField && $user != null) {
-                $field->value = $user->getMeta($field->name);
-            }
-        }
+    if (isset($_GET['member']) && (!is_user_logged_in() || !User::getCurrent()->isBoard())) {
+        return (new Message('You have no access to view this profile.', Message::ERROR_MESSAGE))->getHTML();
     }
     $html = SSV_General::getCustomFieldsHTML($fields, SSV_Users::ADMIN_REFERER_PROFILE);
     return str_replace(SSV_Users::PROFILE_FIELDS_TAG, $html, $content);

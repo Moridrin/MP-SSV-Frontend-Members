@@ -278,3 +278,23 @@ function ssv_users_authenticate($user, $login, $password)
 
 add_filter('authenticate', 'ssv_users_authenticate', 20, 3);
 #endregion
+
+#region Set Profile Page Title
+function mp_ssv_user_set_profile_page_title($title, $id)
+{
+    if (is_page_template('content-page.php')) {
+        die('henk');
+    }
+    if (is_admin() || !is_page('My Profile')) {
+    }
+    if ($title != 'Profile Page') {
+        return $title;
+    }
+    if (isset($_GET['member']) && is_user_logged_in() && User::getCurrent()->isBoard()) {
+        return User::getByID($_GET['member'])->display_name;
+    }
+    return $title;
+}
+
+add_filter('the_title', 'mp_ssv_user_set_profile_page_title', 20, 2);
+#endregion

@@ -68,17 +68,6 @@ function mp_ssv_user_save_fields($fields, $values)
  */
 function mp_ssv_user_get_fields($content, $fields)
 {
-    foreach ($fields as $field) {
-        if ($field instanceof TabField) {
-            foreach ($field->fields as $childField) {
-                if ($childField instanceof InputField) {
-                    $childField->value = '';
-                }
-            }
-        } elseif ($field instanceof InputField) {
-            $field->value = '';
-        }
-    }
     $html = SSV_General::getCustomFieldsHTML($fields, SSV_Users::ADMIN_REFERER_REGISTRATION, 'Register');
     return str_replace(SSV_Users::REGISTER_FIELDS_TAG, $html, $content);
 }
