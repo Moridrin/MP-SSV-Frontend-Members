@@ -29,17 +29,16 @@ function mp_ssv_user_save_fields($fields, $values)
     foreach ($fields as $field) {
         if ($field instanceof InputField) {
             $field->setValue($values);
-
-            if ($field->name == 'username') {
-                $username = $field->value;
-            } elseif ($field->name == 'password') {
-                $password = $field->value;
-            } elseif ($field->name == 'email') {
-                $email = $field->value;
-            }
-
             if ($field->isValid() === true) {
-                $inputFields[] = $field;
+                if ($field->name == 'username') {
+                    $username = $field->value;
+                } elseif ($field->name == 'password') {
+                    $password = $field->value;
+                } elseif ($field->name == 'email') {
+                    $email = $field->value;
+                } else {
+                    $inputFields[] = $field;
+                }
             } else {
                 $errors = array_merge($errors, $field->isValid());
             }
@@ -52,7 +51,10 @@ function mp_ssv_user_save_fields($fields, $values)
         }
         /** @var InputField $field */
         foreach ($inputFields as $field) {
-            $messages[] = $user->updateMeta($field->name, $field->value);
+            $response = $user->updateMeta($field->name, $field->value);
+            if ($response !== true) {
+                $messages[] = $response;
+            }
         }
         $messages[] = new Message('Registration Successful.', Message::NOTIFICATION_MESSAGE);
 //        SSV_General::redirect(get_permalink());

@@ -282,11 +282,6 @@ add_filter('authenticate', 'ssv_users_authenticate', 20, 3);
 #region Set Profile Page Title
 function mp_ssv_user_set_profile_page_title($title, $id)
 {
-    if (is_page_template('content-page.php')) {
-        die('henk');
-    }
-    if (is_admin() || !is_page('My Profile')) {
-    }
     if ($title != 'Profile Page') {
         return $title;
     }

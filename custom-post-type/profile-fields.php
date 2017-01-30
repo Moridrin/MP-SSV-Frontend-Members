@@ -65,16 +65,24 @@ function mp_ssv_user_save_fields($fields, $values)
 }
 
 /**
- * @param $content
- * @param $fields
+ * @param string $content
+ * @param Form   $form
  *
- * @return string
+ * @return string HTML
  */
-function mp_ssv_user_get_fields($content, $fields)
+function mp_ssv_user_get_fields($content, $form)
 {
-    if (isset($_GET['member']) && (!is_user_logged_in() || !User::getCurrent()->isBoard())) {
-        return (new Message('You have no access to view this profile.', Message::ERROR_MESSAGE))->getHTML();
+    $html = '';
+    if (isset($_GET['member'])) {
+        if (!is_user_logged_in()) {
+            return (new Message('You must sign in to view this profile.', Message::ERROR_MESSAGE))->getHTML();
+        } elseif (!User::getCurrent()->isBoard()) {
+            $html .= (new Message('You have no access to view this profile.', Message::ERROR_MESSAGE))->getHTML();
+            $user = User::getCurrent();
+        } else {
+            $user = User::getByID($_GET['member']);
+        }
     }
-    $html = SSV_General::getCustomFieldsHTML($fields, SSV_Users::ADMIN_REFERER_PROFILE);
+    $html = $form->getHTML(SSV_Users::ADMIN_REFERER_PROFILE);
     return str_replace(SSV_Users::PROFILE_FIELDS_TAG, $html, $content);
 }
