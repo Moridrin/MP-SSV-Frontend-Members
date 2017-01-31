@@ -9,7 +9,7 @@
 /**
  * @param Form $form
  *
-*@return Message[]
+ * @return Message[]
  */
 function mp_ssv_user_save_fields($form)
 {
@@ -20,14 +20,8 @@ function mp_ssv_user_save_fields($form)
         return array(new Message('No values to save', Message::NOTIFICATION_MESSAGE));
     }
 
-    if (isset($_GET['member'])) {
-        if (User::isBoard()) {
-            $user = User::getByID($_GET['member']);
-        } else {
-            return array(new Message('You have no rights to view this user.', Message::ERROR_MESSAGE));
-        }
-    } else {
-        $user = User::getCurrent();
+    if (isset($_GET['member']) && !User::isBoard()) {
+        return array(new Message('You have no rights to view this user.', Message::ERROR_MESSAGE));
     }
 
     $tabID = -1;
@@ -36,32 +30,12 @@ function mp_ssv_user_save_fields($form)
     }
 
     $form->setValues($_POST);
-    $messages = $form->isValid();
+    $messages = $form->isValid($tabID);
     if ($messages === true) {
-        $form->save();
-    }
-    foreach ($form as $field) {
-        if ($field instanceof TabField && $tabID == $field->id) {
-            foreach ($field->fields as $childField) {
-                if ($childField instanceof InputField) {
-                    $childField->setValue($_POST);
-                    $inputFields[] = $childField;
-                    if ($childField->isValid() !== true) {
-                        $messages = array_merge($messages, $childField->isValid());
-                    }
-                }
-            }
-        } elseif ($field instanceof InputField) {
-            $field->setValue($_POST);
-            $inputFields[] = $field;
-            if ($field->isValid() !== true) {
-                $messages = array_merge($messages, $field->isValid());
-            }
-        }
-    }
-    if (empty($messages) || $user->isBoard()) {
-        $user->update($inputFields);
-        $messages[] = new Message('Profile Updated.', Message::NOTIFICATION_MESSAGE);
+        $messages = $form->save($tabID);
+    } elseif (User::isBoard()) {
+        $tmp      = $form->save($tabID);
+        $messages = array_merge($messages, $tmp);
     }
     return $messages;
 }

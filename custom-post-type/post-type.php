@@ -25,7 +25,8 @@ function ssv_users_page_fields()
 {
     global $post;
     $allowTabs = strpos($post->post_content, SSV_Users::PROFILE_FIELDS_TAG) !== false;
-    echo SSV_General::getCustomFieldsEditor($allowTabs);
+    $form = Form::fromMeta($allowTabs);
+    echo $form->getEditor($allowTabs);
 }
 
 #endregion
@@ -50,10 +51,9 @@ function mp_ssv_user_pages_save_meta($post_id)
     }
 
     // Save fields
-    $registrationFields = SSV_General::getCustomFieldsFromPost();
-    $registrationFields = $registrationFields ?: array();
-    $registrationIDs    = array();
-    foreach ($registrationFields as $id => $field) {
+    $form            = Form::editorFromPost();
+    $registrationIDs = array();
+    foreach ($form->fields as $id => $field) {
         /** @var Field $field */
         update_post_meta($post_id, Field::PREFIX . $id, $field->toJSON());
         $registrationIDs[] = $id;
