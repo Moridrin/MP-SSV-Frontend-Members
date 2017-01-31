@@ -33,9 +33,18 @@ function mp_ssv_user_save_fields($form)
     $messages = $form->isValid($tabID);
     if ($messages === true) {
         $messages = $form->save($tabID);
+        if ($messages === true) {
+            $messages = array(new Message('Profile Saved.'));
+        }
     } elseif (User::isBoard()) {
-        $tmp      = $form->save($tabID);
-        $messages = array_merge($messages, $tmp);
+        $saveMessages = $form->save($tabID);
+        $saveMessages = $saveMessages === true ? array() : $saveMessages;
+        $messages     = array_merge($messages, $saveMessages);
+        if (empty($saveMessages)) {
+            $messages[] = new Message('Profile Forcibly Saved (As Board member).');
+        } else {
+            $messages[] = new Message('Profile Partially Saved (As Board member).');
+        }
     }
     return $messages;
 }
