@@ -44,7 +44,7 @@ function mp_ssv_user_save_fields($fields, $values)
             }
         }
     }
-    if (empty($messages) || (is_user_logged_in() && User::getCurrent()->isBoard())) {
+    if (empty($messages) || (is_user_logged_in() && User::isBoard())) {
         $user = User::register($username, $password, $email);
         if ($user instanceof Message) {
             return array($user);

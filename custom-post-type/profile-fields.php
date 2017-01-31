@@ -7,22 +7,21 @@
  */
 
 /**
- * @param $fields
- * @param $values
+ * @param Form $form
  *
- * @return Message[]
+*@return Message[]
  */
-function mp_ssv_user_save_fields($fields, $values)
+function mp_ssv_user_save_fields($form)
 {
     if (!SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_PROFILE)) {
         return array();
     }
-    if (empty($values) || !is_user_logged_in()) {
+    if (empty($_POST) || !is_user_logged_in()) {
         return array(new Message('No values to save', Message::NOTIFICATION_MESSAGE));
     }
 
     if (isset($_GET['member'])) {
-        if (User::getCurrent()->isBoard()) {
+        if (User::isBoard()) {
             $user = User::getByID($_GET['member']);
         } else {
             return array(new Message('You have no rights to view this user.', Message::ERROR_MESSAGE));
@@ -32,17 +31,20 @@ function mp_ssv_user_save_fields($fields, $values)
     }
 
     $tabID = -1;
-    if (isset($values['tab'])) {
-        $tabID = $values['tab'];
+    if (isset($_POST['tab'])) {
+        $tabID = $_POST['tab'];
     }
 
-    $inputFields = array();
-    $messages = array();
-    foreach ($fields as $field) {
+    $form->setValues($_POST);
+    $messages = $form->isValid();
+    if ($messages === true) {
+        $form->save();
+    }
+    foreach ($form as $field) {
         if ($field instanceof TabField && $tabID == $field->id) {
             foreach ($field->fields as $childField) {
                 if ($childField instanceof InputField) {
-                    $childField->setValue($values);
+                    $childField->setValue($_POST);
                     $inputFields[] = $childField;
                     if ($childField->isValid() !== true) {
                         $messages = array_merge($messages, $childField->isValid());
@@ -50,7 +52,7 @@ function mp_ssv_user_save_fields($fields, $values)
                 }
             }
         } elseif ($field instanceof InputField) {
-            $field->setValue($values);
+            $field->setValue($_POST);
             $inputFields[] = $field;
             if ($field->isValid() !== true) {
                 $messages = array_merge($messages, $field->isValid());
@@ -76,13 +78,11 @@ function mp_ssv_user_get_fields($content, $form)
     if (isset($_GET['member'])) {
         if (!is_user_logged_in()) {
             return (new Message('You must sign in to view this profile.', Message::ERROR_MESSAGE))->getHTML();
-        } elseif (!User::getCurrent()->isBoard()) {
+        } elseif (!User::isBoard()) {
             $html .= (new Message('You have no access to view this profile.', Message::ERROR_MESSAGE))->getHTML();
-            $user = User::getCurrent();
-        } else {
-            $user = User::getByID($_GET['member']);
         }
     }
-    $html = $form->getHTML(SSV_Users::ADMIN_REFERER_PROFILE);
+    $form->setValues();
+    $html .= $form->getHTML(SSV_Users::ADMIN_REFERER_PROFILE);
     return str_replace(SSV_Users::PROFILE_FIELDS_TAG, $html, $content);
 }

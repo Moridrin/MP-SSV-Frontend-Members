@@ -74,17 +74,16 @@ function mp_ssv_user_pages_set_content($content)
     } elseif (strpos($content, SSV_Users::REGISTER_FIELDS_TAG) !== false) {
         $form = Form::fromMeta(false);
         require_once 'registration-fields.php';
-        $form = array_merge(User::getDefaultFields(), $form);
+        $form->addFields(User::getDefaultFields(), false);
     } else {
         return $content;
     }
-    $form     = $form ?: array();
     $messagesHTML = '';
     $messages = mp_ssv_user_save_fields($form, $_POST);
     foreach ($messages as $message) {
         $messagesHTML .= $message->getHTML();
     }
-    $content      = $messagesHTML . mp_ssv_user_get_fields($content, $form);
+    $content = $messagesHTML . mp_ssv_user_get_fields($content, $form);
     return $content;
 }
 
