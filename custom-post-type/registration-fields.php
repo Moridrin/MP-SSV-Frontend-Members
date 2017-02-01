@@ -7,69 +7,77 @@
  */
 
 /**
- * @param $fields
- * @param $values
+ * @param Form $form
  *
- * @return Message[]
+*@return Message[]
  */
-function mp_ssv_user_save_fields($fields, $values)
+function mp_ssv_user_save_fields($form)
 {
     if (!SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_REGISTRATION)) {
-        return array(); //No Messages to show.
+        return array();
     }
-    if (empty($values)) {
+    if (empty($_POST) || !is_user_logged_in()) {
         return array(new Message('No values to save', Message::NOTIFICATION_MESSAGE));
     }
 
-    $inputFields = array();
-    $errors      = array();
-    $username = '';
-    $password = '';
-    $email = '';
-    foreach ($fields as $field) {
-        if ($field instanceof InputField) {
-            $field->setValue($values);
-            if ($field->isValid() === true) {
-                if ($field->name == 'username') {
-                    $username = $field->value;
-                } elseif ($field->name == 'password') {
-                    $password = $field->value;
-                } elseif ($field->name == 'email') {
-                    $email = $field->value;
-                } else {
-                    $inputFields[] = $field;
-                }
-            } else {
-                $errors = array_merge($errors, $field->isValid());
-            }
-        }
+    $tabID = -1;
+    if (isset($_POST['tab'])) {
+        $tabID = $_POST['tab'];
     }
-    if (empty($messages) || (is_user_logged_in() && User::isBoard())) {
-        $user = User::register($username, $password, $email);
-        if ($user instanceof Message) {
-            return array($user);
+
+    $form->setValues($_POST);
+    $messages = $form->isValid($tabID);
+
+//    if (empty($messages) || (is_user_logged_in() && User::isBoard())) {
+//        $user = User::register($username, $password, $email);
+//        if ($user instanceof Message) {
+//            return array($user);
+//        }
+//        /** @var InputField $field */
+//        foreach ($inputFields as $field) {
+//            $response = $user->updateMeta($field->name, $field->value);
+//            if ($response !== true) {
+//                $messages[] = $response;
+//            }
+//        }
+//        $messages[] = new Message('Registration Successful.', Message::NOTIFICATION_MESSAGE);
+////        SSV_General::redirect(get_permalink());
+//    }
+
+    if ($messages === true) {
+        $messages = $form->save($tabID);
+        if ($messages === true) {
+            $messages = array(new Message('Profile Saved.'));
         }
-        /** @var InputField $field */
-        foreach ($inputFields as $field) {
-            $response = $user->updateMeta($field->name, $field->value);
-            if ($response !== true) {
-                $messages[] = $response;
-            }
+    } elseif (User::isBoard()) {
+        $saveMessages = $form->save($tabID);
+        $saveMessages = $saveMessages === true ? array() : $saveMessages;
+        $messages     = array_merge($messages, $saveMessages);
+        if (empty($saveMessages)) {
+            $messages[] = new Message('Profile Forcibly Saved (As Board member).');
+        } else {
+            $messages[] = new Message('Profile Partially Saved (As Board member).');
         }
-        $messages[] = new Message('Registration Successful.', Message::NOTIFICATION_MESSAGE);
-//        SSV_General::redirect(get_permalink());
     }
     return $messages;
 }
 
 /**
- * @param $content
- * @param $fields
+ * @param string $content
+ * @param Form   $form
  *
- * @return string
+ * @return string HTML
  */
-function mp_ssv_user_get_fields($content, $fields)
+function mp_ssv_user_get_fields($content, $form)
 {
-    $html = SSV_General::getCustomFieldsHTML($fields, SSV_Users::ADMIN_REFERER_REGISTRATION, 'Register');
+    $html = '';
+    if (isset($_GET['member'])) {
+        if (!is_user_logged_in()) {
+            return (new Message('You must sign in to view this profile.', Message::ERROR_MESSAGE))->getHTML();
+        } elseif (!User::isBoard()) {
+            $html .= (new Message('You have no access to view this profile.', Message::ERROR_MESSAGE))->getHTML();
+        }
+    }
+    $html .= $form->getHTML(SSV_Users::ADMIN_REFERER_REGISTRATION, 'Register');
     return str_replace(SSV_Users::REGISTER_FIELDS_TAG, $html, $content);
 }
