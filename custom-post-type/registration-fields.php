@@ -9,7 +9,7 @@
 /**
  * @param Form $form
  *
-*@return Message[]
+ * @return Message[]
  */
 function mp_ssv_user_save_fields($form)
 {
@@ -20,13 +20,8 @@ function mp_ssv_user_save_fields($form)
         return array(new Message('No values to save', Message::NOTIFICATION_MESSAGE));
     }
 
-    $tabID = -1;
-    if (isset($_POST['tab'])) {
-        $tabID = $_POST['tab'];
-    }
-
     $form->setValues($_POST);
-    $messages = $form->isValid($tabID);
+    $messages = $form->isValid();
 
 //    if (empty($messages) || (is_user_logged_in() && User::isBoard())) {
 //        $user = User::register($username, $password, $email);
@@ -44,20 +39,38 @@ function mp_ssv_user_save_fields($form)
 ////        SSV_General::redirect(get_permalink());
 //    }
 
+    $username        = $form->getValue('username');
+    $password        = $form->getValue('password');
+    $confirmPassword = $form->getValue('password_confirm');
+    $email           = $form->getValue('email');
+
+    if ($password !== $confirmPassword) {
+        $messages   = is_array($messages) ?: array();
+        $messages[] = new Message('Passwords mismatch.', Message::ERROR_MESSAGE);
+    } elseif (email_exists($email)) {
+        $messages   = is_array($messages) ?: array();
+        $messages[] = new Message('Email already used.', Message::ERROR_MESSAGE);
+    } elseif (username_exists($username)) {
+        $messages   = is_array($messages) ?: array();
+        $messages[] = new Message('Username already used.', Message::ERROR_MESSAGE);
+    }
+
     if ($messages === true) {
-        $messages = $form->save($tabID);
+        $user       = User::register($username, $password, $email);
+        $form->user = $user;
+        $messages   = $form->save();
         if ($messages === true) {
-            $messages = array(new Message('Profile Saved.'));
+            $messages = array(new Message('Registration Successful.'));
         }
-    } elseif (User::isBoard()) {
-        $saveMessages = $form->save($tabID);
-        $saveMessages = $saveMessages === true ? array() : $saveMessages;
-        $messages     = array_merge($messages, $saveMessages);
-        if (empty($saveMessages)) {
-            $messages[] = new Message('Profile Forcibly Saved (As Board member).');
-        } else {
-            $messages[] = new Message('Profile Partially Saved (As Board member).');
-        }
+//    } elseif (User::isBoard()) {
+//        $saveMessages = $form->save($tabID);
+//        $saveMessages = $saveMessages === true ? array() : $saveMessages;
+//        $messages     = array_merge($messages, $saveMessages);
+//        if (empty($saveMessages)) {
+//            $messages[] = new Message('Profile Forcibly Saved (As Board member).');
+//        } else {
+//            $messages[] = new Message('Profile Partially Saved (As Board member).');
+//        }
     }
     return $messages;
 }
