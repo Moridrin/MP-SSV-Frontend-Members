@@ -23,54 +23,41 @@ function mp_ssv_user_save_fields($form)
     $form->setValues($_POST);
     $messages = $form->isValid();
 
-//    if (empty($messages) || (is_user_logged_in() && User::isBoard())) {
-//        $user = User::register($username, $password, $email);
-//        if ($user instanceof Message) {
-//            return array($user);
-//        }
-//        /** @var InputField $field */
-//        foreach ($inputFields as $field) {
-//            $response = $user->updateMeta($field->name, $field->value);
-//            if ($response !== true) {
-//                $messages[] = $response;
-//            }
-//        }
-//        $messages[] = new Message('Registration Successful.', Message::NOTIFICATION_MESSAGE);
-////        SSV_General::redirect(get_permalink());
-//    }
-
     $username        = $form->getValue('username');
     $password        = $form->getValue('password');
     $confirmPassword = $form->getValue('password_confirm');
     $email           = $form->getValue('email');
 
+    $requiredFieldsMessages = array();
     if ($password !== $confirmPassword) {
-        $messages   = is_array($messages) ?: array();
-        $messages[] = new Message('Passwords mismatch.', Message::ERROR_MESSAGE);
+        $requiredFieldsMessages[] = new Message('Passwords mismatch.', Message::ERROR_MESSAGE);
     } elseif (email_exists($email)) {
-        $messages   = is_array($messages) ?: array();
-        $messages[] = new Message('Email already used.', Message::ERROR_MESSAGE);
+        $requiredFieldsMessages[] = new Message('Email already used.', Message::ERROR_MESSAGE);
     } elseif (username_exists($username)) {
-        $messages   = is_array($messages) ?: array();
-        $messages[] = new Message('Username already used.', Message::ERROR_MESSAGE);
+        $requiredFieldsMessages[] = new Message('Username already used.', Message::ERROR_MESSAGE);
+    }
+    if (!empty($requiredFieldsMessages)) {
+        $messages = is_array($messages) ?: array();
+        $messages = array_push($messages, $requiredFieldsMessages);
     }
 
     if ($messages === true) {
         $user       = User::register($username, $password, $email);
         $form->user = $user;
         $messages   = $form->save();
-        if ($messages === true) {
-            $messages = array(new Message('Registration Successful.'));
+        if (empty($messages)) {
+            $messages[] = new Message('Registration Successful.');
         }
-//    } elseif (User::isBoard()) {
-//        $saveMessages = $form->save($tabID);
-//        $saveMessages = $saveMessages === true ? array() : $saveMessages;
-//        $messages     = array_merge($messages, $saveMessages);
-//        if (empty($saveMessages)) {
-//            $messages[] = new Message('Profile Forcibly Saved (As Board member).');
-//        } else {
-//            $messages[] = new Message('Profile Partially Saved (As Board member).');
-//        }
+    } elseif (!empty($requiredFieldsMessages) && User::isBoard()) {
+        $user         = User::register($username, $password, $email);
+        $form->user   = $user;
+        $saveMessages = $form->save();
+        $messages     = array_merge($messages, $saveMessages);
+        if (empty($saveMessages)) {
+            $messages[] = new Message('Profile Forcibly Saved (As Board member).');
+        } else {
+            $messages[] = new Message('Profile Partially Saved (As Board member).');
+        }
     }
     return $messages;
 }
