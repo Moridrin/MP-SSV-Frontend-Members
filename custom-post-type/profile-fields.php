@@ -33,11 +33,13 @@ function mp_ssv_user_save_fields($form)
     $messages = $form->isValid($tabID);
     if ($messages === true) {
         $messages = $form->save($tabID);
+        do_action('ssv_users_updated');
         if ($messages === true) {
             $messages = array(new Message('Profile Saved.'));
         }
     } elseif (User::isBoard()) {
         $saveMessages = $form->save($tabID);
+        do_action('ssv_users_updated');
         $saveMessages = $saveMessages === true ? array() : $saveMessages;
         $messages     = array_merge($messages, $saveMessages);
         if (empty($saveMessages)) {

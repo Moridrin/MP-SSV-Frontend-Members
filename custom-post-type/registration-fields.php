@@ -45,6 +45,7 @@ function mp_ssv_user_save_fields($form)
         $user       = User::register($username, $password, $email);
         $form->user = $user;
         $messages   = $form->save();
+        do_action('ssv_users_registered');
         if (empty($messages)) {
             $messages[] = new Message('Registration Successful.');
         }
@@ -52,6 +53,7 @@ function mp_ssv_user_save_fields($form)
         $user         = User::register($username, $password, $email);
         $form->user   = $user;
         $saveMessages = $form->save();
+        do_action('ssv_users_registered');
         $messages     = array_merge($messages, $saveMessages);
         if (empty($saveMessages)) {
             $messages[] = new Message('Profile Forcibly Saved (As Board member).');
