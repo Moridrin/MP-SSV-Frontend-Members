@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 require_once 'general/general.php';
 
 require_once 'options/options.php';
-
+require_once 'users-page-columns.php';
 require_once 'custom-post-type/post-type.php';
 #endregion
 
@@ -45,9 +45,6 @@ class SSV_Users
     const OPTION_LOGIN_POST_ID = 'ssv_users__login_post_id';
     const OPTION_CHANGE_PASSWORD_POST_ID = 'ssv_users__change_password_post_id';
     const OPTION_DEFAULT_MEMBER_ROLE = 'ssv_users__default_member_role';
-    const OPTION_BOARD_ROLE = 'ssv_users__board_role';
-    const OPTION_CUSTOM_USER_FILTER_LOCATION = 'ssv_users__custom_user_filter_location';
-    const OPTION_CUSTOM_USER_FILTERS = 'ssv_users__custom_users_filters';
     const OPTION_USERS_PAGE_MAIN_COLUMN = 'ssv_users__main_column';
     const OPTION_USER_COLUMNS = 'ssv_users__user_columns';
     const OPTION_MEMBER_ADMIN = 'ssv_users__member_admin';
@@ -66,8 +63,6 @@ class SSV_Users
     public static function resetOptions()
     {
         update_option(self::OPTION_DEFAULT_MEMBER_ROLE, 'subscriber');
-        update_option(self::OPTION_BOARD_ROLE, 'administrator');
-        update_option(self::OPTION_CUSTOM_USER_FILTERS, 'under');
         update_option(self::OPTION_USERS_PAGE_MAIN_COLUMN, 'plugin_default');
         update_option(self::OPTION_USER_COLUMNS, json_encode(array('wp_Role', 'wp_Posts')));
         update_option(self::OPTION_MEMBER_ADMIN, get_option('admin_email'));
@@ -92,22 +87,16 @@ class SSV_Users
         $customFieldsTag = self::PROFILE_FIELDS_TAG;
         $results         = $wpdb->get_results("SELECT * FROM wp_posts WHERE post_content LIKE '%$customFieldsTag%'");
         $fieldNames      = array();
-        foreach ($results as $key => $row) {
-            $fieldIDs = get_post_meta($row->ID, Field::ID_TAG, true);
-            $fieldIDs = is_array($fieldIDs) ? $fieldIDs : array();
-            foreach ($fieldIDs as $id) {
-                $field = get_post_meta($row->ID, Field::PREFIX . $id, true);
-                $field = Field::fromJSON($field);
-                if ($field instanceof InputField) {
-                    /** @var InputField $field */
-                    $fieldNames[$field->name] = $field->name;
-                }
-            }
+        /** @var WP_Post $row */
+        foreach ($results as $row) {
+            global $post;
+            $post       = $row;
+            $form       = Form::fromMeta(false);
+            $fieldNames = array_merge($fieldNames, $form->getInputFieldProperty('name'));
         }
-        return $fieldNames;
+        return array_unique($fieldNames);
     }
 }
-
 #endregion
 
 #region Register
@@ -280,7 +269,7 @@ add_filter('authenticate', 'ssv_users_authenticate', 20, 3);
 #endregion
 
 #region Set Profile Page Title
-function mp_ssv_user_set_profile_page_title($title, $id)
+function mp_ssv_users_set_profile_page_title($title, $id)
 {
     if ($title != 'Profile Page') {
         return $title;
@@ -291,5 +280,5 @@ function mp_ssv_user_set_profile_page_title($title, $id)
     return $title;
 }
 
-add_filter('the_title', 'mp_ssv_user_set_profile_page_title', 20, 2);
+add_filter('the_title', 'mp_ssv_users_set_profile_page_title', 20, 2);
 #endregion
