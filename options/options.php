@@ -15,7 +15,6 @@ function ssv_users_options_page_content()
         <h1>Users Options</h1>
         <h2 class="nav-tab-wrapper">
             <a href="?page=<?= $_GET['page'] ?>&tab=general" class="nav-tab <?= $active_tab == 'general' ? 'nav-tab-active' : '' ?>">General</a>
-            <a href="?page=<?= $_GET['page'] ?>&tab=users_page_columns" class="nav-tab <?= $active_tab == 'users_page_columns' ? 'nav-tab-active' : '' ?>">Users Page Columns</a>
             <a href="?page=<?= $_GET['page'] ?>&tab=email" class="nav-tab <?= $active_tab == 'email' ? 'nav-tab-active' : '' ?>">Email</a>
             <a href="http://2016.bosso.nl/ssv-users/" target="_blank" class="nav-tab">
                 Help <img src="<?= SSV_Users::URL ?>general/images/link-new-tab.png" width="14px" style="vertical-align:middle">
@@ -26,12 +25,8 @@ function ssv_users_options_page_content()
             case "general":
                 require_once "general.php";
                 break;
-            case "profile_page":
-            case "register_page":
-                break;
-            case "users_page_columns":
-                break;
             case "email":
+                require_once "email.php";
                 break;
         }
         ?>

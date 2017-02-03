@@ -13,7 +13,7 @@
  */
 function mp_ssv_user_save_fields($form)
 {
-    if (!SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_PROFILE)) {
+    if (!SSV_General::isValidPOST(SSV_Users::ADMIN_REFERRER_PROFILE)) {
         return array();
     }
     if (empty($_POST) || !is_user_logged_in()) {
@@ -68,6 +68,6 @@ function mp_ssv_user_get_fields($content, $form)
         }
     }
     $form->setValues();
-    $html .= $form->getHTML(SSV_Users::ADMIN_REFERER_PROFILE);
+    $html .= $form->getHTML(SSV_Users::ADMIN_REFERRER_PROFILE);
     return str_replace(SSV_Users::TAG_PROFILE_FIELDS, $html, $content);
 }

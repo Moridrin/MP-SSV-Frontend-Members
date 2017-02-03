@@ -13,7 +13,7 @@
  */
 function mp_ssv_user_save_fields($form)
 {
-    if (!SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_REGISTRATION)) {
+    if (!SSV_General::isValidPOST(SSV_Users::ADMIN_REFERRER_REGISTRATION)) {
         return array();
     }
     if (empty($_POST) && !is_user_logged_in()) {
@@ -46,6 +46,8 @@ function mp_ssv_user_save_fields($form)
         $form->user = $user;
         $messages   = $form->save();
         do_action('ssv_users_registered');
+        if (SSV_Events::OPTION_EMAIL_AUTHOR) {
+        }
         if (empty($messages)) {
             $messages[] = new Message('Registration Successful.');
         }
@@ -80,6 +82,6 @@ function mp_ssv_user_get_fields($content, $form)
             $html .= (new Message('You have no access to view this profile.', Message::ERROR_MESSAGE))->getHTML();
         }
     }
-    $html .= $form->getHTML(SSV_Users::ADMIN_REFERER_REGISTRATION, 'Register');
+    $html .= $form->getHTML(SSV_Users::ADMIN_REFERRER_REGISTRATION, 'Register');
     return str_replace(SSV_Users::TAG_REGISTER_FIELDS, $html, $content);
 }

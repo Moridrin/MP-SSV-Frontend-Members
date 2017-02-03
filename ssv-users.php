@@ -44,18 +44,15 @@ class SSV_Users
 
     const PAGE_ROLE_META = 'page_role';
 
-    const OPTION_LOGIN_POST_ID = 'ssv_users__login_post_id';
-    const OPTION_CHANGE_PASSWORD_POST_ID = 'ssv_users__change_password_post_id';
     const OPTION_DEFAULT_MEMBER_ROLE = 'ssv_users__default_member_role';
     const OPTION_USERS_PAGE_MAIN_COLUMN = 'ssv_users__main_column';
     const OPTION_USER_COLUMNS = 'ssv_users__user_columns';
-    const OPTION_MEMBER_ADMIN = 'ssv_users__member_admin';
-    const OPTION_NEW_MEMBER_REGISTRATION_EMAIL = 'ssv_users__new_member_registration_email';
-    const OPTION_MEMBER_ROLE_CHANGED_EMAIL = 'ssv_users__member_role_changed_email';
+    const OPTION_NEW_MEMBER_ADMIN_EMAIL = 'ssv_users__new_member_admin_email';
+    const OPTION_NEW_MEMBER_REGISTRANT_EMAIL = 'ssv_users__new_member_registrant_email';
 
-    const ADMIN_REFERER_OPTIONS = 'ssv_users__admin_referer_options';
-    const ADMIN_REFERER_REGISTRATION = 'ssv_users__admin_referer_registration';
-    const ADMIN_REFERER_PROFILE = 'ssv_users__admin_referer_profile';
+    const ADMIN_REFERRER_OPTIONS = 'ssv_users__admin_referrer_options';
+    const ADMIN_REFERRER_REGISTRATION = 'ssv_users__admin_referrer_registration';
+    const ADMIN_REFERRER_PROFILE = 'ssv_users__admin_referrer_profile';
     #endregion
 
     #region resetOptions()
@@ -67,9 +64,8 @@ class SSV_Users
         update_option(self::OPTION_DEFAULT_MEMBER_ROLE, 'subscriber');
         update_option(self::OPTION_USERS_PAGE_MAIN_COLUMN, 'plugin_default');
         update_option(self::OPTION_USER_COLUMNS, json_encode(array('wp_Role', 'wp_Posts')));
-        update_option(self::OPTION_MEMBER_ADMIN, get_option('admin_email'));
-        update_option(self::OPTION_NEW_MEMBER_REGISTRATION_EMAIL, true);
-        update_option(self::OPTION_MEMBER_ROLE_CHANGED_EMAIL, true);
+        update_option(self::OPTION_NEW_MEMBER_ADMIN_EMAIL, true);
+        update_option(self::OPTION_NEW_MEMBER_REGISTRANT_EMAIL, true);
     }
 
     #endregion

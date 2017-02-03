@@ -5,19 +5,14 @@
  * Date: 21-1-17
  * Time: 7:38
  */
-if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_OPTIONS)) {
+if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERRER_OPTIONS)) {
     if (isset($_POST['reset'])) {
         SSV_Users::CLEAN_INSTALL();
 //            SSV_Users::resetOptions();
     } else {
         update_option(SSV_Users::OPTION_DEFAULT_MEMBER_ROLE, SSV_General::sanitize($_POST['default_member_role']));
-        //Users Page Columns
         update_option(SSV_Users::OPTION_USERS_PAGE_MAIN_COLUMN, SSV_General::sanitize($_POST['users_page_main_column']));
         update_option(SSV_Users::OPTION_USER_COLUMNS, json_encode(isset($_POST['user_columns']) ? $_POST['user_columns'] : ''));
-        //Email
-//        update_option(SSV_Users::OPTION_MEMBER_ADMIN, $_POST['default_registration_status']);
-//        update_option(SSV_Users::OPTION_NEW_MEMBER_REGISTRATION_EMAIL, $_POST['default_registration_status']);
-//        update_option(SSV_Users::OPTION_MEMBER_ROLE_CHANGED_EMAIL, $_POST['default_registration_status']);
     }
 }
 ?>
@@ -60,5 +55,5 @@ if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_OPTIONS)) {
             </td>
         </tr>
     </table>
-    <?= SSV_General::getFormSecurityFields(SSV_Users::ADMIN_REFERER_OPTIONS); ?>
+    <?= SSV_General::getFormSecurityFields(SSV_Users::ADMIN_REFERRER_OPTIONS); ?>
 </form>
