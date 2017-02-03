@@ -69,5 +69,5 @@ function mp_ssv_user_get_fields($content, $form)
     }
     $form->setValues();
     $html .= $form->getHTML(SSV_Users::ADMIN_REFERER_PROFILE);
-    return str_replace(SSV_Users::PROFILE_FIELDS_TAG, $html, $content);
+    return str_replace(SSV_Users::TAG_PROFILE_FIELDS, $html, $content);
 }

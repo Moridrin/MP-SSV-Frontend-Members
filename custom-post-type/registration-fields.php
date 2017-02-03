@@ -81,5 +81,5 @@ function mp_ssv_user_get_fields($content, $form)
         }
     }
     $html .= $form->getHTML(SSV_Users::ADMIN_REFERER_REGISTRATION, 'Register');
-    return str_replace(SSV_Users::REGISTER_FIELDS_TAG, $html, $content);
+    return str_replace(SSV_Users::TAG_REGISTER_FIELDS, $html, $content);
 }

@@ -37,10 +37,12 @@ class SSV_Users
 
     const HOOK_NEW_MEMBER = 'ssv_users__hook_new_registration';
 
-    const REGISTER_FIELDS_TAG = '[ssv-users-register-fields]';
-    const LOGIN_FIELDS_TAG = '[ssv-users-login-fields]';
-    const PROFILE_FIELDS_TAG = '[ssv-users-profile-fields]';
-    const CHANGE_PASSWORD_FIELDS_TAG = '[ssv-users-change-password-fields]';
+    const TAG_REGISTER_FIELDS = '[ssv-users-register-fields]';
+    const TAG_LOGIN_FIELDS = '[ssv-users-login-fields]';
+    const TAG_PROFILE_FIELDS = '[ssv-users-profile-fields]';
+    const TAG_CHANGE_PASSWORD_FIELDS = '[ssv-users-change-password-fields]';
+
+    const PAGE_ROLE_META = 'page_role';
 
     const OPTION_LOGIN_POST_ID = 'ssv_users__login_post_id';
     const OPTION_CHANGE_PASSWORD_POST_ID = 'ssv_users__change_password_post_id';
@@ -83,20 +85,30 @@ class SSV_Users
      */
     public static function getInputFieldNames()
     {
-        global $wpdb;
-        $customFieldsTag = self::PROFILE_FIELDS_TAG;
-        $results         = $wpdb->get_results("SELECT * FROM wp_posts WHERE post_content LIKE '%$customFieldsTag%'");
-        $fieldNames      = array();
-        /** @var WP_Post $row */
-        foreach ($results as $row) {
+        $pages      = self::getPagesWithTag(self::TAG_PROFILE_FIELDS);
+        $fieldNames = array();
+        /** @var WP_Post $page */
+        foreach ($pages as $page) {
             global $post;
-            $post       = $row;
+            $post       = $page;
             $form       = Form::fromMeta(false);
             $fieldNames = array_merge($fieldNames, $form->getInputFieldProperty('name'));
         }
         return array_unique($fieldNames);
     }
+
+    /**
+     * @param $customFieldsTag
+     *
+     * @return array|null|object Database query results
+     */
+    public static function getPagesWithTag($customFieldsTag)
+    {
+        global $wpdb;
+        return $wpdb->get_results("SELECT * FROM wp_posts WHERE post_content LIKE '%$customFieldsTag%'");
+    }
 }
+
 #endregion
 
 #region Register
@@ -104,7 +116,7 @@ function mp_ssv_users_register_plugin()
 {
     /* Pages */
     $register_post = array(
-        'post_content' => SSV_Users::REGISTER_FIELDS_TAG,
+        'post_content' => SSV_Users::TAG_REGISTER_FIELDS,
         'post_name'    => 'register',
         'post_title'   => 'Register',
         'post_status'  => 'publish',
@@ -112,7 +124,7 @@ function mp_ssv_users_register_plugin()
     );
     wp_insert_post($register_post);
     $login_post    = array(
-        'post_content' => SSV_Users::LOGIN_FIELDS_TAG,
+        'post_content' => SSV_Users::TAG_LOGIN_FIELDS,
         'post_name'    => 'login',
         'post_title'   => 'Login',
         'post_status'  => 'publish',
@@ -121,7 +133,7 @@ function mp_ssv_users_register_plugin()
     $login_post_id = wp_insert_post($login_post);
     update_option(SSV_Users::OPTION_LOGIN_POST_ID, $login_post_id);
     $profile_post = array(
-        'post_content' => SSV_Users::PROFILE_FIELDS_TAG,
+        'post_content' => SSV_Users::TAG_PROFILE_FIELDS,
         'post_name'    => 'profile',
         'post_title'   => 'My Profile',
         'post_status'  => 'publish',
@@ -129,7 +141,7 @@ function mp_ssv_users_register_plugin()
     );
     wp_insert_post($profile_post);
     $change_password_post    = array(
-        'post_content' => SSV_Users::CHANGE_PASSWORD_FIELDS_TAG,
+        'post_content' => SSV_Users::TAG_CHANGE_PASSWORD_FIELDS,
         'post_name'    => 'change-password',
         'post_title'   => 'Change Password',
         'post_status'  => 'publish',
@@ -148,7 +160,7 @@ register_activation_hook(__FILE__, 'mp_ssv_users_register_plugin');
 function mp_ssv_users_unregister()
 {
     global $wpdb;
-    $customFieldsTag = SSV_Users::PROFILE_FIELDS_TAG;
+    $customFieldsTag = SSV_Users::TAG_PROFILE_FIELDS;
     $results         = $wpdb->get_results("SELECT * FROM wp_posts WHERE post_content LIKE '%$customFieldsTag%'");
     foreach ($results as $key => $row) {
         wp_delete_post($row->ID);
