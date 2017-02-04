@@ -12,6 +12,9 @@
 function mp_ssv_users_meta_boxes()
 {
     global $post;
+    if (!$post) {
+        return;
+    }
     $containsProfileTag      = strpos($post->post_content, SSV_Users::TAG_PROFILE_FIELDS) !== false;
     $containsRegistrationTag = strpos($post->post_content, SSV_Users::TAG_REGISTER_FIELDS) !== false;
     if ($containsProfileTag || $containsRegistrationTag) {

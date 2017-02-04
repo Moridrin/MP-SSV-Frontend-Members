@@ -44,14 +44,12 @@ class SSV_Users
 
     const PAGE_ROLE_META = 'page_role';
 
-    const OPTION_LOGIN_POST_ID = 'ssv_users__login_post_id';
-    const OPTION_CHANGE_PASSWORD_POST_ID = 'ssv_users__change_password_post_id';
     const OPTION_DEFAULT_MEMBER_ROLE = 'ssv_users__default_member_role';
     const OPTION_USERS_PAGE_MAIN_COLUMN = 'ssv_users__main_column';
     const OPTION_USER_COLUMNS = 'ssv_users__user_columns';
     const OPTION_MEMBER_ADMIN = 'ssv_users__member_admin';
-    const OPTION_NEW_MEMBER_REGISTRATION_EMAIL = 'ssv_users__new_member_registration_email';
-    const OPTION_MEMBER_ROLE_CHANGED_EMAIL = 'ssv_users__member_role_changed_email';
+    const OPTION_NEW_MEMBER_REGISTRANT_EMAIL = 'ssv_users__new_member_registration_email';
+    const OPTION_NEW_MEMBER_ADMIN_EMAIL = 'ssv_users__member_role_changed_email';
 
     const ADMIN_REFERER_OPTIONS = 'ssv_users__admin_referer_options';
     const ADMIN_REFERER_REGISTRATION = 'ssv_users__admin_referer_registration';
@@ -64,12 +62,14 @@ class SSV_Users
      */
     public static function resetOptions()
     {
+        /** @var User $siteAdmin */
+        $siteAdmin = get_users(array('role' => 'administrator'))[0];
         update_option(self::OPTION_DEFAULT_MEMBER_ROLE, 'subscriber');
         update_option(self::OPTION_USERS_PAGE_MAIN_COLUMN, 'plugin_default');
         update_option(self::OPTION_USER_COLUMNS, json_encode(array('wp_Role', 'wp_Posts')));
-        update_option(self::OPTION_MEMBER_ADMIN, get_option('admin_email'));
-        update_option(self::OPTION_NEW_MEMBER_REGISTRATION_EMAIL, true);
-        update_option(self::OPTION_MEMBER_ROLE_CHANGED_EMAIL, true);
+        update_option(self::OPTION_MEMBER_ADMIN, $siteAdmin->ID);
+        update_option(self::OPTION_NEW_MEMBER_REGISTRANT_EMAIL, true);
+        update_option(self::OPTION_NEW_MEMBER_ADMIN_EMAIL, true);
     }
 
     #endregion
@@ -123,32 +123,30 @@ function mp_ssv_users_register_plugin()
         'post_type'    => 'page',
     );
     wp_insert_post($register_post);
-    $login_post    = array(
+    $login_post = array(
         'post_content' => SSV_Users::TAG_LOGIN_FIELDS,
         'post_name'    => 'login',
         'post_title'   => 'Login',
         'post_status'  => 'publish',
         'post_type'    => 'page',
     );
-    $login_post_id = wp_insert_post($login_post);
-    update_option(SSV_Users::OPTION_LOGIN_POST_ID, $login_post_id);
+    wp_insert_post($login_post);
     $profile_post = array(
         'post_content' => SSV_Users::TAG_PROFILE_FIELDS,
         'post_name'    => 'profile',
-        'post_title'   => 'My Profile',
+        'post_title'   => 'Profile',
         'post_status'  => 'publish',
         'post_type'    => 'page',
     );
     wp_insert_post($profile_post);
-    $change_password_post    = array(
+    $change_password_post = array(
         'post_content' => SSV_Users::TAG_CHANGE_PASSWORD_FIELDS,
         'post_name'    => 'change-password',
         'post_title'   => 'Change Password',
         'post_status'  => 'publish',
         'post_type'    => 'page',
     );
-    $change_password_post_id = wp_insert_post($change_password_post);
-    update_option(SSV_Users::OPTION_CHANGE_PASSWORD_POST_ID, $change_password_post_id);
+    wp_insert_post($change_password_post);
 
     SSV_Users::resetOptions();
 }
@@ -165,8 +163,6 @@ function mp_ssv_users_unregister()
     foreach ($results as $key => $row) {
         wp_delete_post($row->ID);
     }
-    wp_delete_post(get_option(SSV_Users::OPTION_LOGIN_POST_ID), true);
-    wp_delete_post(get_option(SSV_Users::OPTION_CHANGE_PASSWORD_POST_ID), true);
 }
 
 register_deactivation_hook(__FILE__, 'mp_ssv_users_unregister');
