@@ -279,10 +279,20 @@ add_filter('authenticate', 'ssv_users_authenticate', 20, 3);
 #region Set Profile Page Title
 function mp_ssv_users_set_profile_page_title($title, $id)
 {
-    if ($title != 'Profile Page') {
+    $pages = SSV_Users::getPagesWithTag(SSV_Users::TAG_PROFILE_FIELDS);
+    $correctPage = null;
+    foreach ($pages as $page) {
+        if ($page->ID == $id) {
+            $correctPage = $page;
+        }
+    }
+    if ($correctPage == null) {
         return $title;
     }
     if (isset($_GET['member']) && is_user_logged_in() && User::isBoard()) {
+        if (!User::getByID($_GET['member'])) {
+            return $title;
+        }
         return User::getByID($_GET['member'])->display_name;
     }
     return $title;

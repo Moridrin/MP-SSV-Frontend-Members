@@ -29,7 +29,7 @@ function ssv_users_page_fields()
 {
     global $post;
     $allowTabs = strpos($post->post_content, SSV_Users::TAG_PROFILE_FIELDS) !== false;
-    $form      = Form::fromMeta($allowTabs);
+    $form      = Form::fromMeta();
     echo $form->getEditor($allowTabs);
 }
 
@@ -101,7 +101,7 @@ function mp_ssv_user_pages_set_content($content)
         return $content;
     }
     $messagesHTML = '';
-    $messages = mp_ssv_user_save_fields($form, $_POST);
+    $messages     = mp_ssv_user_save_fields($form, $_POST);
     foreach ($messages as $message) {
         $messagesHTML .= $message->getHTML();
     }
