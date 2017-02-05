@@ -40,7 +40,6 @@ class SSV_Users
     const TAG_LOGIN_FIELDS = '[ssv-users-login-fields]';
     const TAG_PROFILE_FIELDS = '[ssv-users-profile-fields]';
     const TAG_LOST_PASSWORD = '[ssv-users-lost-password-fields]';
-    const TAG_CHANGE_PASSWORD_FIELDS = '[ssv-users-change-password-fields]';
 
     const PAGE_ROLE_META = 'page_role';
 
@@ -71,6 +70,7 @@ class SSV_Users
         update_option(self::OPTION_NEW_MEMBER_REGISTRANT_EMAIL, true);
         update_option(self::OPTION_NEW_MEMBER_ADMIN_EMAIL, true);
     }
+
     #endregion
 
     public static function CLEAN_INSTALL()
@@ -85,15 +85,18 @@ class SSV_Users
     public static function getInputFieldNames()
     {
         $pages      = self::getPagesWithTag(self::TAG_PROFILE_FIELDS);
+        $pages      = array_merge($pages, self::getPagesWithTag(self::TAG_PROFILE_FIELDS));
         $fieldNames = array();
         /** @var WP_Post $page */
         foreach ($pages as $page) {
             global $post;
             $post       = $page;
             $form       = Form::fromMeta(false);
-            $fieldNames = array_merge($fieldNames, $form->getInputFieldProperty('name'));
+            $fieldNames = array_merge($fieldNames, $form->getFieldProperty('name'));
         }
-        return array_unique($fieldNames);
+        $fieldNames = array_unique($fieldNames);
+        asort($fieldNames);
+        return $fieldNames;
     }
 
     /**
@@ -150,14 +153,14 @@ function mp_ssv_users_register_plugin()
         'post_type'    => 'page',
     );
     wp_insert_post($profile_post);
-    $change_password_post = array(
-        'post_content' => SSV_Users::TAG_CHANGE_PASSWORD_FIELDS,
-        'post_name'    => 'change-password',
-        'post_title'   => 'Change Password',
+    $lost_password_post = array(
+        'post_content' => SSV_Users::TAG_LOST_PASSWORD,
+        'post_name'    => 'lost-password',
+        'post_title'   => 'Lost Password',
         'post_status'  => 'publish',
         'post_type'    => 'page',
     );
-    wp_insert_post($change_password_post);
+    wp_insert_post($lost_password_post);
 
     SSV_Users::resetOptions();
 }
@@ -290,7 +293,7 @@ add_filter('authenticate', 'ssv_users_authenticate', 20, 3);
 #region Set Profile Page Title
 function mp_ssv_users_set_profile_page_title($title, $id)
 {
-    $pages = SSV_Users::getPagesWithTag(SSV_Users::TAG_PROFILE_FIELDS);
+    $pages       = SSV_Users::getPagesWithTag(SSV_Users::TAG_PROFILE_FIELDS);
     $correctPage = null;
     foreach ($pages as $page) {
         if ($page->ID == $id) {
