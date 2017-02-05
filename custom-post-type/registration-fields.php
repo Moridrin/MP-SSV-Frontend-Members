@@ -5,6 +5,9 @@
  * Date: 26-1-17
  * Time: 8:55
  */
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 /**
  * @param Form $form

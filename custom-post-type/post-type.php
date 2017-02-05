@@ -5,6 +5,10 @@
  * Date: 22-1-17
  * Time: 8:06
  */
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 #region Meta Boxes
 /**
  * This method adds the custom Meta Boxes
@@ -97,11 +101,17 @@ function mp_ssv_user_pages_set_content($content)
         $form = Form::fromMeta(false);
         require_once 'registration-fields.php';
         $form->addFields(User::getDefaultFields(), false);
+    } elseif (strpos($content, SSV_Users::TAG_LOGIN_FIELDS) !== false) {
+        require_once 'login-fields.php';
+        return mp_ssv_user_get_fields($content);
+    } elseif (strpos($content, SSV_Users::TAG_LOST_PASSWORD) !== false) {
+        require_once 'forgot-password-page.php';
+        return mp_ssv_user_get_fields($content);
     } else {
         return $content;
     }
     $messagesHTML = '';
-    $messages     = mp_ssv_user_save_fields($form, $_POST);
+    $messages     = mp_ssv_user_save_fields($form);
     foreach ($messages as $message) {
         $messagesHTML .= $message->getHTML();
     }

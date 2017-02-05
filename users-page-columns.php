@@ -5,6 +5,9 @@
  * Date: 3-2-17
  * Time: 6:29
  */
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 /**
  * @param      $url

@@ -5,6 +5,10 @@
  * Date: 21-1-17
  * Time: 7:38
  */
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_OPTIONS)) {
     if (isset($_POST['reset'])) {
         SSV_Users::resetOptions();

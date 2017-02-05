@@ -17,6 +17,7 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+
 #region Require Once
 require_once 'general/general.php';
 
@@ -35,11 +36,10 @@ class SSV_Users
     const PATH = SSV_USERS_PATH;
     const URL = SSV_USERS_URL;
 
-    const HOOK_NEW_MEMBER = 'ssv_users__hook_new_registration';
-
     const TAG_REGISTER_FIELDS = '[ssv-users-register-fields]';
     const TAG_LOGIN_FIELDS = '[ssv-users-login-fields]';
     const TAG_PROFILE_FIELDS = '[ssv-users-profile-fields]';
+    const TAG_LOST_PASSWORD = '[ssv-users-lost-password-fields]';
     const TAG_CHANGE_PASSWORD_FIELDS = '[ssv-users-change-password-fields]';
 
     const PAGE_ROLE_META = 'page_role';
@@ -71,7 +71,6 @@ class SSV_Users
         update_option(self::OPTION_NEW_MEMBER_REGISTRANT_EMAIL, true);
         update_option(self::OPTION_NEW_MEMBER_ADMIN_EMAIL, true);
     }
-
     #endregion
 
     public static function CLEAN_INSTALL()
@@ -106,6 +105,18 @@ class SSV_Users
     {
         global $wpdb;
         return $wpdb->get_results("SELECT * FROM wp_posts WHERE post_content LIKE '%$customFieldsTag%'");
+    }
+
+    /**
+     * @param $customFieldsTag
+     *
+     * @return array|null|object Database query results
+     */
+    public static function getPageIDsWithTag($customFieldsTag)
+    {
+        global $wpdb;
+        $results = $wpdb->get_results("SELECT ID FROM wp_posts WHERE post_content LIKE '%$customFieldsTag%'");
+        return array_column($results, 'ID');
     }
 }
 

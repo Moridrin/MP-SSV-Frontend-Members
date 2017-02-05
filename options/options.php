@@ -1,4 +1,8 @@
 <?php
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 function ssv_users_add_sub_menu()
 {
     add_submenu_page('ssv_settings', 'Users Options', 'Users', 'manage_options', __FILE__, 'ssv_users_options_page_content');
