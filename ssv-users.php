@@ -83,7 +83,7 @@ class SSV_Users
     public static function getInputFieldNames()
     {
         $pages      = self::getPagesWithTag(self::TAG_PROFILE_FIELDS);
-        $pages      = array_merge($pages, self::getPagesWithTag(self::TAG_PROFILE_FIELDS));
+        $pages      = array_merge($pages, self::getPagesWithTag(self::TAG_REGISTER_FIELDS));
         $fieldNames = array();
         /** @var WP_Post $page */
         foreach ($pages as $page) {

@@ -37,7 +37,7 @@ function mp_ssv_user_save_fields($form)
     if ($messages === true) {
         $messages = $form->save($tabID);
         do_action(SSV_General::HOOK_USERS_SAVE_MEMBER, $form->user);
-        if ($messages === true) {
+        if (empty($messages)) {
             $messages = array(new Message('Profile Saved.'));
         }
     } elseif (User::isBoard()) {
