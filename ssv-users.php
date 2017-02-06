@@ -87,9 +87,7 @@ class SSV_Users
         $fieldNames = array();
         /** @var WP_Post $page */
         foreach ($pages as $page) {
-            global $post;
-            $post       = $page;
-            $form       = Form::fromDatabase(false);
+            $form       = Form::fromDatabase(false, $page);
             $fieldNames = array_merge($fieldNames, $form->getFieldProperty('name'));
         }
         $fieldNames = array_unique($fieldNames);
