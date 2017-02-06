@@ -27,7 +27,7 @@ function mp_ssv_user_save_fields($form)
         return array(new Message('You have no rights to view this user.', Message::ERROR_MESSAGE));
     }
 
-    $tabID = -1;
+    $tabID = null;
     if (isset($_POST['tab'])) {
         $tabID = $_POST['tab'];
     }
