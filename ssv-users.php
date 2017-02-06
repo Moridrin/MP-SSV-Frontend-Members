@@ -43,7 +43,6 @@ class SSV_Users
 
     const PAGE_ROLE_META = 'page_role';
 
-    const OPTION_DEFAULT_MEMBER_ROLE = 'ssv_users__default_member_role';
     const OPTION_USERS_PAGE_MAIN_COLUMN = 'ssv_users__main_column';
     const OPTION_USER_COLUMNS = 'ssv_users__user_columns';
     const OPTION_MEMBER_ADMIN = 'ssv_users__member_admin';
@@ -63,7 +62,6 @@ class SSV_Users
     {
         /** @var User $siteAdmin */
         $siteAdmin = get_users(array('role' => 'administrator'))[0];
-        update_option(self::OPTION_DEFAULT_MEMBER_ROLE, 'subscriber');
         update_option(self::OPTION_USERS_PAGE_MAIN_COLUMN, 'plugin_default');
         update_option(self::OPTION_USER_COLUMNS, json_encode(array('wp_Role', 'wp_Posts')));
         update_option(self::OPTION_MEMBER_ADMIN, $siteAdmin->ID);

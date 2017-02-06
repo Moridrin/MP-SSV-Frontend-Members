@@ -13,7 +13,6 @@ if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_OPTIONS)) {
     if (isset($_POST['reset'])) {
         SSV_Users::resetOptions();
     } else {
-        update_option(SSV_Users::OPTION_DEFAULT_MEMBER_ROLE, SSV_General::sanitize($_POST['default_member_role']));
         update_option(SSV_Users::OPTION_USERS_PAGE_MAIN_COLUMN, SSV_General::sanitize($_POST['users_page_main_column']));
         update_option(SSV_Users::OPTION_USER_COLUMNS, json_encode(isset($_POST['user_columns']) ? $_POST['user_columns'] : ''));
     }
@@ -21,14 +20,6 @@ if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_OPTIONS)) {
 ?>
 <form method="post" action="#">
     <table class="form-table">
-        <tr>
-            <th scope="row">Default Member Role</th>
-            <td>
-                <select name="default_member_role" title="Default Member Role">
-                    <?php wp_dropdown_roles(get_option(SSV_Users::OPTION_DEFAULT_MEMBER_ROLE)); ?>
-                </select>
-            </td>
-        </tr>
         <tr>
             <th scope="row">Main Column</th>
             <td>
