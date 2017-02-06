@@ -91,7 +91,7 @@ class SSV_Users
         foreach ($pages as $page) {
             global $post;
             $post       = $page;
-            $form       = Form::fromMeta(false);
+            $form       = Form::fromDatabase(false);
             $fieldNames = array_merge($fieldNames, $form->getFieldProperty('name'));
         }
         $fieldNames = array_unique($fieldNames);
@@ -166,6 +166,7 @@ function mp_ssv_users_register_plugin()
 }
 
 register_activation_hook(__FILE__, 'mp_ssv_users_register_plugin');
+register_activation_hook(__FILE__, 'mp_ssv_general_register_plugin');
 #endregion
 
 #region Unregister

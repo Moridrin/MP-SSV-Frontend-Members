@@ -33,7 +33,7 @@ function ssv_users_page_fields()
 {
     global $post;
     $allowTabs = strpos($post->post_content, SSV_Users::TAG_PROFILE_FIELDS) !== false;
-    $form      = Form::fromMeta();
+    $form      = Form::fromDatabase();
     echo $form->getEditor($allowTabs);
 }
 
@@ -63,22 +63,8 @@ function mp_ssv_user_pages_save_meta($post_id)
         return $post_id;
     }
 
-    // Remove old fields
-    $registrationIDs = get_post_meta($post_id, Field::CUSTOM_FIELD_IDS_META, true);
-    $registrationIDs = $registrationIDs ?: array();
-    foreach ($registrationIDs as $id) {
-        delete_post_meta($post_id, Field::PREFIX . $id);
-    }
-
     // Save fields
-    $form            = Form::editorFromPost();
-    $registrationIDs = array();
-    foreach ($form->fields as $id => $field) {
-        /** @var Field $field */
-        update_post_meta($post_id, Field::PREFIX . $id, $field->toJSON());
-        $registrationIDs[] = $id;
-    }
-    update_post_meta($post_id, Field::CUSTOM_FIELD_IDS_META, $registrationIDs);
+    Form::saveEditorFromPost();
 
     // Page Role
     if (isset($_POST['page_role'])) {
@@ -95,10 +81,10 @@ add_action('save_post', 'mp_ssv_user_pages_save_meta');
 function mp_ssv_user_pages_set_content($content)
 {
     if (strpos($content, SSV_Users::TAG_PROFILE_FIELDS) !== false) {
-        $form = Form::fromMeta();
+        $form = Form::fromDatabase();
         require_once 'profile-fields.php';
     } elseif (strpos($content, SSV_Users::TAG_REGISTER_FIELDS) !== false) {
-        $form = Form::fromMeta(false);
+        $form = Form::fromDatabase(false);
         require_once 'registration-fields.php';
         $form->addFields(User::getDefaultFields(), false);
     } elseif (strpos($content, SSV_Users::TAG_LOGIN_FIELDS) !== false) {
