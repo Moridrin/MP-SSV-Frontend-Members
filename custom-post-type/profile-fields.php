@@ -5,6 +5,9 @@
  * Date: 26-1-17
  * Time: 8:55
  */
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 /**
  * @param Form $form
@@ -24,7 +27,7 @@ function mp_ssv_user_save_fields($form)
         return array(new Message('You have no rights to view this user.', Message::ERROR_MESSAGE));
     }
 
-    $tabID = -1;
+    $tabID = null;
     if (isset($_POST['tab'])) {
         $tabID = $_POST['tab'];
     }
@@ -33,13 +36,13 @@ function mp_ssv_user_save_fields($form)
     $messages = $form->isValid($tabID);
     if ($messages === true) {
         $messages = $form->save($tabID);
-        do_action('ssv_users_updated');
-        if ($messages === true) {
+        do_action(SSV_General::HOOK_USERS_SAVE_MEMBER, $form->user);
+        if (empty($messages)) {
             $messages = array(new Message('Profile Saved.'));
         }
     } elseif (User::isBoard()) {
         $saveMessages = $form->save($tabID);
-        do_action('ssv_users_updated');
+        do_action(SSV_General::HOOK_USERS_SAVE_MEMBER, $form->user);
         $saveMessages = $saveMessages === true ? array() : $saveMessages;
         $messages     = array_merge($messages, $saveMessages);
         if (empty($saveMessages)) {

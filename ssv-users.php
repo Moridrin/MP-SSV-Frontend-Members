@@ -17,6 +17,7 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+
 #region Require Once
 require_once 'general/general.php';
 
@@ -35,24 +36,22 @@ class SSV_Users
     const PATH = SSV_USERS_PATH;
     const URL = SSV_USERS_URL;
 
-    const HOOK_NEW_MEMBER = 'ssv_users__hook_new_registration';
-
     const TAG_REGISTER_FIELDS = '[ssv-users-register-fields]';
     const TAG_LOGIN_FIELDS = '[ssv-users-login-fields]';
     const TAG_PROFILE_FIELDS = '[ssv-users-profile-fields]';
-    const TAG_CHANGE_PASSWORD_FIELDS = '[ssv-users-change-password-fields]';
+    const TAG_LOST_PASSWORD = '[ssv-users-lost-password-fields]';
 
     const PAGE_ROLE_META = 'page_role';
 
-    const OPTION_DEFAULT_MEMBER_ROLE = 'ssv_users__default_member_role';
     const OPTION_USERS_PAGE_MAIN_COLUMN = 'ssv_users__main_column';
     const OPTION_USER_COLUMNS = 'ssv_users__user_columns';
-    const OPTION_NEW_MEMBER_ADMIN_EMAIL = 'ssv_users__new_member_admin_email';
-    const OPTION_NEW_MEMBER_REGISTRANT_EMAIL = 'ssv_users__new_member_registrant_email';
+    const OPTION_MEMBER_ADMIN = 'ssv_users__member_admin';
+    const OPTION_NEW_MEMBER_REGISTRANT_EMAIL = 'ssv_users__new_member_registration_email';
+    const OPTION_NEW_MEMBER_ADMIN_EMAIL = 'ssv_users__member_role_changed_email';
 
-    const ADMIN_REFERRER_OPTIONS = 'ssv_users__admin_referrer_options';
-    const ADMIN_REFERRER_REGISTRATION = 'ssv_users__admin_referrer_registration';
-    const ADMIN_REFERRER_PROFILE = 'ssv_users__admin_referrer_profile';
+    const ADMIN_REFERER_OPTIONS = 'ssv_users__admin_referer_options';
+    const ADMIN_REFERER_REGISTRATION = 'ssv_users__admin_referer_registration';
+    const ADMIN_REFERER_PROFILE = 'ssv_users__admin_referer_profile';
     #endregion
 
     #region resetOptions()
@@ -61,11 +60,13 @@ class SSV_Users
      */
     public static function resetOptions()
     {
-        update_option(self::OPTION_DEFAULT_MEMBER_ROLE, 'subscriber');
+        /** @var User $siteAdmin */
+        $siteAdmin = get_users(array('role' => 'administrator'))[0];
         update_option(self::OPTION_USERS_PAGE_MAIN_COLUMN, 'plugin_default');
         update_option(self::OPTION_USER_COLUMNS, json_encode(array('wp_Role', 'wp_Posts')));
-        update_option(self::OPTION_NEW_MEMBER_ADMIN_EMAIL, true);
+        update_option(self::OPTION_MEMBER_ADMIN, $siteAdmin->ID);
         update_option(self::OPTION_NEW_MEMBER_REGISTRANT_EMAIL, true);
+        update_option(self::OPTION_NEW_MEMBER_ADMIN_EMAIL, true);
     }
 
     #endregion
@@ -82,15 +83,16 @@ class SSV_Users
     public static function getInputFieldNames()
     {
         $pages      = self::getPagesWithTag(self::TAG_PROFILE_FIELDS);
+        $pages      = array_merge($pages, self::getPagesWithTag(self::TAG_REGISTER_FIELDS));
         $fieldNames = array();
         /** @var WP_Post $page */
         foreach ($pages as $page) {
-            global $post;
-            $post       = $page;
-            $form       = Form::fromMeta(false);
-            $fieldNames = array_merge($fieldNames, $form->getInputFieldProperty('name'));
+            $form       = Form::fromDatabase(false, $page);
+            $fieldNames = array_merge($fieldNames, $form->getFieldProperty('name'));
         }
-        return array_unique($fieldNames);
+        $fieldNames = array_unique($fieldNames);
+        asort($fieldNames);
+        return $fieldNames;
     }
 
     /**
@@ -103,6 +105,18 @@ class SSV_Users
         global $wpdb;
         return $wpdb->get_results("SELECT * FROM wp_posts WHERE post_content LIKE '%$customFieldsTag%'");
     }
+
+    /**
+     * @param $customFieldsTag
+     *
+     * @return array|null|object Database query results
+     */
+    public static function getPageIDsWithTag($customFieldsTag)
+    {
+        global $wpdb;
+        $results = $wpdb->get_results("SELECT ID FROM wp_posts WHERE post_content LIKE '%$customFieldsTag%'");
+        return array_column($results, 'ID');
+    }
 }
 
 #endregion
@@ -110,46 +124,53 @@ class SSV_Users
 #region Register
 function mp_ssv_users_register_plugin()
 {
-    /* Pages */
-    $register_post = array(
-        'post_content' => SSV_Users::TAG_REGISTER_FIELDS,
-        'post_name'    => 'register',
-        'post_title'   => 'Register',
-        'post_status'  => 'publish',
-        'post_type'    => 'page',
-    );
-    wp_insert_post($register_post);
-    $login_post    = array(
-        'post_content' => SSV_Users::TAG_LOGIN_FIELDS,
-        'post_name'    => 'login',
-        'post_title'   => 'Login',
-        'post_status'  => 'publish',
-        'post_type'    => 'page',
-    );
-    $login_post_id = wp_insert_post($login_post);
-    update_option(SSV_Users::OPTION_LOGIN_POST_ID, $login_post_id);
-    $profile_post = array(
-        'post_content' => SSV_Users::TAG_PROFILE_FIELDS,
-        'post_name'    => 'profile',
-        'post_title'   => 'My Profile',
-        'post_status'  => 'publish',
-        'post_type'    => 'page',
-    );
-    wp_insert_post($profile_post);
-    $change_password_post    = array(
-        'post_content' => SSV_Users::TAG_CHANGE_PASSWORD_FIELDS,
-        'post_name'    => 'change-password',
-        'post_title'   => 'Change Password',
-        'post_status'  => 'publish',
-        'post_type'    => 'page',
-    );
-    $change_password_post_id = wp_insert_post($change_password_post);
-    update_option(SSV_Users::OPTION_CHANGE_PASSWORD_POST_ID, $change_password_post_id);
+    if (empty(SSV_Users::getPageIDsWithTag(SSV_Users::TAG_REGISTER_FIELDS))) {
+        /* Pages */
+        $register_post = array(
+            'post_content' => SSV_Users::TAG_REGISTER_FIELDS,
+            'post_name'    => 'register',
+            'post_title'   => 'Register',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+        );
+        wp_insert_post($register_post);
+    }
+    if (empty(SSV_Users::getPageIDsWithTag(SSV_Users::TAG_LOGIN_FIELDS))) {
+        $login_post = array(
+            'post_content' => SSV_Users::TAG_LOGIN_FIELDS,
+            'post_name'    => 'login',
+            'post_title'   => 'Login',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+        );
+        wp_insert_post($login_post);
+    }
+    if (empty(SSV_Users::getPageIDsWithTag(SSV_Users::TAG_PROFILE_FIELDS))) {
+        $profile_post = array(
+            'post_content' => SSV_Users::TAG_PROFILE_FIELDS,
+            'post_name'    => 'profile',
+            'post_title'   => 'Profile',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+        );
+        wp_insert_post($profile_post);
+    }
+    if (empty(SSV_Users::getPageIDsWithTag(SSV_Users::TAG_LOST_PASSWORD))) {
+        $lost_password_post = array(
+            'post_content' => SSV_Users::TAG_LOST_PASSWORD,
+            'post_name'    => 'lost-password',
+            'post_title'   => 'Lost Password',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+        );
+        wp_insert_post($lost_password_post);
+    }
 
     SSV_Users::resetOptions();
 }
 
 register_activation_hook(__FILE__, 'mp_ssv_users_register_plugin');
+register_activation_hook(__FILE__, 'mp_ssv_general_register_plugin');
 #endregion
 
 #region Unregister
@@ -161,8 +182,6 @@ function mp_ssv_users_unregister()
     foreach ($results as $key => $row) {
         wp_delete_post($row->ID);
     }
-    wp_delete_post(get_option(SSV_Users::OPTION_LOGIN_POST_ID), true);
-    wp_delete_post(get_option(SSV_Users::OPTION_CHANGE_PASSWORD_POST_ID), true);
 }
 
 register_deactivation_hook(__FILE__, 'mp_ssv_users_unregister');
@@ -279,10 +298,20 @@ add_filter('authenticate', 'ssv_users_authenticate', 20, 3);
 #region Set Profile Page Title
 function mp_ssv_users_set_profile_page_title($title, $id)
 {
-    if ($title != 'Profile Page') {
+    $pages       = SSV_Users::getPagesWithTag(SSV_Users::TAG_PROFILE_FIELDS);
+    $correctPage = null;
+    foreach ($pages as $page) {
+        if ($page->ID == $id) {
+            $correctPage = $page;
+        }
+    }
+    if ($correctPage == null) {
         return $title;
     }
     if (isset($_GET['member']) && is_user_logged_in() && User::isBoard()) {
+        if (!User::getByID($_GET['member'])) {
+            return $title;
+        }
         return User::getByID($_GET['member'])->display_name;
     }
     return $title;

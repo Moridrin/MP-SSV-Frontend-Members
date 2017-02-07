@@ -5,6 +5,9 @@
  * Date: 3-2-17
  * Time: 6:29
  */
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 /**
  * @param      $url
@@ -62,9 +65,12 @@ function mp_ssv_users_custom_user_column_values($val, $column_name, $user_id)
         $username_block .= get_avatar($user->ID, 32, '', '', array('extra_attr' => 'style="float: left; margin-right: 5px; margin-top: 1px;"'));
         $username_block .= '<strong>' . $user->getProfileLink('_blank') . '</strong><br/>';
         $directDebitPDF  = $user->getProfileURL() . '&view=directDebitPDF';
-        $editURL = get_edit_user_link($user->ID);
+        $editURL         = get_edit_user_link($user->ID);
         $capebilitiesURL = 'users.php?page=users-user-role-editor.php&object=user&user_id=' . $user->ID;
-        $username_block .= '<div class="row-actions"><span class="direct_debit_pdf"><a href="' . esc_url($directDebitPDF) . '" target="_blank">PDF</a> | </span><span class="edit"><a href="' . esc_url($editURL) . '">Edit</a> | </span><span class="capabilities"><a href="' . esc_url($capebilitiesURL) . '">Capabilities</a></span></div>';
+        $username_block .= '<div class="row-actions">';
+//        $username_block .= '<span class="direct_debit_pdf"><a href="' . esc_url($directDebitPDF) . '" target="_blank">PDF</a> | </span>';
+        $username_block .= '<span class="edit"><a href="' . esc_url($editURL) . '">Edit</a></span>';
+        $username_block .= '</div>';
         return $username_block;
     } elseif (starts_with($column_name, 'ssv_')) {
         return $user->getMeta(str_replace('ssv_', '', $column_name));
