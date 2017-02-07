@@ -124,39 +124,47 @@ class SSV_Users
 #region Register
 function mp_ssv_users_register_plugin()
 {
-    /* Pages */
-    $register_post = array(
-        'post_content' => SSV_Users::TAG_REGISTER_FIELDS,
-        'post_name'    => 'register',
-        'post_title'   => 'Register',
-        'post_status'  => 'publish',
-        'post_type'    => 'page',
-    );
-    wp_insert_post($register_post);
-    $login_post = array(
-        'post_content' => SSV_Users::TAG_LOGIN_FIELDS,
-        'post_name'    => 'login',
-        'post_title'   => 'Login',
-        'post_status'  => 'publish',
-        'post_type'    => 'page',
-    );
-    wp_insert_post($login_post);
-    $profile_post = array(
-        'post_content' => SSV_Users::TAG_PROFILE_FIELDS,
-        'post_name'    => 'profile',
-        'post_title'   => 'Profile',
-        'post_status'  => 'publish',
-        'post_type'    => 'page',
-    );
-    wp_insert_post($profile_post);
-    $lost_password_post = array(
-        'post_content' => SSV_Users::TAG_LOST_PASSWORD,
-        'post_name'    => 'lost-password',
-        'post_title'   => 'Lost Password',
-        'post_status'  => 'publish',
-        'post_type'    => 'page',
-    );
-    wp_insert_post($lost_password_post);
+    if (empty(SSV_Users::getPageIDsWithTag(SSV_Users::TAG_REGISTER_FIELDS))) {
+        /* Pages */
+        $register_post = array(
+            'post_content' => SSV_Users::TAG_REGISTER_FIELDS,
+            'post_name'    => 'register',
+            'post_title'   => 'Register',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+        );
+        wp_insert_post($register_post);
+    }
+    if (empty(SSV_Users::getPageIDsWithTag(SSV_Users::TAG_LOGIN_FIELDS))) {
+        $login_post = array(
+            'post_content' => SSV_Users::TAG_LOGIN_FIELDS,
+            'post_name'    => 'login',
+            'post_title'   => 'Login',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+        );
+        wp_insert_post($login_post);
+    }
+    if (empty(SSV_Users::getPageIDsWithTag(SSV_Users::TAG_PROFILE_FIELDS))) {
+        $profile_post = array(
+            'post_content' => SSV_Users::TAG_PROFILE_FIELDS,
+            'post_name'    => 'profile',
+            'post_title'   => 'Profile',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+        );
+        wp_insert_post($profile_post);
+    }
+    if (empty(SSV_Users::getPageIDsWithTag(SSV_Users::TAG_LOST_PASSWORD))) {
+        $lost_password_post = array(
+            'post_content' => SSV_Users::TAG_LOST_PASSWORD,
+            'post_name'    => 'lost-password',
+            'post_title'   => 'Lost Password',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+        );
+        wp_insert_post($lost_password_post);
+    }
 
     SSV_Users::resetOptions();
 }
