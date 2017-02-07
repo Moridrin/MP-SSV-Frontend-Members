@@ -39,6 +39,7 @@ class SSV_Users
     const TAG_REGISTER_FIELDS = '[ssv-users-register-fields]';
     const TAG_LOGIN_FIELDS = '[ssv-users-login-fields]';
     const TAG_PROFILE_FIELDS = '[ssv-users-profile-fields]';
+    const TAG_CHANGE_PASSWORD = '[ssv-users-change-password-fields]';
     const TAG_LOST_PASSWORD = '[ssv-users-lost-password-fields]';
 
     const PAGE_ROLE_META = 'page_role';
@@ -126,44 +127,54 @@ function mp_ssv_users_register_plugin()
 {
     if (empty(SSV_Users::getPageIDsWithTag(SSV_Users::TAG_REGISTER_FIELDS))) {
         /* Pages */
-        $register_post = array(
+        $registerPost = array(
             'post_content' => SSV_Users::TAG_REGISTER_FIELDS,
             'post_name'    => 'register',
             'post_title'   => 'Register',
             'post_status'  => 'publish',
             'post_type'    => 'page',
         );
-        wp_insert_post($register_post);
+        wp_insert_post($registerPost);
     }
     if (empty(SSV_Users::getPageIDsWithTag(SSV_Users::TAG_LOGIN_FIELDS))) {
-        $login_post = array(
+        $loginPost = array(
             'post_content' => SSV_Users::TAG_LOGIN_FIELDS,
             'post_name'    => 'login',
             'post_title'   => 'Login',
             'post_status'  => 'publish',
             'post_type'    => 'page',
         );
-        wp_insert_post($login_post);
+        wp_insert_post($loginPost);
     }
     if (empty(SSV_Users::getPageIDsWithTag(SSV_Users::TAG_PROFILE_FIELDS))) {
-        $profile_post = array(
+        $profilePost = array(
             'post_content' => SSV_Users::TAG_PROFILE_FIELDS,
             'post_name'    => 'profile',
             'post_title'   => 'Profile',
             'post_status'  => 'publish',
             'post_type'    => 'page',
         );
-        wp_insert_post($profile_post);
+        wp_insert_post($profilePost);
+    }
+    if (empty(SSV_Users::getPageIDsWithTag(SSV_Users::TAG_CHANGE_PASSWORD))) {
+        $changePasswordPost = array(
+            'post_content' => SSV_Users::TAG_CHANGE_PASSWORD,
+            'post_name'    => 'change-password',
+            'post_title'   => 'Change Password',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+        );
+        wp_insert_post($changePasswordPost);
     }
     if (empty(SSV_Users::getPageIDsWithTag(SSV_Users::TAG_LOST_PASSWORD))) {
-        $lost_password_post = array(
+        $lostPasswordPost = array(
             'post_content' => SSV_Users::TAG_LOST_PASSWORD,
             'post_name'    => 'lost-password',
             'post_title'   => 'Lost Password',
             'post_status'  => 'publish',
             'post_type'    => 'page',
         );
-        wp_insert_post($lost_password_post);
+        wp_insert_post($lostPasswordPost);
     }
 
     SSV_Users::resetOptions();

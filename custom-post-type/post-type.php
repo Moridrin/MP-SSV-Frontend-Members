@@ -87,6 +87,10 @@ function mp_ssv_user_pages_set_content($content)
         $form = Form::fromDatabase(false);
         require_once 'registration-fields.php';
         $form->addFields(User::getDefaultFields(), false);
+    } elseif (strpos($content, SSV_Users::TAG_CHANGE_PASSWORD) !== false) {
+        $form = Form::fromDatabase(false);
+        require_once 'change-password-page.php';
+        $form->addFields(User::getPasswordChangeFields(), false);
     } elseif (strpos($content, SSV_Users::TAG_LOGIN_FIELDS) !== false) {
         require_once 'login-fields.php';
         return mp_ssv_user_get_fields($content);
