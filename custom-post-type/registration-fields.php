@@ -70,7 +70,7 @@ function mp_ssv_user_save_fields($form)
             $message .= '<p>Your registration for ' . get_bloginfo() . ' was successful.</p>';
             $message .= '<p>You have registered with the following fields:</p>';
             $message .= $form->getEmail(false);
-            $message .= '</br></br>Greetings, ' . $userAdmin->display_name . '.';
+            $message .= '</br></br><p>Greetings, ' . $userAdmin->display_name . '.</p>';
             $headers = array('Content-Type: text/html; charset=UTF-8');
             wp_mail($to, $subject, $message, $headers);
         }

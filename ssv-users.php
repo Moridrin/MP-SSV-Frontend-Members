@@ -1,14 +1,14 @@
 <?php
 /**
  * Plugin Name: SSV Users
- * Plugin URI: http://studentensurvival.com/ssv-users
+ * Plugin URI: https://bosso.nl/ssv-users/
  * Description: SSV Users is a plugin that allows you to manage members of a Students Sports Club the way you want to. With this plugin you can:
  * - Have a frontend registration and login page
  * - Customize member data fields,
  * - Easy manage, view and edit member profiles.
  * - Etc.
  * This plugin is fully compatible with the SSV library which can add functionality like: MailChimp, Events, etc.
- * Version: 1.4.1
+ * Version: 3.0.0
  * Author: Jeroen Berkvens
  * Author URI: http://nl.linkedin.com/in/jberkvens/
  * License: WTFPL
