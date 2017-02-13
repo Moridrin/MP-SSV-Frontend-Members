@@ -206,7 +206,7 @@ register_deactivation_hook(__FILE__, 'mp_ssv_users_unregister');
  */
 function mp_ssv_users_reset_options($admin_referer)
 {
-    if (!starts_with($admin_referer, 'ssv_users__')) {
+    if (!mp_ssv_starts_with($admin_referer, 'ssv_users__')) {
         return;
     }
     SSV_Users::resetOptions();

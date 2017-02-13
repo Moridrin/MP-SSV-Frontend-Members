@@ -45,7 +45,7 @@ function mp_ssv_users_custom_user_columns($column_headers)
     $selected_columns = json_decode(get_option(SSV_Users::OPTION_USER_COLUMNS));
     $selected_columns = $selected_columns ?: array();
     foreach ($selected_columns as $column) {
-        if (starts_with($column, 'wp_')) {
+        if (mp_ssv_starts_with($column, 'wp_')) {
             $column                              = str_replace('wp_', '', $column);
             $column_headers[strtolower($column)] = $column;
         } else {
@@ -72,7 +72,7 @@ function mp_ssv_users_custom_user_column_values($val, $column_name, $user_id)
         $username_block .= '<span class="edit"><a href="' . esc_url($editURL) . '">Edit</a></span>';
         $username_block .= '</div>';
         return $username_block;
-    } elseif (starts_with($column_name, 'ssv_')) {
+    } elseif (mp_ssv_starts_with($column_name, 'ssv_')) {
         return $user->getMeta(str_replace('ssv_', '', $column_name));
     }
     return $val;
@@ -86,7 +86,7 @@ function mp_ssv_users_custom_sortable_user_columns($columns)
     $selected_columns[] = 'display_name';
     $selected_columns   = $selected_columns ?: array();
     foreach ($selected_columns as $column) {
-        if (starts_with($column, 'wp_')) {
+        if (mp_ssv_starts_with($column, 'wp_')) {
             $column                       = str_replace('wp_', '', $column);
             $columns[strtolower($column)] = $column;
         } else {
