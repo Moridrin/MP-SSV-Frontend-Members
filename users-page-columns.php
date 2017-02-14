@@ -97,3 +97,35 @@ function mp_ssv_users_custom_sortable_user_columns($columns)
 }
 
 add_filter('manage_users_sortable_columns', 'mp_ssv_users_custom_sortable_user_columns');
+
+/**
+ * @param WP_User_Query $query
+ *
+ * @return WP_User_Query
+ */
+function mp_ssv_users_sort_request($query)
+{
+    if (!isset($_GET['orderby'])) {
+        return $query;
+    }
+    if ($_GET['orderby'] == 'email'
+        || $_GET['orderby'] == 'display_name'
+        || $_GET['orderby'] == 'first_name'
+        || $_GET['orderby'] == 'last_name'
+        || $_GET['orderby'] == 'user_login'
+    ) {
+        return $query;
+    }
+
+    $query->query_fields = 'SQL_CALC_FOUND_ROWS wp_users.*';
+    $query->query_from   = 'FROM wp_users INNER JOIN wp_usermeta ON ( wp_users.ID = wp_usermeta.user_id )';
+    $query->query_where  = 'WHERE 1=1 AND (wp_usermeta.meta_key = \'' . $_GET['orderby'] . '\')';
+    if (isset($_GET['order'])) {
+        $query->query_orderby = 'ORDER BY wp_usermeta.meta_value ' . $_GET['order'];
+    } else {
+        $query->query_orderby = 'ORDER BY wp_usermeta.meta_value ' . 'ASC';
+    }
+    return $query;
+}
+
+add_filter('pre_user_query', 'mp_ssv_users_sort_request');
