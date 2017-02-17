@@ -49,7 +49,7 @@ function mp_ssv_users_custom_user_columns($column_headers)
             $column                              = str_replace('wp_', '', $column);
             $column_headers[strtolower($column)] = $column;
         } else {
-            $column_headers['ssv_' . $column] = $column;
+            $column_headers['ssv_' . $column] = Field::fromDatabase($column);
         }
     }
     return $column_headers;
