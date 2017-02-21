@@ -22,7 +22,7 @@ if (!defined('ABSPATH')) {
 require_once 'general/general.php';
 
 require_once 'options/options.php';
-require_once 'users-page-columns.php';
+require_once 'users-page.php';
 require_once 'custom-post-type/post-type.php';
 #endregion
 
@@ -53,6 +53,7 @@ class SSV_Users
     const ADMIN_REFERER_OPTIONS = 'ssv_users__admin_referer_options';
     const ADMIN_REFERER_REGISTRATION = 'ssv_users__admin_referer_registration';
     const ADMIN_REFERER_PROFILE = 'ssv_users__admin_referer_profile';
+    const ADMIN_REFERER_EXPORT = 'ssv_users__admin_referer_export';
     #endregion
 
     #region resetOptions()

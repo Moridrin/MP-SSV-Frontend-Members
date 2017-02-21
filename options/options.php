@@ -20,6 +20,7 @@ function ssv_users_options_page_content()
         <h2 class="nav-tab-wrapper">
             <a href="?page=<?= $_GET['page'] ?>&tab=general" class="nav-tab <?= $active_tab == 'general' ? 'nav-tab-active' : '' ?>">General</a>
             <a href="?page=<?= $_GET['page'] ?>&tab=email" class="nav-tab <?= $active_tab == 'email' ? 'nav-tab-active' : '' ?>">Email</a>
+            <a href="?page=<?= $_GET['page'] ?>&tab=users-export" class="nav-tab <?= $active_tab == 'users-export' ? 'nav-tab-active' : '' ?>">Export</a>
             <a href="http://bosso.nl/ssv-users/" target="_blank" class="nav-tab">
                 Help <img src="<?= SSV_Users::URL ?>general/images/link-new-tab.png" width="14px" style="vertical-align:middle">
             </a>
@@ -31,6 +32,9 @@ function ssv_users_options_page_content()
                 break;
             case "email":
                 require_once "email.php";
+                break;
+            case "users-export":
+                require_once "users-export.php";
                 break;
         }
         ?>

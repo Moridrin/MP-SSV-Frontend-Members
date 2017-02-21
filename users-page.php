@@ -9,6 +9,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+#region Columns
 /**
  * @param      $url
  * @param User $user
@@ -129,3 +130,34 @@ function mp_ssv_users_sort_request($query)
 }
 
 add_filter('pre_user_query', 'mp_ssv_users_sort_request');
+#endregion
+
+#region Filters
+#endregion
+
+#region Export
+function mp_ssv_users_bulk_action_export($actions)
+{
+    $actions['csv_export'] = 'Export CSV';
+    return $actions;
+}
+
+add_filter('bulk_actions-users', 'mp_ssv_users_bulk_action_export');
+
+function mp_ssv_users_exporter($redirect_to, $doaction, $user_ids)
+{
+    if ($doaction !== 'csv_export') {
+        return $redirect_to;
+    }
+    $csv = '';
+    foreach ($user_ids as $user_id) {
+//        $user = User::getByID($user_id);
+//        $csv .= $user->getCSV();
+    }
+
+//    $redirect_to = add_query_arg('csv_export', count($user_ids), $redirect_to);
+    return $redirect_to;
+}
+
+add_filter('handle_bulk_actions-users', 'mp_ssv_users_exporter', 10, 3);
+#endregion
