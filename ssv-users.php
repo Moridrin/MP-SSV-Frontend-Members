@@ -8,7 +8,7 @@
  * - Easy manage, view and edit member profiles.
  * - Etc.
  * This plugin is fully compatible with the SSV library which can add functionality like: MailChimp, Events, etc.
- * Version: 3.0.1
+ * Version: 3.0.2
  * Author: moridrin
  * Author URI: http://nl.linkedin.com/in/jberkvens/
  * License: WTFPL
