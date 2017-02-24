@@ -138,7 +138,7 @@ add_filter('pre_user_query', 'mp_ssv_users_sort_request');
 #region Export
 function mp_ssv_users_bulk_action_export($actions)
 {
-    $actions['csv_export'] = 'Export CSV';
+    $actions['csv_export'] = 'Export';
     return $actions;
 }
 
@@ -149,13 +149,22 @@ function mp_ssv_users_exporter($redirect_to, $doaction, $user_ids)
     if ($doaction !== 'csv_export') {
         return $redirect_to;
     }
-    $csv = '';
-    foreach ($user_ids as $user_id) {
-//        $user = User::getByID($user_id);
-//        $csv .= $user->getCSV();
+
+    $fields = json_decode(get_option(SSV_Users::OPTION_USER_EXPORT_COLUMNS));
+    if (empty($fields)) {
+        $fields = SSV_Users::getInputFieldNames();
     }
 
-//    $redirect_to = add_query_arg('csv_export', count($user_ids), $redirect_to);
+    $users = array();
+    foreach ($user_ids as $user_id) {
+        $users[] = User::getByID($user_id);
+    }
+    if (!$users) {
+        return $redirect_to;
+    }
+
+    SSV_Users::export($users, $fields);
+
     return $redirect_to;
 }
 

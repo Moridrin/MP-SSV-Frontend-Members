@@ -8,6 +8,7 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+
 ?>
 <form method="post" action="#" enctype="multipart/form-data">
     <table class="form-table">
@@ -15,7 +16,8 @@ if (!defined('ABSPATH')) {
             <th scope="row">Columns to Export</th>
             <td>
                 <?php
-                $selected   = array();
+                $selected   = json_decode(get_option(SSV_Users::OPTION_USER_EXPORT_COLUMNS));
+                $selected   = $selected ?: array();
                 $fieldNames = SSV_Users::getInputFieldNames();
                 echo SSV_General::getListSelect('field_names', $fieldNames, $selected);
                 ?>
