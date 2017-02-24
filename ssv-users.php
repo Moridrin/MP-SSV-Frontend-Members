@@ -416,5 +416,5 @@ function mp_ssv_users_generate_data() {
         exit;
     }
 }
-add_action('admin_init', 'mp_ssv_users_generate_data');
+//add_action('admin_init', 'mp_ssv_users_generate_data');
 #endregion
