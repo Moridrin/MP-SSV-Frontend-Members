@@ -49,6 +49,12 @@ function mp_ssv_user_save_fields($form)
     return $messages;
 }
 
+/**
+ * @param string $content
+ * @param Form   $form
+ *
+ * @return string
+ */
 function mp_ssv_user_get_fields($content, $form)
 {
     $html = '';
