@@ -23,6 +23,20 @@ if (!defined('ABSPATH')) {
                 ?>
             </td>
         </tr>
+        <tr>
+            <th scope="row">Filters</th>
+            <td>
+                <table>
+                    <?php $fields = SSV_Users::getInputFields(); ?>
+                    <?php foreach ($fields as $field): ?>
+                        <tr>
+                            <?php echo $field->getFilterRow(); ?>
+                        </tr>
+                    <?php endforeach; ?>
+                </table>
+                <script>mp_ssv_auto_enable_filter();</script>
+            </td>
+        </tr>
     </table>
     <?= SSV_General::getFormSecurityFields(SSV_Users::ADMIN_REFERER_EXPORT, false, false); ?>
     <input type="submit" name="save_export" id="save_export" class="button button-primary" value="Export">

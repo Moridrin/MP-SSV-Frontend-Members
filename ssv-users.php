@@ -8,7 +8,7 @@
  * - Easy manage, view and edit member profiles.
  * - Etc.
  * This plugin is fully compatible with the SSV library which can add functionality like: MailChimp, Events, etc.
- * Version: 3.0.2
+ * Version: 3.0.3
  * Author: moridrin
  * Author URI: http://nl.linkedin.com/in/jberkvens/
  * License: WTFPL
@@ -99,6 +99,24 @@ class SSV_Users
     }
 
     /**
+     * @return InputField[]
+     */
+    public static function getInputFields()
+    {
+        $pages  = self::getPagesWithTag(self::TAG_PROFILE_FIELDS);
+        $pages  = array_merge($pages, self::getPagesWithTag(self::TAG_REGISTER_FIELDS));
+        $fields = array();
+        /** @var WP_Post $page */
+        foreach ($pages as $page) {
+            $form   = Form::fromDatabase(false, $page);
+            $fields = array_merge($fields, $form->getInputFields());
+        }
+        $fields = array_unique($fields);
+        asort($fields);
+        return $fields;
+    }
+
+    /**
      * @param $customFieldsTag
      *
      * @return array|null|object Database query results
@@ -121,7 +139,13 @@ class SSV_Users
         return array_column($results, 'ID');
     }
 
-    public static function export($users, $fields) {
+    public static function export($users, $fields)
+    {
+        if (ini_get('safe_mode') == false) {
+            set_time_limit(0);
+            ini_set('memory_limit', '2048M');
+        }
+
         $filename = get_bloginfo('name') . ' users ' . date('Y-m-d H:i:s');
         header('Content-Description: File Transfer');
         header('Content-Disposition: attachment; filename=' . $filename . '.csv');
@@ -408,10 +432,7 @@ add_filter('the_title', 'mp_ssv_users_set_profile_page_title', 20, 2);
 function mp_ssv_users_generate_data()
 {
     if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_EXPORT)) {
-        if (ini_get('safe_mode') == false) {
-            set_time_limit(0);
-            ini_set('memory_limit', '2048M');
-        }
+        // Fields
         if (isset($_POST['field_names'])) {
             $fields = SSV_General::sanitize($_POST['field_names']);
             $fields = empty($fields) ? array() : explode(',', $fields);
@@ -422,10 +443,31 @@ function mp_ssv_users_generate_data()
         if (empty($fields)) { //If nothing is specified, select all fields.
             $fields = SSV_Users::getInputFieldNames();
         }
-        $users = get_users();
-        if (!$users) {
-            return; //TODO Add Message;
+        // Filters
+        $filters = array();
+        foreach ($_POST as $key => $value) {
+            if (mp_ssv_starts_with($key, 'filter_')) {
+                $filterKey = str_replace('filter_', '', $key);
+                $filters[$filterKey] = $_POST[$filterKey];
+            }
         }
+//        SSV_General::var_export($filters, 1);
+        // Users
+        $users = array();
+        foreach (get_users() as $user) {
+            $matchesFilters = true;
+            $user = new User($user);
+            foreach ($filters as $key => $value) {
+                if (strpos($user->getMeta($key), $value) === false) {
+                    $matchesFilters = false;
+                    break;
+                }
+            }
+            if ($matchesFilters) {
+                $users[] = $user;
+            }
+        }
+        SSV_General::var_export($users, 1);
         SSV_Users::export($users, $fields);
     }
 }

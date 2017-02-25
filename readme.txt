@@ -1,7 +1,7 @@
 === SSV Users ===
 Contributors: moridrin
 Tags: ssv, mp-ssv, members, user management, moridrin, Users, sportvereniging, sports club,
-Requires at least: 3.0.1
+Requires at least: 3.0.3
 Tested up to: 4.7
 Stable tag: trunk
 License: WTFPL
@@ -30,6 +30,10 @@ The best way is to add an issue on GitHub (https://github.com/Moridrin/ssv-users
 The best way is to add an issue on GitHub (https://github.com/Moridrin/ssv-users/issues). But you can also send an email to J.Berkvens@Moridrin.com (the lead developer).
 
 == Changelog ==
+= 3.0.3 =
+* User filters (for export) working.
+* User Export working from Users page.
+
 = 3.0.2 =
 * User Export working.
 
