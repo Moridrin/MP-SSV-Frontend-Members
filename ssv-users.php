@@ -55,6 +55,10 @@ class SSV_Users
     const ADMIN_REFERER_REGISTRATION = 'ssv_users__admin_referer_registration';
     const ADMIN_REFERER_PROFILE = 'ssv_users__admin_referer_profile';
     const ADMIN_REFERER_EXPORT = 'ssv_users__admin_referer_export';
+
+    const CAPABILITY_EDIT_USERS = 'edit_users';
+    const CAPABILITY_ADMIN_EDIT_USERS = 'admin_edit_users';
+
     #endregion
 
     #region resetOptions()
@@ -90,7 +94,7 @@ class SSV_Users
         $fieldNames = array();
         /** @var WP_Post $page */
         foreach ($pages as $page) {
-            $form       = Form::fromDatabase(false, $page);
+            $form       = Form::fromDatabase(SSV_Users::CAPABILITY_ADMIN_EDIT_USERS, false, $page);
             $fieldNames = array_merge($fieldNames, $form->getFieldProperty('name'));
         }
         $fieldNames = array_unique($fieldNames);
@@ -108,7 +112,7 @@ class SSV_Users
         $fields = array();
         /** @var WP_Post $page */
         foreach ($pages as $page) {
-            $form   = Form::fromDatabase(false, $page);
+            $form   = Form::fromDatabase(SSV_Users::CAPABILITY_ADMIN_EDIT_USERS, false, $page);
             $fields = array_merge($fields, $form->getInputFields());
         }
         $fields = array_unique($fields);

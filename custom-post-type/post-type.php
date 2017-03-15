@@ -33,7 +33,7 @@ function ssv_users_page_fields()
 {
     global $post;
     $allowTabs = strpos($post->post_content, SSV_Users::TAG_PROFILE_FIELDS) !== false;
-    $form      = Form::fromDatabase();
+    $form      = Form::fromDatabase(SSV_Users::CAPABILITY_ADMIN_EDIT_USERS);
     echo $form->getEditor($allowTabs);
 }
 
@@ -81,14 +81,14 @@ add_action('save_post', 'mp_ssv_user_pages_save_meta');
 function mp_ssv_user_pages_set_content($content)
 {
     if (strpos($content, SSV_Users::TAG_PROFILE_FIELDS) !== false) {
-        $form = Form::fromDatabase();
+        $form = Form::fromDatabase(SSV_Users::CAPABILITY_ADMIN_EDIT_USERS);
         require_once 'profile-fields.php';
     } elseif (strpos($content, SSV_Users::TAG_REGISTER_FIELDS) !== false) {
-        $form = Form::fromDatabase(false);
+        $form = Form::fromDatabase(SSV_Users::CAPABILITY_ADMIN_EDIT_USERS, false);
         require_once 'registration-fields.php';
         $form->addFields(User::getDefaultFields(), false);
     } elseif (strpos($content, SSV_Users::TAG_CHANGE_PASSWORD) !== false) {
-        $form = Form::fromDatabase(false);
+        $form = Form::fromDatabase(SSV_Users::CAPABILITY_ADMIN_EDIT_USERS, false);
         require_once 'change-password-page.php';
         $form->addFields(User::getPasswordChangeFields(), false);
     } elseif (strpos($content, SSV_Users::TAG_LOGIN_FIELDS) !== false) {
