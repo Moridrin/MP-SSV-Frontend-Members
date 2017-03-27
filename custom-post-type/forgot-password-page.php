@@ -15,7 +15,7 @@ function mp_ssv_user_get_fields($content)
     $users = get_users();
     ob_start();
     if (current_theme_supports('materialize')): ?>
-        <form name="lostpasswordform" id="lostpasswordform" action="<?php echo esc_url(network_site_url('wp-login.php?action=lostpassword', 'login_post')); ?>" method="post">
+        <form name="lostpasswordform" id="lostpasswordform" action="<?php echo esc_url(site_url('wp-login.php?action=lostpassword', 'login_post')); ?>" method="post">
             <?php if (User::isBoard()): ?>
                 <div class="input-field col s12">
                     <select name="user_login">
