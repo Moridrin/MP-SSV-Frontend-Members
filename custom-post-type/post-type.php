@@ -82,6 +82,30 @@ function mp_ssv_user_pages_set_content($content)
 {
     if (strpos($content, SSV_Users::TAG_PROFILE_FIELDS) !== false) {
         $form = Form::fromDatabase(SSV_Users::CAPABILITY_ADMIN_EDIT_USERS);
+
+        $_SESSION['field_errors'] = array();
+        if (isset($_GET['view']) && $_GET['view'] == 'directDebitPDF') {
+            if (isset($_GET['user_id'])) {
+                $user = User::getByID($_GET['user_id']);
+            } else {
+                $user = User::getCurrent();
+            }
+            $_SESSION["ABSPATH"]         = ABSPATH;
+            $_SESSION["first_name"]      = $user->first_name;
+            $_SESSION["initials"]        = $user->getMeta('initials');
+            $_SESSION["last_name"]       = $user->last_name;
+            $_SESSION["gender"]          = $user->getMeta('gender');
+            $_SESSION["iban"]            = $user->getMeta('iban');
+            $_SESSION["date_of_birth"]   = $user->getMeta('date_of_birth');
+            $_SESSION["street"]          = $user->getMeta('street');
+            $_SESSION["email"]           = $user->getMeta('email');
+            $_SESSION["postal_code"]     = $user->getMeta('postal_code');
+            $_SESSION["city"]            = $user->getMeta('city');
+            $_SESSION["phone_number"]    = $user->getMeta('phone_number');
+            $_SESSION["emergency_phone"] = $user->getMeta('emergency_phone');
+            SSV_General::redirect(SSV_Users::URL . '/direct-debit-pdf.php');
+        }
+
         require_once 'profile-fields.php';
     } elseif (strpos($content, SSV_Users::TAG_REGISTER_FIELDS) !== false) {
         $form = Form::fromDatabase(SSV_Users::CAPABILITY_ADMIN_EDIT_USERS, false);
