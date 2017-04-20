@@ -165,8 +165,8 @@ class SSV_DirectDebitPDF extends FPDF
     public function AddPageWithFormat($ABSPATH, $orientation = '', $size = '')
     {
         parent::AddPage($orientation, $size);
-        $this->Image($ABSPATH . '/wp-content/plugins/ssv-frontend-members/images/Document Header.png', $this->w - $this->pageRMargin - 75, $this->pageTMargin, 75, 37, 'PNG');
-        $this->Image($ABSPATH . '/wp-content/plugins/ssv-frontend-members/images/Vertical Banner.png', $this->pageLMargin, $this->pageTMargin, 25, null, 'PNG');
+        $this->Image(SSV_Users::PATH . '/images/Document Header.png', $this->w - $this->pageRMargin - 75, $this->pageTMargin, 75, 37, 'PNG');
+        $this->Image(SSV_Users::PATH. '/images/Vertical Banner.png', $this->pageLMargin, $this->pageTMargin, 25, null, 'PNG');
         $this->SetXY($this->lMargin, $this->pageTMargin);
 
         // <editor-fold desc="Company Information">

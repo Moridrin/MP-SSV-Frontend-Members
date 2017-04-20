@@ -24,6 +24,7 @@ require_once 'general/general.php';
 require_once 'options/options.php';
 require_once 'users-page.php';
 require_once 'custom-post-type/post-type.php';
+require_once 'direct-debit-pdf.php';
 #endregion
 
 #region SSV_Users class
@@ -420,7 +421,7 @@ function mp_ssv_users_set_profile_page_title($title, $id)
     if ($correctPage == null) {
         return $title;
     }
-    if (isset($_GET['member']) && is_user_logged_in() && User::isBoard()) {
+    if (isset($_GET['member']) && User::currentUserCan('edit_users')) {
         if (!User::getByID($_GET['member'])) {
             return $title;
         }

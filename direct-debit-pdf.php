@@ -5,57 +5,80 @@
  * Date: 10-4-17
  * Time: 10:35
  */
-session_start();
-require_once('include/fpdf/SSV_DirectDebitPDF.php');
-if (
-    !isset($_SESSION['ABSPATH'])
-    || !isset($_SESSION['first_name'])
-    || !isset($_SESSION['initials'])
-    || !isset($_SESSION['last_name'])
-    || !isset($_SESSION['gender'])
-    || !isset($_SESSION['iban'])
-    || !isset($_SESSION['date_of_birth'])
-    || !isset($_SESSION['street'])
-    || !isset($_SESSION['email'])
-    || !isset($_SESSION['postal_code'])
-    || !isset($_SESSION['city'])
-    || !isset($_SESSION['phone_number'])
-    || !isset($_SESSION['emergency_phone'])
-) {
-    ?>
-    Incomplete variable set.
-    This pdf requires the member to have the following fields:
-    <ul>
-        <li>first_name</li>
-        <li>initials</li>
-        <li>last_name</li>
-        <li>gender</li>
-        <li>iban</li>
-        <li>date_of_birth</li>
-        <li>street</li>
-        <li>email</li>
-        <li>postal_code</li>
-        <li>city</li>
-        <li>phone_number</li>
-        <li>emergency_phone</li>
-    </ul>
-    If the member does have these fields, try reloading the profile page.
-    <?php
+
+/**
+ * @param      $url
+ * @param User $user
+ *
+ * @return mixed
+ */
+function mp_ssv_users_direct_debit_pdf_url($url, $user)
+{
+    /** @var WP_Post[] $pages */
+    $pages       = SSV_Users::getPagesWithTag(SSV_Users::TAG_PROFILE_FIELDS);
+    $wildcardURL = null;
+    foreach ($pages as $page) {
+        $pageRole = get_post_meta($page->ID, SSV_Users::PAGE_ROLE_META, true);
+        if ($pageRole == $user->roles[0]) {
+            return get_permalink($page) . '?member=' . $user->ID;
+        } elseif ($pageRole == -1) {
+            $wildcardURL = get_permalink($page) . '?member=' . $user->ID;
+        }
+    }
+    return $wildcardURL ?: $url;
 }
-$pdf = new SSV_DirectDebitPDF();
-$pdf->build(
-    $_SESSION['ABSPATH'],
-    iconv('UTF-8', 'windows-1252', $_SESSION['first_name']),
-    iconv('UTF-8', 'windows-1252', $_SESSION['initials']),
-    iconv('UTF-8', 'windows-1252', $_SESSION['last_name']),
-    iconv('UTF-8', 'windows-1252', $_SESSION['gender']),
-    iconv('UTF-8', 'windows-1252', $_SESSION['iban']),
-    iconv('UTF-8', 'windows-1252', $_SESSION['date_of_birth']),
-    iconv('UTF-8', 'windows-1252', $_SESSION['street']),
-    iconv('UTF-8', 'windows-1252', $_SESSION['email']),
-    iconv('UTF-8', 'windows-1252', $_SESSION['postal_code']),
-    iconv('UTF-8', 'windows-1252', $_SESSION['city']),
-    iconv('UTF-8', 'windows-1252', $_SESSION['phone_number']),
-    iconv('UTF-8', 'windows-1252', $_SESSION['emergency_phone'])
-);
-$pdf->Output('I');
+
+add_filter(SSV_General::HOOK_USER_PDF_URL, 'mp_ssv_users_direct_debit_pdf_url', 10, 2);
+
+require_once('include/fpdf/SSV_DirectDebitPDF.php');
+
+function mp_ssv_user_pdf_content($content)
+{
+    if (strpos($content, '[direct_debit_pdf]') === false) {
+        return $content;
+    }
+    $user = null;
+    if (isset($_GET['member']) && User::currentUserCan('edit_users')) {
+        $user = User::getByID($_GET['member']);
+    }
+    if ($user == null) {
+        $user = User::getCurrent();
+    }
+    if ($user == null) {
+        SSV_General::redirect('/login');
+        return $content;
+    }
+
+    $first_name      = $user->getMeta('first_name');
+    $initials        = $user->getMeta('initials');
+    $last_name       = $user->getMeta('last_name');
+    $gender          = $user->getMeta('gender');
+    $iban            = $user->getMeta('iban');
+    $date_of_birth   = $user->getMeta('date_of_birth');
+    $street          = $user->getMeta('street');
+    $email           = $user->getMeta('email');
+    $postal_code     = $user->getMeta('postal_code');
+    $city            = $user->getMeta('city');
+    $phone_number    = $user->getMeta('phone_number');
+    $emergency_phone = $user->getMeta('emergency_phone');
+
+    $pdf = new SSV_DirectDebitPDF();
+    $pdf->build(
+        $_SESSION['ABSPATH'],
+        iconv('UTF-8', 'windows-1252', $first_name),
+        iconv('UTF-8', 'windows-1252', $initials),
+        iconv('UTF-8', 'windows-1252', $last_name),
+        iconv('UTF-8', 'windows-1252', $gender),
+        iconv('UTF-8', 'windows-1252', $iban),
+        iconv('UTF-8', 'windows-1252', $date_of_birth),
+        iconv('UTF-8', 'windows-1252', $street),
+        iconv('UTF-8', 'windows-1252', $email),
+        iconv('UTF-8', 'windows-1252', $postal_code),
+        iconv('UTF-8', 'windows-1252', $city),
+        iconv('UTF-8', 'windows-1252', $phone_number),
+        iconv('UTF-8', 'windows-1252', $emergency_phone)
+    );
+    $pdf->Output('I');
+}
+
+add_filter('the_content', 'mp_ssv_user_pdf_content');
