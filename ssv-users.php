@@ -24,7 +24,6 @@ require_once 'general/general.php';
 require_once 'options/options.php';
 require_once 'users-page.php';
 require_once 'custom-post-type/post-type.php';
-require_once 'direct-debit-pdf.php';
 #endregion
 
 #region SSV_Users class
