@@ -42,6 +42,7 @@ class SSV_Users
     const TAG_PROFILE_FIELDS = '[ssv-users-profile-fields]';
     const TAG_CHANGE_PASSWORD = '[ssv-users-change-password-fields]';
     const TAG_LOST_PASSWORD = '[ssv-users-lost-password-fields]';
+    const TAG_DIRECT_DEBIT_PDF = '[ssv-users-direct-debit-pdf]';
 
     const PAGE_ROLE_META = 'page_role';
 

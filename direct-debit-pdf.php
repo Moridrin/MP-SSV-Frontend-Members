@@ -15,17 +15,11 @@
 function mp_ssv_users_direct_debit_pdf_url($url, $user)
 {
     /** @var WP_Post[] $pages */
-    $pages       = SSV_Users::getPagesWithTag(SSV_Users::TAG_PROFILE_FIELDS);
-    $wildcardURL = null;
-    foreach ($pages as $page) {
-        $pageRole = get_post_meta($page->ID, SSV_Users::PAGE_ROLE_META, true);
-        if ($pageRole == $user->roles[0]) {
-            return get_permalink($page) . '?member=' . $user->ID;
-        } elseif ($pageRole == -1) {
-            $wildcardURL = get_permalink($page) . '?member=' . $user->ID;
-        }
+    $pages = SSV_Users::getPagesWithTag(SSV_Users::TAG_DIRECT_DEBIT_PDF);
+    if (!empty($pages)) {
+        return get_permalink($pages[0]) . '?member=' . $user->ID;
     }
-    return $wildcardURL ?: $url;
+    return $url;
 }
 
 add_filter(SSV_General::HOOK_USER_PDF_URL, 'mp_ssv_users_direct_debit_pdf_url', 10, 2);
@@ -34,7 +28,7 @@ require_once('include/fpdf/SSV_DirectDebitPDF.php');
 
 function mp_ssv_user_pdf_content($content)
 {
-    if (strpos($content, '[direct_debit_pdf]') === false) {
+    if (strpos($content, '[ssv-users-direct-debit-pdf]') === false) {
         return $content;
     }
     $user = null;
