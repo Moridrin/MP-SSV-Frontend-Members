@@ -14,6 +14,7 @@
  * License: WTFPL
  * License URI: http://www.wtfpl.net/txt/copying/
  */
+namespace mp_ssv_users;
 if (!defined('ABSPATH')) {
     exit;
 }

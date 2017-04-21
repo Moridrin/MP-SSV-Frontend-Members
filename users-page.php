@@ -32,7 +32,7 @@ function mp_ssv_users_custom_profile_url($url, $user)
     return $wildcardURL ?: $url;
 }
 
-//add_filter(SSV_General::HOOK_USER_PROFILE_URL, 'mp_ssv_users_custom_profile_url', 10, 2);
+add_filter(SSV_General::HOOK_USER_PROFILE_URL, 'mp_ssv_users_custom_profile_url', 10, 2);
 
 function mp_ssv_users_custom_user_columns($column_headers)
 {
@@ -56,7 +56,7 @@ function mp_ssv_users_custom_user_columns($column_headers)
     return $column_headers;
 }
 
-//add_action('manage_users_columns', 'mp_ssv_users_custom_user_columns');
+add_action('manage_users_columns', 'mp_ssv_users_custom_user_columns');
 
 function mp_ssv_users_custom_user_column_values($val, $column_name, $user_id)
 {
@@ -78,7 +78,7 @@ function mp_ssv_users_custom_user_column_values($val, $column_name, $user_id)
     return $val;
 }
 
-//add_filter('manage_users_custom_column', 'mp_ssv_users_custom_user_column_values', 10, 3);
+add_filter('manage_users_custom_column', 'mp_ssv_users_custom_user_column_values', 10, 3);
 
 function mp_ssv_users_custom_sortable_user_columns($columns)
 {
