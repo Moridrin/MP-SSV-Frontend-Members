@@ -8,13 +8,21 @@
  * - Easy manage, view and edit member profiles.
  * - Etc.
  * This plugin is fully compatible with the SSV library which can add functionality like: MailChimp, Events, etc.
- * Version: 3.0.3
+ * Version: 3.1.0
  * Author: moridrin
  * Author URI: http://nl.linkedin.com/in/jberkvens/
  * License: WTFPL
  * License URI: http://www.wtfpl.net/txt/copying/
  */
 namespace mp_ssv_users;
+use mp_ssv_general\custom_fields\InputField;
+use mp_ssv_general\Form;
+use mp_ssv_general\SSV_General;
+use mp_ssv_general\User;
+use WP_Error;
+use WP_Post;
+use WP_User;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -96,7 +104,7 @@ class SSV_Users
         $fieldNames = array();
         /** @var WP_Post $page */
         foreach ($pages as $page) {
-            $form       = Form::fromDatabase(SSV_Users::CAPABILITY_ADMIN_EDIT_USERS, false, $page);
+            $form       = Form::fromDatabase(false, $page);
             $fieldNames = array_merge($fieldNames, $form->getFieldProperty('name'));
         }
         $fieldNames = array_unique($fieldNames);
@@ -114,7 +122,7 @@ class SSV_Users
         $fields = array();
         /** @var WP_Post $page */
         foreach ($pages as $page) {
-            $form   = Form::fromDatabase(SSV_Users::CAPABILITY_ADMIN_EDIT_USERS, false, $page);
+            $form   = Form::fromDatabase(false, $page);
             $fields = array_merge($fields, $form->getInputFields());
         }
         $fields = array_unique($fields);

@@ -1,10 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: moridrin
- * Date: 5-2-17
- * Time: 10:32
- */
+namespace mp_ssv_users;
+use mp_ssv_general\User;
+use WP_User;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -18,7 +16,7 @@ function mp_ssv_user_get_fields($content)
         <form name="lostpasswordform" id="lostpasswordform" action="<?php echo esc_url(site_url('wp-login.php?action=lostpassword', 'login_post')); ?>" method="post">
             <?php if (User::isBoard()): ?>
                 <div class="input-field col s12">
-                    <select name="user_login">
+                    <select name="user_login" title="User Login">
                         <?php /** @var WP_User $user */ ?>
                         <?php foreach ($users as $user): ?>
                             <option value="<?= $user->user_login ?>"><?= $user->display_name ?></option>
