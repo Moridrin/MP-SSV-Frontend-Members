@@ -102,7 +102,7 @@ class SSV_Users
         $fieldNames = array();
         /** @var WP_Post $page */
         foreach ($pages as $page) {
-            $form       = Form::fromDatabase(SSV_Users::CAPABILITY_ADMIN_EDIT_USERS, false, $page);
+            $form       = Form::fromDatabase(false, $page);
             $fieldNames = array_merge($fieldNames, $form->getFieldProperty('name'));
         }
         $fieldNames = array_unique($fieldNames);
@@ -120,7 +120,7 @@ class SSV_Users
         $fields = array();
         /** @var WP_Post $page */
         foreach ($pages as $page) {
-            $form   = Form::fromDatabase(SSV_Users::CAPABILITY_ADMIN_EDIT_USERS, false, $page);
+            $form   = Form::fromDatabase(false, $page);
             $fields = array_merge($fields, $form->getInputFields());
         }
         $fields = array_unique($fields);
