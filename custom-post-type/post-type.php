@@ -1,8 +1,8 @@
 <?php
-namespace mp_ssv_users;
 use mp_ssv_general\Form;
 use mp_ssv_general\SSV_General;
 use mp_ssv_general\User;
+use mp_ssv_users\SSV_Users;
 
 if (!defined('ABSPATH')) {
     exit;
