@@ -8,17 +8,24 @@
  * - Easy manage, view and edit member profiles.
  * - Etc.
  * This plugin is fully compatible with the SSV library which can add functionality like: MailChimp, Events, etc.
- * Version: 3.0.3
+ * Version: 3.1.0
  * Author: moridrin
  * Author URI: http://nl.linkedin.com/in/jberkvens/
  * License: WTFPL
  * License URI: http://www.wtfpl.net/txt/copying/
  */
+namespace mp_ssv_users;
+use mp_ssv_general\custom_fields\InputField;
+use mp_ssv_general\Form;
+use mp_ssv_general\SSV_General;
+use mp_ssv_general\User;
+
 if (!defined('ABSPATH')) {
     exit;
 }
 
 #region Require Once
+require_once 'functions.php';
 require_once 'general/general.php';
 
 require_once 'options/options.php';
@@ -41,6 +48,7 @@ class SSV_Users
     const TAG_PROFILE_FIELDS = '[ssv-users-profile-fields]';
     const TAG_CHANGE_PASSWORD = '[ssv-users-change-password-fields]';
     const TAG_LOST_PASSWORD = '[ssv-users-lost-password-fields]';
+    const TAG_DIRECT_DEBIT_PDF = '[ssv-users-direct-debit-pdf]';
 
     const PAGE_ROLE_META = 'page_role';
 
@@ -420,7 +428,7 @@ function mp_ssv_users_set_profile_page_title($title, $id)
     if ($correctPage == null) {
         return $title;
     }
-    if (isset($_GET['member']) && is_user_logged_in() && User::isBoard()) {
+    if (isset($_GET['member']) && User::currentUserCan('edit_users')) {
         if (!User::getByID($_GET['member'])) {
             return $title;
         }

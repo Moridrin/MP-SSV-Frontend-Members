@@ -1,10 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: moridrin
- * Date: 26-1-17
- * Time: 8:55
- */
+use mp_ssv_general\Form;
+use mp_ssv_general\Message;
+use mp_ssv_general\SSV_General;
+use mp_ssv_general\User;
+use mp_ssv_users\SSV_Users;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -40,7 +40,7 @@ function mp_ssv_user_save_fields($form)
         if (empty($messages)) {
             $messages = array(new Message('Profile Saved.'));
         }
-    } elseif (User::isBoard()) {
+    } elseif (User::currentUserCan('edit_users')) {
         $saveMessages = $form->save($tabID);
         do_action(SSV_General::HOOK_USERS_SAVE_MEMBER, $form->user);
         $saveMessages = $saveMessages === true ? array() : $saveMessages;
@@ -66,7 +66,7 @@ function mp_ssv_user_get_fields($content, $form)
     if (isset($_GET['member'])) {
         if (!is_user_logged_in()) {
             return (new Message('You must sign in to view this profile.', Message::ERROR_MESSAGE))->getHTML();
-        } elseif (!User::isBoard()) {
+        } elseif (!User::currentUserCan('edit_users')) {
             $html .= (new Message('You have no access to view this profile.', Message::ERROR_MESSAGE))->getHTML();
         }
     }

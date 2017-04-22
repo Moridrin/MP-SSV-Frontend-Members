@@ -1,10 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: moridrin
- * Date: 5-2-17
- * Time: 10:32
- */
+namespace mp_ssv_users;
+use mp_ssv_general\Form;
+use mp_ssv_general\Message;
+use mp_ssv_general\SSV_General;
+use mp_ssv_general\User;
+
 if (!defined('ABSPATH')) {
     exit;
 }
