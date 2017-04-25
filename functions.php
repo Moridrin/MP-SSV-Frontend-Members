@@ -1,19 +1,4 @@
 <?php
-/**
- * Plugin Name: SSV Users
- * Plugin URI: https://bosso.nl/ssv-users/
- * Description: SSV Users is a plugin that allows you to manage members of a Students Sports Club the way you want to. With this plugin you can:
- * - Have a frontend registration and login page
- * - Customize member data fields,
- * - Easy manage, view and edit member profiles.
- * - Etc.
- * This plugin is fully compatible with the SSV library which can add functionality like: MailChimp, Events, etc.
- * Version: 3.1.0
- * Author: moridrin
- * Author URI: http://nl.linkedin.com/in/jberkvens/
- * License: WTFPL
- * License URI: http://www.wtfpl.net/txt/copying/
- */
 use mp_ssv_general\SSV_General;
 use mp_ssv_general\User;
 use mp_ssv_users\SSV_Users;
@@ -250,7 +235,7 @@ function mp_ssv_users_generate_data()
         $filters = array();
         foreach ($_POST as $key => $value) {
             if (mp_ssv_starts_with($key, 'filter_')) {
-                $filterKey = str_replace('filter_', '', $key);
+                $filterKey           = str_replace('filter_', '', $key);
                 $filters[$filterKey] = $_POST[$filterKey];
             }
         }
@@ -259,7 +244,7 @@ function mp_ssv_users_generate_data()
         $users = array();
         foreach (get_users() as $user) {
             $matchesFilters = true;
-            $user = new User($user);
+            $user           = new User($user);
             foreach ($filters as $key => $value) {
                 if (strpos($user->getMeta($key), $value) === false) {
                     $matchesFilters = false;
@@ -275,5 +260,5 @@ function mp_ssv_users_generate_data()
     }
 }
 
-add_action('admin_init', 'mp_ssv_users_generate_data');
+//add_action('admin_init', 'mp_ssv_users_generate_data');
 #endregion
