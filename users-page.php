@@ -61,16 +61,18 @@ function mp_ssv_users_custom_user_column_values($val, $column_name, $user_id)
 {
     $user = User::getByID($user_id);
     if ($column_name == 'ssv_display_name') {
-        $username_block = '';
-        $username_block .= get_avatar($user->ID, 32, '', '', array('extra_attr' => 'style="float: left; margin-right: 5px; margin-top: 1px;"'));
-        $username_block .= '<strong>' . $user->getProfileLink('_blank') . '</strong><br/>';
+        $capebilitiesURL = 'users.php?page=users-user-role-editor.php&object=user&user_id=' . $user->ID;
         $editURL         = get_edit_user_link($user->ID);
-//        $capebilitiesURL = 'users.php?page=users-user-role-editor.php&object=user&user_id=' . $user->ID;
-        $username_block .= '<div class="row-actions">';
-        $username_block .= '<span class="direct_debit_pdf"><a href="' . esc_url($user->getPDFURL()) . '" target="_blank">PDF</a> | </span>';
-        $username_block .= '<span class="edit"><a href="' . esc_url($editURL) . '">Edit</a></span>';
-        $username_block .= '</div>';
-        return $username_block;
+        ob_start();
+        ?>
+        <?= get_avatar($user->ID, 32, '', '', array('extra_attr' => 'style="float: left; margin-right: 5px; margin-top: 1px;"')); ?>
+        <strong><?= $user->getProfileLink('_blank') ?></strong><br/>
+        <div class="row-actions">
+            <?php do_action(SSV_General::HOOK_USER_LINKS); ?>
+            <span class="edit"><a href="<?= esc_url($editURL) ?>">Edit</a></span>
+        </div>
+        <?php
+        return ob_get_clean();
     } elseif (mp_ssv_starts_with($column_name, 'ssv_')) {
         return $user->getMeta(str_replace('ssv_', '', $column_name));
     }
