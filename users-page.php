@@ -61,15 +61,27 @@ function mp_ssv_users_custom_user_column_values($val, $column_name, $user_id)
 {
     $user = User::getByID($user_id);
     if ($column_name == 'ssv_display_name') {
-        $capebilitiesURL = 'users.php?page=users-user-role-editor.php&object=user&user_id=' . $user->ID;
-        $editURL         = get_edit_user_link($user->ID);
+        $actions   = array();
+        $edit_link = esc_url(add_query_arg('wp_http_referer', urlencode(wp_unslash($_SERVER['REQUEST_URI'])), get_edit_user_link($user->ID)));
+        if (current_user_can('edit_user', $user->ID)) {
+            $actions['edit'] = '<a href="' . $edit_link . '">' . __('Edit') . '</a>';
+        }
+        if (!is_multisite() && get_current_user_id() != $user->ID && current_user_can('delete_user', $user->ID)) {
+            $actions['delete'] = "<a class='submitdelete' href='" . wp_nonce_url("users.php?action=delete&amp;user=$user->ID", 'bulk-users') . "'>" . __('Delete') . "</a>";
+        }
+        if (is_multisite() && get_current_user_id() != $user->ID && current_user_can('remove_user', $user->ID)) {
+            $actions['remove'] = "<a class='submitdelete' href='" . wp_nonce_url("users.php?action=remove&amp;user=$user->ID", 'bulk-users') . "'>" . __('Remove') . "</a>";
+        }
+        $actions = apply_filters('user_row_actions', $actions, $user);
         ob_start();
         ?>
         <?= get_avatar($user->ID, 32, '', '', array('extra_attr' => 'style="float: left; margin-right: 5px; margin-top: 1px;"')); ?>
         <strong><?= $user->getProfileLink('_blank') ?></strong><br/>
         <div class="row-actions">
-            <?php do_action(SSV_General::HOOK_USER_LINKS); ?>
-            <span class="edit"><a href="<?= esc_url($editURL) ?>">Edit</a></span>
+            <?php foreach ($actions as $key => $action): ?>
+                <span class="<?= $key ?>"><?= $action ?></span>
+                <?= $action !== end($actions) ? ' | ' : '' ?>
+            <?php endforeach; ?>
         </div>
         <?php
         return ob_get_clean();
