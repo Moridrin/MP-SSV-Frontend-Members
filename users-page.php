@@ -131,8 +131,8 @@ function mp_ssv_users_sort_request($query)
     }
 
     $query->query_fields = 'SQL_CALC_FOUND_ROWS wp_users.*';
-    $query->query_from   = 'FROM wp_users INNER JOIN wp_usermeta ON ( wp_users.ID = wp_usermeta.user_id )';
-    $query->query_where  = 'WHERE 1=1 AND (wp_usermeta.meta_key = \'' . $_GET['orderby'] . '\')';
+    $query->query_from   = 'FROM wp_users LEFT JOIN wp_usermeta ON ( wp_users.ID = wp_usermeta.user_id AND wp_usermeta.meta_key = \'' . $_GET['orderby'] . '\' )';
+//    $query->query_where  = 'WHERE (wp_usermeta.meta_key = \'' . $_GET['orderby'] . '\')';
     if (isset($_GET['order'])) {
         $query->query_orderby = 'ORDER BY wp_usermeta.meta_value ' . $_GET['order'];
     } else {
