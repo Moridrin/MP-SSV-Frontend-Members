@@ -113,8 +113,16 @@ add_filter(SSV_General::HOOK_RESET_OPTIONS, 'mp_ssv_users_reset_options');
  *
  * @return string The <img> component of the avatar.
  */
-function ssv_users_avatar($avatar, $id_or_email, $size = 150, $default = null, $alt = '', $args = array())
-{
+function ssv_users_avatar(
+    $avatar,
+    $id_or_email,
+    /** @noinspection PhpUnusedParameterInspection */
+    $size = 150,
+    $default = null,
+    /** @noinspection PhpUnusedParameterInspection */
+    $alt = '',
+    $args = array()
+) {
     $user = false;
 
     if (is_numeric($id_or_email)) {
@@ -204,7 +212,7 @@ function mp_ssv_users_set_profile_page_title($title, $id)
     if ($correctPage == null) {
         return $title;
     }
-    if (isset($_GET['member']) && User::currentUserCan('edit_users')) {
+    if (isset($_GET['member']) && current_user_can('edit_users')) {
         if (!User::getByID($_GET['member'])) {
             return $title;
         }

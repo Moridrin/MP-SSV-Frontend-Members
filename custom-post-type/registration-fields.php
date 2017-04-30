@@ -78,7 +78,7 @@ function mp_ssv_user_save_fields($form)
 
     if (empty($messages)) {
         $messages[] = new Message('Registration Successful.');
-    } elseif (!empty($requiredFieldsMessages) && User::isBoard()) {
+    } elseif (!empty($requiredFieldsMessages) && current_user_can('admin_edit_users')) {
         $user         = User::register($username, $password, $email);
         $form->user   = $user;
         $saveMessages = $form->save();
@@ -105,7 +105,7 @@ function mp_ssv_user_get_fields($content, $form)
     if (isset($_GET['member'])) {
         if (!is_user_logged_in()) {
             return (new Message('You must sign in to view this profile.', Message::ERROR_MESSAGE))->getHTML();
-        } elseif (!User::isBoard()) {
+        } elseif (!current_user_can('view_users')) {
             $html .= (new Message('You have no access to view this profile.', Message::ERROR_MESSAGE))->getHTML();
         }
     }

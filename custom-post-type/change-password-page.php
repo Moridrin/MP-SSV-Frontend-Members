@@ -19,13 +19,6 @@ function mp_ssv_user_save_fields($form)
     if (!SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_PROFILE)) {
         return array();
     }
-    if (empty($_POST) || !is_user_logged_in()) {
-        return array(new Message('No values to save', Message::NOTIFICATION_MESSAGE));
-    }
-
-    if (isset($_GET['member']) && !User::isBoard()) {
-        return array(new Message('You have no rights to view this user.', Message::ERROR_MESSAGE));
-    }
 
     $form->setValues($_POST);
     $messages = $form->isValid();

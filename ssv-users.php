@@ -120,7 +120,7 @@ class SSV_Users
         $fields = array();
         /** @var WP_Post $page */
         foreach ($pages as $page) {
-            $form   = Form::fromDatabase(false, $page);
+            $form   = Form::fromDatabase('', false, $page);
             $fields = array_merge($fields, $form->getInputFields());
         }
         $fields = array_unique($fields);

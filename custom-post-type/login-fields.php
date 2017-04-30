@@ -8,9 +8,9 @@ function mp_ssv_user_get_fields($content)
 {
     ob_start();
     if (is_user_logged_in()) {
-        $current_user = wp_get_current_user();
         $url          = (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '?logout=success';
         $link         = '<a href="' . wp_logout_url($url) . '">Logout</a>';
+        $current_user = wp_get_current_user();
         ob_start();
         ?>
         <div class="card-panel primary">

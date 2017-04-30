@@ -32,7 +32,6 @@ if (!defined('ABSPATH')) {
                         </tr>
                     <?php endforeach; ?>
                 </table>
-                <script>mp_ssv_auto_enable_filter();</script>
             </td>
         </tr>
     </table>

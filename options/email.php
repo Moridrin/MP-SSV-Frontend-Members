@@ -50,7 +50,7 @@ if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_OPTIONS)) {
                 <label>
                     <input type="hidden" name="email_on_registration_status_changed" value="false"/>
                     <input type="checkbox" name="email_on_registration_status_changed" value="true" <?= get_option(SSV_Users::OPTION_NEW_MEMBER_REGISTRANT_EMAIL) ? 'checked' : '' ?>/>
-                    When someone registers the Registrant will receive a confirmation email.
+                    When someone registers he/she will receive a confirmation email.
                 </label>
             </td>
         </tr>

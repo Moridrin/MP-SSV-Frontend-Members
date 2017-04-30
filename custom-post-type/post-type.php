@@ -116,19 +116,19 @@ function mp_ssv_user_pages_set_content($content)
         $form->addFields(User::getPasswordChangeFields(), false);
     } elseif (strpos($content, SSV_Users::TAG_LOGIN_FIELDS) !== false) {
         require_once 'login-fields.php';
-        return mp_ssv_user_get_fields($content);
+        return mp_ssv_users\mp_ssv_user_get_fields($content);
     } elseif (strpos($content, SSV_Users::TAG_LOST_PASSWORD) !== false) {
         require_once 'forgot-password-page.php';
-        return mp_ssv_user_get_fields($content);
+        return mp_ssv_users\mp_ssv_user_get_fields($content);
     } else {
         return $content;
     }
     $messagesHTML = '';
-    $messages     = mp_ssv_user_save_fields($form);
+    $messages     = mp_ssv_users\mp_ssv_user_save_fields($form);
     foreach ($messages as $message) {
         $messagesHTML .= $message->getHTML();
     }
-    $content = $messagesHTML . mp_ssv_user_get_fields($content, $form);
+    $content = $messagesHTML . mp_ssv_users\mp_ssv_user_get_fields($content, $form);
     return $content;
 }
 
