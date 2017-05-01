@@ -120,10 +120,9 @@ class SSV_Users
         /** @var WP_Post $page */
         foreach ($pages as $page) {
             $form   = Form::fromDatabase('', false, $page);
-            $fields = array_merge($fields, $form->getInputFields());
+            $fields = array_merge_recursive($fields, $form->getInputFields());
         }
         $fields = array_unique($fields);
-        SSV_General::var_export($fields, 1);
         asort($fields);
         return $fields;
     }

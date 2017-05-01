@@ -244,18 +244,21 @@ function mp_ssv_users_generate_data()
         foreach ($_POST as $key => $value) {
             if (mp_ssv_starts_with($key, 'filter_')) {
                 $filterKey           = str_replace('filter_', '', $key);
-                SSV_General::var_export($_POST, 1);
                 $filters[$filterKey] = $_POST[$filterKey];
             }
         }
-        SSV_General::var_export($filters, 1);
         // Users
         $users = array();
         foreach (get_users() as $user) {
             $matchesFilters = true;
             $user           = new User($user);
             foreach ($filters as $key => $value) {
-                if (strpos($user->getMeta($key), $value) === false) {
+                if ($value == '*') {
+                    if (empty($user->getMeta($key))) {
+                        $matchesFilters = false;
+                        break;
+                    }
+                } elseif (strpos(strtolower($user->getMeta($key)), strtolower($value)) === false) {
                     $matchesFilters = false;
                     break;
                 }
@@ -270,7 +273,6 @@ function mp_ssv_users_generate_data()
 
 add_action('admin_init', 'mp_ssv_users_generate_data');
 #endregion
-
 
 #region Update Settings Message.
 function mp_ssv_events_update_settings_notification()
