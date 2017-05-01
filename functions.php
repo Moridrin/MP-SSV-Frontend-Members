@@ -244,10 +244,11 @@ function mp_ssv_users_generate_data()
         foreach ($_POST as $key => $value) {
             if (mp_ssv_starts_with($key, 'filter_')) {
                 $filterKey           = str_replace('filter_', '', $key);
+                SSV_General::var_export($_POST, 1);
                 $filters[$filterKey] = $_POST[$filterKey];
             }
         }
-//        SSV_General::var_export($filters, 1);
+        SSV_General::var_export($filters, 1);
         // Users
         $users = array();
         foreach (get_users() as $user) {
@@ -263,12 +264,11 @@ function mp_ssv_users_generate_data()
                 $users[] = $user;
             }
         }
-        SSV_General::var_export($users, 1);
         SSV_Users::export($users, $fields);
     }
 }
 
-//add_action('admin_init', 'mp_ssv_users_generate_data');
+add_action('admin_init', 'mp_ssv_users_generate_data');
 #endregion
 
 

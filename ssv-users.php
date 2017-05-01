@@ -123,6 +123,7 @@ class SSV_Users
             $fields = array_merge($fields, $form->getInputFields());
         }
         $fields = array_unique($fields);
+        SSV_General::var_export($fields, 1);
         asort($fields);
         return $fields;
     }
