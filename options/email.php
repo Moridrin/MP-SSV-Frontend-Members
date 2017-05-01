@@ -11,7 +11,7 @@ if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_OPTIONS)) {
     if (isset($_POST['reset'])) {
         SSV_Users::resetOptions();
     } else {
-        update_option(SSV_Users::OPTION_MEMBER_ADMIN, SSV_General::sanitize($_POST['members_admin']));
+        update_option(SSV_Users::OPTION_MEMBER_ADMINS, SSV_General::sanitize($_POST['members_admin']));
         update_option(SSV_Users::OPTION_NEW_MEMBER_ADMIN_EMAIL, filter_var($_POST['email_admin_on_registration'], FILTER_VALIDATE_BOOLEAN));
         update_option(SSV_Users::OPTION_NEW_MEMBER_REGISTRANT_EMAIL, filter_var($_POST['email_on_registration_status_changed'], FILTER_VALIDATE_BOOLEAN));
     }
@@ -24,12 +24,20 @@ if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_OPTIONS)) {
             <td>
                 <label>
                     <?php
-                    wp_dropdown_users(
+                    $dropdown = wp_dropdown_users(
                         array(
-                            'name'     => 'members_admin',
-                            'selected' => get_option(SSV_Users::OPTION_MEMBER_ADMIN),
+                            'echo' => false,
+                            'name' => 'members_admin[]',
                         )
                     );
+                    if (is_array(get_option(SSV_Users::OPTION_MEMBER_ADMINS))) {
+                        foreach (get_option(SSV_Users::OPTION_MEMBER_ADMINS) as $member_admin) {
+                            $dropdown = str_replace(' value=\'' . $member_admin . '\'', ' value="' . $member_admin . '" selected="selected"', $dropdown);
+                        }
+                    }
+                    $usersCount = count(get_users());
+                    $size       = $usersCount > 25 ? 25 : $usersCount;
+                    echo str_replace('id=', 'multiple="multiple" size="' . $size . '" id=', $dropdown);
                     ?>
                 </label>
             </td>

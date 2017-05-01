@@ -51,11 +51,14 @@ function mp_ssv_user_save_fields($form)
         $form->user = $user;
         $messages   = $form->save();
         do_action('ssv_users_registered');
-        if (get_option(SSV_Users::OPTION_NEW_MEMBER_ADMIN_EMAIL, true)) {
-            $userAdmin = User::getByID(get_option(SSV_Users::OPTION_MEMBER_ADMIN, true));
-            $to        = $userAdmin->user_email;
+        if (get_option(SSV_Users::OPTION_NEW_MEMBER_ADMIN_EMAIL, true) && !empty(get_option(SSV_Users::OPTION_MEMBER_ADMINS))) {
+            $userAdmins = get_option(SSV_Users::OPTION_MEMBER_ADMINS);
+            $to = array();
+            foreach ($userAdmins as $userAdmin) {
+                $to[] = User::getByID($userAdmin)->user_email;
+            }
             $subject   = 'New User registration';
-            $message   = '<p>Hello ' . $userAdmin->display_name . ',</p><br/>';
+            $message   = '<p>Hello Members Admin,</p><br/>';
             $message .= '<p>A new user has registered for ' . get_bloginfo() . ':</p>';
             $message .= $form->getEmail();
             $message .= '</br></br>Send by WordPress (SSV Plugin).';
@@ -63,14 +66,17 @@ function mp_ssv_user_save_fields($form)
             wp_mail($to, $subject, $message, $headers);
         }
         if (get_option(SSV_Users::OPTION_NEW_MEMBER_REGISTRANT_EMAIL, true)) {
-            $userAdmin = User::getByID(get_option(SSV_Users::OPTION_MEMBER_ADMIN, true));
-            $to        = $user->user_email;
+            $userAdmins = get_option(SSV_Users::OPTION_MEMBER_ADMINS);
+            $to = array();
+            foreach ($userAdmins as $userAdmin) {
+                $to[] = User::getByID($userAdmin)->user_email;
+            }
             $subject   = 'Registration Successful';
-            $message   = '<p>Hello ' . $user->display_name . ',</p><br/>';
+            $message   = '<p>Hello Members Admin,</p><br/>';
             $message .= '<p>Your registration for ' . get_bloginfo() . ' was successful.</p>';
             $message .= '<p>You have registered with the following fields:</p>';
             $message .= $form->getEmail(false);
-            $message .= '</br></br><p>Greetings, ' . $userAdmin->display_name . '.</p>';
+            $message .= '</br></br><p>Greetings</p>';
             $headers = array('Content-Type: text/html; charset=UTF-8');
             wp_mail($to, $subject, $message, $headers);
         }

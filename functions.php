@@ -270,3 +270,20 @@ function mp_ssv_users_generate_data()
 
 //add_action('admin_init', 'mp_ssv_users_generate_data');
 #endregion
+
+
+#region Update Settings Message.
+function mp_ssv_events_update_settings_notification()
+{
+    if (empty(get_option(SSV_Users::OPTION_MEMBER_ADMINS))) {
+        ?>
+        <div class="update-nag notice">
+            <p>You still need to set a members admin for SSV Users.</p>
+            <p><a href="/wp-admin/admin.php?page=ssv-users-settings&tab=email">Set Now</a></p>
+        </div>
+        <?php
+    }
+}
+
+add_action('admin_notices', 'mp_ssv_events_update_settings_notification');
+#endregion

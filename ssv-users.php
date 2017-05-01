@@ -55,7 +55,7 @@ class SSV_Users
     const OPTION_USERS_PAGE_MAIN_COLUMN = 'ssv_users__main_column';
     const OPTION_USER_COLUMNS = 'ssv_users__user_columns';
     const OPTION_USER_EXPORT_COLUMNS = 'ssv_users__user_export_columns';
-    const OPTION_MEMBER_ADMIN = 'ssv_users__member_admin';
+    const OPTION_MEMBER_ADMINS = 'ssv_users__member_admin';
     const OPTION_NEW_MEMBER_REGISTRANT_EMAIL = 'ssv_users__new_member_registration_email';
     const OPTION_NEW_MEMBER_ADMIN_EMAIL = 'ssv_users__member_role_changed_email';
 
@@ -76,10 +76,9 @@ class SSV_Users
     public static function resetOptions()
     {
         /** @var User $siteAdmin */
-        $siteAdmin = get_users(array('role' => 'administrator'))[0];
         update_option(self::OPTION_USERS_PAGE_MAIN_COLUMN, 'plugin_default');
         update_option(self::OPTION_USER_COLUMNS, json_encode(array('wp_Role', 'wp_Posts')));
-        update_option(self::OPTION_MEMBER_ADMIN, $siteAdmin->ID);
+        delete_option(self::OPTION_MEMBER_ADMINS);
         update_option(self::OPTION_NEW_MEMBER_REGISTRANT_EMAIL, true);
         update_option(self::OPTION_NEW_MEMBER_ADMIN_EMAIL, true);
     }
