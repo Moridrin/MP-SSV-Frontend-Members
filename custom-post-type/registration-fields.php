@@ -47,7 +47,12 @@ function mp_ssv_user_save_fields($form)
     }
 
     if ($messages === true) {
+        global $post;
+        $pageRole = get_post_meta($post->ID, 'page_role', true);
         $user       = User::register($username, $password, $email);
+        if ($pageRole != -1) {
+            $user->set_role($pageRole);
+        }
         $form->user = $user;
         $messages   = $form->save();
         do_action('ssv_users_registered');
