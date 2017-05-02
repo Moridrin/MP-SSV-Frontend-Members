@@ -312,7 +312,6 @@ add_action('add_user_role', 'mp_ssv_user_role_added', 10, 3);
 
 function mp_ssv_user_role_removed($user_id, $role)
 {
-    SSV_General::var_export($role, 1);
     User::getByID($user_id)->updateMeta($role, 'false');
 }
 
