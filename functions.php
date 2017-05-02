@@ -289,3 +289,12 @@ function mp_ssv_events_update_settings_notification()
 
 add_action('admin_notices', 'mp_ssv_events_update_settings_notification');
 #endregion
+
+#region Update Settings Message.
+function mp_ssv_users_role_updated($user_id, $role, $old_roles)
+{
+    User::getByID($user_id)->updateMeta($role, 'true');
+}
+
+add_action('set_user_role', 'mp_ssv_users_role_updated', 10, 3);
+#endregion

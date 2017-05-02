@@ -23,7 +23,7 @@ function mp_ssv_user_save_fields($form)
         return array(new Message('No values to save', Message::NOTIFICATION_MESSAGE));
     }
 
-    if (isset($_GET['member']) && !current_user_can('view_users')) {
+    if (isset($_GET['member']) && !current_user_can('list_users')) {
         return array(new Message('You have no rights to view this user.', Message::ERROR_MESSAGE));
     }
 
