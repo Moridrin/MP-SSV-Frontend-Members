@@ -290,11 +290,31 @@ function mp_ssv_events_update_settings_notification()
 add_action('admin_notices', 'mp_ssv_events_update_settings_notification');
 #endregion
 
-#region Update Settings Message.
-function mp_ssv_users_role_updated($user_id, $role, $old_roles)
+#region Update Users Role Meta.
+function mp_ssv_user_profile_update($user_id, $old_user_data)
+{
+    foreach ($old_user_data->roles as $role) {
+        User::getByID($user_id)->updateMeta($role, 'false');
+    }
+    foreach (User::getByID($user_id)->roles as $role) {
+        User::getByID($user_id)->updateMeta($role, 'true');
+    }
+}
+
+add_action('profile_update', 'mp_ssv_user_profile_update', 10, 2);
+
+function mp_ssv_user_role_added($user_id, $role)
 {
     User::getByID($user_id)->updateMeta($role, 'true');
 }
 
-add_action('set_user_role', 'mp_ssv_users_role_updated', 10, 3);
+add_action('add_user_role', 'mp_ssv_user_role_added', 10, 3);
+
+function mp_ssv_user_role_removed($user_id, $role)
+{
+    SSV_General::var_export($role, 1);
+    User::getByID($user_id)->updateMeta($role, 'false');
+}
+
+add_action('remove_user_role', 'mp_ssv_user_role_removed', 10, 3);
 #endregion
