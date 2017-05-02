@@ -130,7 +130,7 @@ class SSV_Users
     /**
      * @param $customFieldsTag
      *
-     * @return array|null|object Database query results
+     * @return WP_Post[]|null|object Database query results
      */
     public static function getPagesWithTag($customFieldsTag)
     {

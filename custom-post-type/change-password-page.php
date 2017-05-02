@@ -36,7 +36,7 @@ function mp_ssv_user_save_fields($form)
         }
         if (empty($messages)) {
             wp_set_password($new_password, $user->ID);
-            $messages[] = new Message('<p>Passwords Successfully Changed! Please <a href="/login">login</a> again with your new password.</p>', Message::NOTIFICATION_MESSAGE);
+            $messages[] = new Message('<p>Passwords Successfully Changed! Please <a href="'.SSV_General::getLoginURL().'">login</a> again with your new password.</p>', Message::NOTIFICATION_MESSAGE);
         }
     }
     return $messages;
