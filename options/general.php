@@ -12,7 +12,9 @@ if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_OPTIONS)) {
         SSV_Users::resetOptions();
     } else {
         update_option(SSV_Users::OPTION_USERS_PAGE_MAIN_COLUMN, SSV_General::sanitize($_POST['users_page_main_column']));
-        update_option(SSV_Users::OPTION_USER_COLUMNS, json_encode(isset($_POST['user_columns']) ? $_POST['user_columns'] : ''));
+        $userColumns = isset($_POST['user_columns']) ? SSV_General::sanitize($_POST['user_columns']) : '';
+        $userColumns = empty($userColumns) ? array() : explode(',', $userColumns);
+        update_option(SSV_Users::OPTION_USER_COLUMNS, json_encode($userColumns));
     }
 }
 ?>
@@ -34,16 +36,10 @@ if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_OPTIONS)) {
                 $selected   = json_decode(get_option(SSV_Users::OPTION_USER_COLUMNS));
                 $selected   = $selected ?: array();
                 $fieldNames = SSV_Users::getInputFieldNames();
-                $fieldCount = count($fieldNames) + 3;
+                $fieldNames[] = 'wp_Role';
+                $fieldNames[] = 'wp_Posts';
+                echo SSV_General::getListSelect('user_columns', $fieldNames, $selected);
                 ?>
-                <select size="<?= $fieldCount > 25 ? 25 : $fieldCount ?>" name="user_columns[]" multiple title="Columns to Display">
-                    <?php foreach ($fieldNames as $fieldName): ?>
-                        <option value="<?= $fieldName ?>" <?= in_array($fieldName, $selected) ? 'selected' : '' ?>><?= $fieldName ?></option>
-                    <?php endforeach; ?>
-                    <option value="blank" disabled>--- WP Defaults ---</option>
-                    <option value="wp_Role" <?= in_array('wp_Role', $selected) ? 'selected' : '' ?>>Role</option>
-                    <option value="wp_Posts" <?= in_array('wp_Posts', $selected) ? 'selected' : '' ?>>Posts</option>
-                </select>
             </td>
         </tr>
     </table>
