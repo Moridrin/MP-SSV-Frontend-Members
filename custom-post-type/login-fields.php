@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: moridrin
- * Date: 5-2-17
- * Time: 10:32
- */
+namespace mp_ssv_users;
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -13,9 +8,9 @@ function mp_ssv_user_get_fields($content)
 {
     ob_start();
     if (is_user_logged_in()) {
-        $current_user = wp_get_current_user();
         $url          = (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '?logout=success';
         $link         = '<a href="' . wp_logout_url($url) . '">Logout</a>';
+        $current_user = wp_get_current_user();
         ob_start();
         ?>
         <div class="card-panel primary">
@@ -46,7 +41,7 @@ function mp_ssv_user_get_fields($content)
                 </p>
             </div>
             <button class="btn waves-effect waves-light" type="submit" name="wp-submit" id="wp-submit">Login</button>
-            <input type="hidden" name="redirect_to" value="<?= get_site_url() ?>">
+            <input type="hidden" name="redirect_to" value="<?= isset($_GET['redirect_to']) ? $_GET['redirect_to'] : get_site_url() ?>">
         </form>
         Don't have an account?
         <a href="register">Click Here</a> to register.

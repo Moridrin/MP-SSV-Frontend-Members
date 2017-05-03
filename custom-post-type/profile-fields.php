@@ -1,10 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: moridrin
- * Date: 26-1-17
- * Time: 8:55
- */
+namespace mp_ssv_users;
+use mp_ssv_general\Form;
+use mp_ssv_general\Message;
+use mp_ssv_general\SSV_General;
+use mp_ssv_general\User;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -23,7 +23,7 @@ function mp_ssv_user_save_fields($form)
         return array(new Message('No values to save', Message::NOTIFICATION_MESSAGE));
     }
 
-    if (isset($_GET['member']) && !User::isBoard()) {
+    if (isset($_GET['member']) && !current_user_can('list_users')) {
         return array(new Message('You have no rights to view this user.', Message::ERROR_MESSAGE));
     }
 
@@ -40,7 +40,7 @@ function mp_ssv_user_save_fields($form)
         if (empty($messages)) {
             $messages = array(new Message('Profile Saved.'));
         }
-    } elseif (User::isBoard()) {
+    } elseif (current_user_can('edit_users')) {
         $saveMessages = $form->save($tabID);
         do_action(SSV_General::HOOK_USERS_SAVE_MEMBER, $form->user);
         $saveMessages = $saveMessages === true ? array() : $saveMessages;
@@ -66,7 +66,7 @@ function mp_ssv_user_get_fields($content, $form)
     if (isset($_GET['member'])) {
         if (!is_user_logged_in()) {
             return (new Message('You must sign in to view this profile.', Message::ERROR_MESSAGE))->getHTML();
-        } elseif (!User::isBoard()) {
+        } elseif (!current_user_can('edit_users')) {
             $html .= (new Message('You have no access to view this profile.', Message::ERROR_MESSAGE))->getHTML();
         }
     }

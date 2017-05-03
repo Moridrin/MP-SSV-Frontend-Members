@@ -1,10 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: moridrin
- * Date: 5-2-17
- * Time: 10:32
- */
+namespace mp_ssv_users;
+use mp_ssv_general\Form;
+use mp_ssv_general\Message;
+use mp_ssv_general\SSV_General;
+use mp_ssv_general\User;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -18,13 +18,6 @@ function mp_ssv_user_save_fields($form)
 {
     if (!SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_PROFILE)) {
         return array();
-    }
-    if (empty($_POST) || !is_user_logged_in()) {
-        return array(new Message('No values to save', Message::NOTIFICATION_MESSAGE));
-    }
-
-    if (isset($_GET['member']) && !User::isBoard()) {
-        return array(new Message('You have no rights to view this user.', Message::ERROR_MESSAGE));
     }
 
     $form->setValues($_POST);
@@ -43,12 +36,18 @@ function mp_ssv_user_save_fields($form)
         }
         if (empty($messages)) {
             wp_set_password($new_password, $user->ID);
-            $messages[] = new Message('<p>Passwords Successfully Changed! Please <a href="/login">login</a> again with your new password.</p>', Message::NOTIFICATION_MESSAGE);
+            $messages[] = new Message('<p>Passwords Successfully Changed! Please <a href="'.SSV_General::getLoginURL().'">login</a> again with your new password.</p>', Message::NOTIFICATION_MESSAGE);
         }
     }
     return $messages;
 }
 
+/**
+ * @param string $content
+ * @param Form   $form
+ *
+ * @return string
+ */
 function mp_ssv_user_get_fields($content, $form)
 {
     $html = '';
