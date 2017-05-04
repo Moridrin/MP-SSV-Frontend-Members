@@ -231,7 +231,7 @@ function mp_ssv_users_generate_data()
         // Fields
         if (isset($_POST['field_names'])) {
             $fields = SSV_General::sanitize($_POST['field_names']);
-            $fields = empty($fields) ? array() : is_array($fields) ? $fields : explode(',', $fields);
+            $fields = empty($fields) ? array() : explode(',', $fields);
             update_option(SSV_Users::OPTION_USER_EXPORT_COLUMNS, json_encode($fields));
         } else {
             $fields = json_decode(get_option(SSV_Users::OPTION_USER_EXPORT_COLUMNS));
