@@ -244,7 +244,14 @@ function mp_ssv_users_generate_data()
         foreach ($_POST as $key => $value) {
             if (mp_ssv_starts_with($key, 'filter_')) {
                 $filterKey           = str_replace('filter_', '', $key);
-                $filters[$filterKey] = $_POST[$filterKey];
+                if (!isset($_POST[$filterKey])) {
+                    $filters[$filterKey] = array(
+                            'after' => $_POST[$filterKey . '_after'],
+                            'before' => $_POST[$filterKey . '_before'],
+                    );
+                } else {
+                    $filters[$filterKey] = $_POST[$filterKey];
+                }
             }
         }
         // Users
@@ -257,6 +264,26 @@ function mp_ssv_users_generate_data()
                     if (empty($user->getMeta($key))) {
                         $matchesFilters = false;
                         break;
+                    }
+                } elseif (is_array($value)) {
+                    $actual = (new DateTime($user->getMeta($key)))->getTimestamp();
+                    if (empty($user->getMeta($key))) {
+                        $matchesFilters = false;
+                        break;
+                    }
+                    if (!empty($value['after'])) {
+                        $after = (new DateTime($value['after']))->getTimestamp();
+                        if ($actual < $after) {
+                            $matchesFilters = false;
+                            break;
+                        }
+                    }
+                    if (!empty($value['before'])) {
+                        $before = (new DateTime($value['before']))->getTimestamp();
+                        if ($actual > $before) {
+                            $matchesFilters = false;
+                            break;
+                        }
                     }
                 } elseif (strpos(strtolower($user->getMeta($key)), strtolower($value)) === false) {
                     $matchesFilters = false;
