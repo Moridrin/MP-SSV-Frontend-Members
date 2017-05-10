@@ -230,7 +230,7 @@ function mp_ssv_users_generate_data()
     if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_EXPORT)) {
         // Fields
         if (isset($_POST['field_names'])) {
-            $fields = SSV_General::sanitize($_POST['field_names']);
+            $fields = SSV_General::sanitize($_POST['field_names'], 'text');
             $fields = empty($fields) ? array() : is_array($fields) ? $fields : explode(',', $fields);
             update_option(SSV_Users::OPTION_USER_EXPORT_COLUMNS, json_encode($fields));
         } else {

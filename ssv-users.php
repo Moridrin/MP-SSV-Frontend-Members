@@ -219,7 +219,6 @@ class SSV_Users
                 if (is_array($value)) {
                     $value = implode(';', $value);
                 }
-                $value  = SSV_General::sanitize($value);
                 $data[] = '"' . str_replace('"', '""', $value) . '"';
             }
             echo implode(',', $data) . "\n";
