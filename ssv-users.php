@@ -17,7 +17,6 @@
 namespace mp_ssv_users;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Form;
-use mp_ssv_general\SSV_General;
 use mp_ssv_general\User;
 use WP_Post;
 
