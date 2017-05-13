@@ -67,7 +67,7 @@ The best way is to add an issue on GitHub (https://github.com/Moridrin/ssv-front
 * Hotfix for extreamly bad bugs in 1.1.5
 
 ### 1.1.5
-* SSV-Theme changed to SSV.
+* SSV-Material changed to SSV.
 
 ### 1.1.4
 * Added images for plugins page.
