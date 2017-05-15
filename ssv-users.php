@@ -23,6 +23,8 @@ use WP_Post;
 if (!defined('ABSPATH')) {
     exit;
 }
+define('SSV_USERS_PATH', plugin_dir_path(__FILE__));
+define('SSV_USERS_URL', plugins_url() . '/ssv-users/');
 
 #region Require Once
 require_once 'general/general.php';
@@ -34,9 +36,6 @@ require_once 'custom-post-type/post-type.php';
 #endregion
 
 #region SSV_Users class
-define('SSV_USERS_PATH', plugin_dir_path(__FILE__));
-define('SSV_USERS_URL', plugins_url() . '/ssv-users/');
-
 class SSV_Users
 {
     #region Constants

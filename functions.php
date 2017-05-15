@@ -65,7 +65,8 @@ function mp_ssv_users_register_plugin()
     SSV_Users::resetOptions();
 }
 
-register_activation_hook(__FILE__, 'mp_ssv_users_register_plugin');
+register_activation_hook(SSV_USERS_PATH . 'ssv-users.php', 'mp_ssv_users_register_plugin');
+register_activation_hook(SSV_USERS_PATH . 'ssv-users.php', 'mp_ssv_general_register_plugin');
 #endregion
 
 #region Unregister
@@ -79,7 +80,7 @@ function mp_ssv_users_unregister()
     }
 }
 
-register_deactivation_hook(__FILE__, 'mp_ssv_users_unregister');
+register_deactivation_hook(SSV_USERS_PATH . 'ssv-users.php', 'mp_ssv_users_unregister');
 #endregion
 
 #region Reset Options
