@@ -302,7 +302,7 @@ add_action('admin_init', 'mp_ssv_users_generate_data');
 #endregion
 
 #region Update Settings Message.
-function mp_ssv_events_update_settings_notification()
+function mp_ssv_users_update_settings_notification()
 {
     if (empty(get_option(SSV_Users::OPTION_MEMBER_ADMINS))) {
         ?>
@@ -314,7 +314,7 @@ function mp_ssv_events_update_settings_notification()
     }
 }
 
-add_action('admin_notices', 'mp_ssv_events_update_settings_notification');
+add_action('admin_notices', 'mp_ssv_users_update_settings_notification');
 #endregion
 
 #region Update Users Role Meta.
