@@ -7,8 +7,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-$selected   = json_decode(get_option(SSV_Users::OPTION_USER_COLUMNS));
-$selected   = $selected ?: array();
 $fieldNames = SSV_Users::getInputFieldNames();
 $fieldNames[] = 'wp_Role';
 $fieldNames[] = 'wp_Posts';
@@ -18,11 +16,16 @@ if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_OPTIONS)) {
         SSV_Users::resetOptions();
     } else {
         update_option(SSV_Users::OPTION_USERS_PAGE_MAIN_COLUMN, SSV_General::sanitize($_POST['users_page_main_column'], array('plugin_default', 'wordpress_default')));
-        $userColumns = isset($_POST['user_columns']) ? SSV_General::sanitize($_POST['user_columns'], $fieldNames) : $fieldNames;
+        $userColumns = isset($_POST['user_columns']) ? $_POST['user_columns'] : $fieldNames;
         $userColumns = empty($userColumns) ? array() : explode(',', $userColumns);
+        foreach ($userColumns as &$column) {
+            $column = SSV_General::sanitize($column, 'text');
+        }
         update_option(SSV_Users::OPTION_USER_COLUMNS, json_encode($userColumns));
     }
 }
+$selected   = json_decode(get_option(SSV_Users::OPTION_USER_COLUMNS));
+$selected   = $selected ?: array();
 ?>
 <form method="post" action="#">
     <table class="form-table">
