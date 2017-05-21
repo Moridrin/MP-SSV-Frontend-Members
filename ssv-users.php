@@ -8,7 +8,7 @@
  * - Easy manage, view and edit member profiles.
  * - Etc.
  * This plugin is fully compatible with the SSV library which can add functionality like: MailChimp, Events, etc.
- * Version: 3.1.1
+ * Version: 3.1.2
  * Author: moridrin
  * Author URI: http://nl.linkedin.com/in/jberkvens/
  * License: WTFPL
@@ -17,7 +17,6 @@
 namespace mp_ssv_users;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Form;
-use mp_ssv_general\SSV_General;
 use mp_ssv_general\User;
 use WP_Post;
 
@@ -133,6 +132,7 @@ class SSV_Users
      */
     public static function getPagesWithTag($customFieldsTag)
     {
+        /** @var \wpdb $wpdb */
         global $wpdb;
         return $wpdb->get_results("SELECT * FROM wp_posts WHERE post_content LIKE '%$customFieldsTag%'");
     }
@@ -144,6 +144,7 @@ class SSV_Users
      */
     public static function getPageIDsWithTag($customFieldsTag)
     {
+        /** @var \wpdb $wpdb */
         global $wpdb;
         $results = $wpdb->get_results("SELECT ID FROM wp_posts WHERE post_content LIKE '%$customFieldsTag%'");
         return array_column($results, 'ID');
