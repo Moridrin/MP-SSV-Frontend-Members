@@ -134,7 +134,8 @@ class SSV_Users
     {
         /** @var \wpdb $wpdb */
         global $wpdb;
-        return $wpdb->get_results("SELECT * FROM wp_posts WHERE post_content LIKE '%$customFieldsTag%'");
+        $table = $wpdb->prefix . 'posts';
+        return $wpdb->get_results("SELECT * FROM $table WHERE post_content LIKE '%$customFieldsTag%'");
     }
 
     /**
@@ -146,7 +147,8 @@ class SSV_Users
     {
         /** @var \wpdb $wpdb */
         global $wpdb;
-        $results = $wpdb->get_results("SELECT ID FROM wp_posts WHERE post_content LIKE '%$customFieldsTag%'");
+        $table = $wpdb->prefix . 'posts';
+        $results = $wpdb->get_results("SELECT ID FROM $table WHERE post_content LIKE '%$customFieldsTag%'");
         return array_column($results, 'ID');
     }
 

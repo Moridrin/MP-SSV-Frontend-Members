@@ -74,7 +74,8 @@ function mp_ssv_users_unregister()
 {
     global $wpdb;
     $customFieldsTag = SSV_Users::TAG_PROFILE_FIELDS;
-    $results         = $wpdb->get_results("SELECT * FROM wp_posts WHERE post_content LIKE '%$customFieldsTag%'");
+    $table = $wpdb->prefix . 'posts';
+    $results         = $wpdb->get_results("SELECT * FROM $table WHERE post_content LIKE '%$customFieldsTag%'");
     foreach ($results as $key => $row) {
         wp_delete_post($row->ID);
     }
