@@ -11,9 +11,9 @@ if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_OPTIONS)) {
     if (isset($_POST['reset'])) {
         SSV_Users::resetOptions();
     } else {
-        update_option(SSV_Users::OPTION_MEMBER_ADMINS, SSV_General::sanitize($_POST['members_admin']));
-        update_option(SSV_Users::OPTION_NEW_MEMBER_ADMIN_EMAIL, filter_var($_POST['email_admin_on_registration'], FILTER_VALIDATE_BOOLEAN));
-        update_option(SSV_Users::OPTION_NEW_MEMBER_REGISTRANT_EMAIL, filter_var($_POST['email_on_registration_status_changed'], FILTER_VALIDATE_BOOLEAN));
+        update_option(SSV_Users::OPTION_MEMBER_ADMINS, SSV_General::sanitize($_POST['members_admin'], 'int'));
+        update_option(SSV_Users::OPTION_NEW_MEMBER_ADMIN_EMAIL, SSV_General::sanitize($_POST['email_admin_on_registration'], 'boolean'));
+        update_option(SSV_Users::OPTION_NEW_MEMBER_REGISTRANT_EMAIL, SSV_General::sanitize($_POST['email_on_registration_status_changed'], 'boolean'));
     }
 }
 ?>

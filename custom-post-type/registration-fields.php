@@ -1,5 +1,7 @@
 <?php
+
 namespace mp_ssv_users;
+
 use mp_ssv_general\Form;
 use mp_ssv_general\Message;
 use mp_ssv_general\SSV_General;
@@ -25,6 +27,9 @@ function mp_ssv_user_save_fields($form)
 
     $form->setValues($_POST);
     $messages = $form->isValid();
+    if ($messages === true) {
+        $messages = array();
+    }
 
     $username        = $form->getValue('username');
     $password        = $form->getValue('password');
@@ -42,14 +47,24 @@ function mp_ssv_user_save_fields($form)
         $requiredFieldsMessages[] = new Message('Username already used.', Message::ERROR_MESSAGE);
     }
     if (!empty($requiredFieldsMessages)) {
-        $messages = is_array($messages) ?: array();
         $messages = array_merge($messages, $requiredFieldsMessages);
     }
 
-    if ($messages === true) {
+    if (!empty($message) && empty($requiredFieldsMessages) && current_user_can('admin_edit_users')) {
+        $user         = User::register($username, $password, $email);
+        $form->user   = $user;
+        $saveMessages = $form->save();
+        do_action(SSV_General::HOOK_USERS_SAVE_MEMBER, $form->user);
+        $messages = array_merge($messages, $saveMessages);
+        if (empty($saveMessages)) {
+            $messages[] = new Message('Profile Forcibly Saved (As Board member).');
+        } else {
+            $messages[] = new Message('Profile Partially Saved (As Board member).');
+        }
+    } elseif (empty($messages)) {
         global $post;
         $pageRole = get_post_meta($post->ID, 'page_role', true);
-        $user       = User::register($username, $password, $email);
+        $user     = User::register($username, $password, $email);
         if ($pageRole != -1) {
             $user->set_role($pageRole);
         }
@@ -58,12 +73,12 @@ function mp_ssv_user_save_fields($form)
         do_action('ssv_users_registered');
         if (get_option(SSV_Users::OPTION_NEW_MEMBER_ADMIN_EMAIL, true) && !empty(get_option(SSV_Users::OPTION_MEMBER_ADMINS))) {
             $userAdmins = get_option(SSV_Users::OPTION_MEMBER_ADMINS);
-            $to = array();
+            $to         = array();
             foreach ($userAdmins as $userAdmin) {
                 $to[] = User::getByID($userAdmin)->user_email;
             }
-            $subject   = 'New User registration';
-            $message   = '<p>Hello Members Admin,</p><br/>';
+            $subject = 'New User registration';
+            $message = '<p>Hello Members Admin,</p><br/>';
             $message .= '<p>A new user has registered for ' . get_bloginfo() . ':</p>';
             $message .= $form->getEmail();
             $message .= '</br></br>Send by WordPress (SSV Plugin).';
@@ -72,12 +87,12 @@ function mp_ssv_user_save_fields($form)
         }
         if (get_option(SSV_Users::OPTION_NEW_MEMBER_REGISTRANT_EMAIL, true)) {
             $userAdmins = get_option(SSV_Users::OPTION_MEMBER_ADMINS);
-            $to = array();
+            $to         = array();
             foreach ($userAdmins as $userAdmin) {
                 $to[] = User::getByID($userAdmin)->user_email;
             }
-            $subject   = 'Registration Successful';
-            $message   = '<p>Hello Members Admin,</p><br/>';
+            $subject = 'Registration Successful';
+            $message = '<p>Hello Members Admin,</p><br/>';
             $message .= '<p>Your registration for ' . get_bloginfo() . ' was successful.</p>';
             $message .= '<p>You have registered with the following fields:</p>';
             $message .= $form->getEmail(false);
@@ -89,17 +104,6 @@ function mp_ssv_user_save_fields($form)
 
     if (empty($messages)) {
         $messages[] = new Message('Registration Successful.');
-    } elseif (!empty($requiredFieldsMessages) && current_user_can('admin_edit_users')) {
-        $user         = User::register($username, $password, $email);
-        $form->user   = $user;
-        $saveMessages = $form->save();
-        do_action(SSV_General::HOOK_USERS_SAVE_MEMBER, $form->user);
-        $messages = array_merge($messages, $saveMessages);
-        if (empty($saveMessages)) {
-            $messages[] = new Message('Profile Forcibly Saved (As Board member).');
-        } else {
-            $messages[] = new Message('Profile Partially Saved (As Board member).');
-        }
     }
     return $messages;
 }

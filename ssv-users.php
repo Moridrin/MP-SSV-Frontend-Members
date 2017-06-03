@@ -8,7 +8,7 @@
  * - Easy manage, view and edit member profiles.
  * - Etc.
  * This plugin is fully compatible with the SSV library which can add functionality like: MailChimp, Events, etc.
- * Version: 3.1.0
+ * Version: 3.2.0
  * Author: moridrin
  * Author URI: http://nl.linkedin.com/in/jberkvens/
  * License: WTFPL
@@ -17,13 +17,14 @@
 namespace mp_ssv_users;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Form;
-use mp_ssv_general\SSV_General;
 use mp_ssv_general\User;
 use WP_Post;
 
 if (!defined('ABSPATH')) {
     exit;
 }
+define('SSV_USERS_PATH', plugin_dir_path(__FILE__));
+define('SSV_USERS_URL', plugins_url() . '/ssv-users/');
 
 #region Require Once
 require_once 'general/general.php';
@@ -35,9 +36,6 @@ require_once 'custom-post-type/post-type.php';
 #endregion
 
 #region SSV_Users class
-define('SSV_USERS_PATH', plugin_dir_path(__FILE__));
-define('SSV_USERS_URL', plugins_url() . '/ssv-users/');
-
 class SSV_Users
 {
     #region Constants
@@ -134,8 +132,10 @@ class SSV_Users
      */
     public static function getPagesWithTag($customFieldsTag)
     {
+        /** @var \wpdb $wpdb */
         global $wpdb;
-        return $wpdb->get_results("SELECT * FROM wp_posts WHERE post_content LIKE '%$customFieldsTag%'");
+        $table = $wpdb->prefix . 'posts';
+        return $wpdb->get_results("SELECT * FROM $table WHERE post_content LIKE '%$customFieldsTag%'");
     }
 
     /**
@@ -145,8 +145,10 @@ class SSV_Users
      */
     public static function getPageIDsWithTag($customFieldsTag)
     {
+        /** @var \wpdb $wpdb */
         global $wpdb;
-        $results = $wpdb->get_results("SELECT ID FROM wp_posts WHERE post_content LIKE '%$customFieldsTag%'");
+        $table = $wpdb->prefix . 'posts';
+        $results = $wpdb->get_results("SELECT ID FROM $table WHERE post_content LIKE '%$customFieldsTag%'");
         return array_column($results, 'ID');
     }
 
@@ -219,7 +221,6 @@ class SSV_Users
                 if (is_array($value)) {
                     $value = implode(';', $value);
                 }
-                $value  = SSV_General::sanitize($value);
                 $data[] = '"' . str_replace('"', '""', $value) . '"';
             }
             echo implode(',', $data) . "\n";

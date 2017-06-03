@@ -130,13 +130,11 @@ function mp_ssv_users_sort_request($query)
         return $query;
     }
 
-    $query->query_fields = 'SQL_CALC_FOUND_ROWS wp_users.*';
-    $query->query_from   = 'FROM wp_users LEFT JOIN wp_usermeta ON ( wp_users.ID = wp_usermeta.user_id AND wp_usermeta.meta_key = \'' . $_GET['orderby'] . '\' )';
-//    $query->query_where  = 'WHERE (wp_usermeta.meta_key = \'' . $_GET['orderby'] . '\')';
+    $query->query_from   .= ' INNER JOIN wp_usermeta usermeta_order ON (wp_users.ID = usermeta_order.user_id AND (usermeta_order.meta_key = \'' . $_GET['orderby'] . '\'))';
     if (isset($_GET['order'])) {
-        $query->query_orderby = 'ORDER BY wp_usermeta.meta_value ' . $_GET['order'];
+        $query->query_orderby = 'ORDER BY usermeta_order.meta_value ' . $_GET['order'];
     } else {
-        $query->query_orderby = 'ORDER BY wp_usermeta.meta_value ' . 'ASC';
+        $query->query_orderby = 'ORDER BY usermeta_order.meta_value ' . 'ASC';
     }
     return $query;
 }

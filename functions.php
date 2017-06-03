@@ -65,8 +65,8 @@ function mp_ssv_users_register_plugin()
     SSV_Users::resetOptions();
 }
 
-register_activation_hook(__FILE__, 'mp_ssv_users_register_plugin');
-register_activation_hook(__FILE__, 'mp_ssv_general_register_plugin');
+register_activation_hook(SSV_USERS_PATH . 'ssv-users.php', 'mp_ssv_users_register_plugin');
+register_activation_hook(SSV_USERS_PATH . 'ssv-users.php', 'mp_ssv_general_register_plugin');
 #endregion
 
 #region Unregister
@@ -74,13 +74,14 @@ function mp_ssv_users_unregister()
 {
     global $wpdb;
     $customFieldsTag = SSV_Users::TAG_PROFILE_FIELDS;
-    $results         = $wpdb->get_results("SELECT * FROM wp_posts WHERE post_content LIKE '%$customFieldsTag%'");
+    $table = $wpdb->prefix . 'posts';
+    $results         = $wpdb->get_results("SELECT * FROM $table WHERE post_content LIKE '%$customFieldsTag%'");
     foreach ($results as $key => $row) {
         wp_delete_post($row->ID);
     }
 }
 
-register_deactivation_hook(__FILE__, 'mp_ssv_users_unregister');
+register_deactivation_hook(SSV_USERS_PATH . 'ssv-users.php', 'mp_ssv_users_unregister');
 #endregion
 
 #region Reset Options
@@ -230,8 +231,8 @@ function mp_ssv_users_generate_data()
     if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_EXPORT)) {
         // Fields
         if (isset($_POST['field_names'])) {
-            $fields = SSV_General::sanitize($_POST['field_names']);
-            $fields = empty($fields) ? array() : explode(',', $fields);
+            $fields = SSV_General::sanitize($_POST['field_names'], 'text');
+            $fields = empty($fields) ? array() : is_array($fields) ? $fields : explode(',', $fields);
             update_option(SSV_Users::OPTION_USER_EXPORT_COLUMNS, json_encode($fields));
         } else {
             $fields = json_decode(get_option(SSV_Users::OPTION_USER_EXPORT_COLUMNS));
@@ -244,7 +245,14 @@ function mp_ssv_users_generate_data()
         foreach ($_POST as $key => $value) {
             if (mp_ssv_starts_with($key, 'filter_')) {
                 $filterKey           = str_replace('filter_', '', $key);
-                $filters[$filterKey] = $_POST[$filterKey];
+                if (!isset($_POST[$filterKey])) {
+                    $filters[$filterKey] = array(
+                            'after' => $_POST[$filterKey . '_after'],
+                            'before' => $_POST[$filterKey . '_before'],
+                    );
+                } else {
+                    $filters[$filterKey] = $_POST[$filterKey];
+                }
             }
         }
         // Users
@@ -257,6 +265,26 @@ function mp_ssv_users_generate_data()
                     if (empty($user->getMeta($key))) {
                         $matchesFilters = false;
                         break;
+                    }
+                } elseif (is_array($value)) {
+                    $actual = (new DateTime($user->getMeta($key)))->getTimestamp();
+                    if (empty($user->getMeta($key))) {
+                        $matchesFilters = false;
+                        break;
+                    }
+                    if (!empty($value['after'])) {
+                        $after = (new DateTime($value['after']))->getTimestamp();
+                        if ($actual < $after) {
+                            $matchesFilters = false;
+                            break;
+                        }
+                    }
+                    if (!empty($value['before'])) {
+                        $before = (new DateTime($value['before']))->getTimestamp();
+                        if ($actual > $before) {
+                            $matchesFilters = false;
+                            break;
+                        }
                     }
                 } elseif (strpos(strtolower($user->getMeta($key)), strtolower($value)) === false) {
                     $matchesFilters = false;
@@ -275,7 +303,7 @@ add_action('admin_init', 'mp_ssv_users_generate_data');
 #endregion
 
 #region Update Settings Message.
-function mp_ssv_events_update_settings_notification()
+function mp_ssv_users_update_settings_notification()
 {
     if (empty(get_option(SSV_Users::OPTION_MEMBER_ADMINS))) {
         ?>
@@ -287,7 +315,7 @@ function mp_ssv_events_update_settings_notification()
     }
 }
 
-add_action('admin_notices', 'mp_ssv_events_update_settings_notification');
+add_action('admin_notices', 'mp_ssv_users_update_settings_notification');
 #endregion
 
 #region Update Users Role Meta.

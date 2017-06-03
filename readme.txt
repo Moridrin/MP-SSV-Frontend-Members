@@ -30,6 +30,24 @@ The best way is to add an issue on GitHub (https://github.com/Moridrin/ssv-users
 The best way is to add an issue on GitHub (https://github.com/Moridrin/ssv-users/issues). But you can also send an email to J.Berkvens@Moridrin.com (the lead developer).
 
 == Changelog ==
+= 3.2.0 =
+* Adding prefix (for multi-site) to all database searches.
+* Updating name fields disabled (due to possible bugs)
+* Sorting list when role selected on Users Page
+* Ready for WordPress
+
+= 3.1.4 =
+* Adding prefix (for multi-site) to all database searches.
+
+= 3.1.3 =
+* Updating name fields disabled (due to possible bugs)
+
+= 3.1.2 =
+* Sorting list when role selected on Users Page
+
+= 3.1.1 =
+* Ready for WordPress
+
 = 3.0.3 =
 * User filters (for export) working.
 * User Export working from Users page.
@@ -92,7 +110,7 @@ The best way is to add an issue on GitHub (https://github.com/Moridrin/ssv-users
 * Hotfix for extreamly bad bugs in 1.1.5
 
 = 1.1.5 =
-* SSV-Theme changed to SSV.
+* SSV-Material changed to SSV.
 
 = 1.1.4 =
 * Added images for plugins page.
