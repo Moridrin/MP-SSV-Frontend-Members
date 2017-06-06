@@ -32,7 +32,8 @@ function ssv_users_page_fields()
 {
     global $post;
     $allowTabs = strpos($post->post_content, SSV_Users::TAG_PROFILE_FIELDS) !== false;
-    $form      = Form::fromDatabase(SSV_Users::CAPABILITY_ADMIN_EDIT_USERS);
+//    $form      = Form::fromDatabase(SSV_Users::CAPABILITY_ADMIN_EDIT_USERS);
+    $form = new Form();
     echo $form->getEditor($allowTabs);
 }
 
