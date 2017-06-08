@@ -14,7 +14,9 @@
  * License: WTFPL
  * License URI: http://www.wtfpl.net/txt/copying/
  */
+
 namespace mp_ssv_users;
+
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Form;
 use mp_ssv_general\User;
@@ -147,7 +149,7 @@ class SSV_Users
     {
         /** @var \wpdb $wpdb */
         global $wpdb;
-        $table = $wpdb->prefix . 'posts';
+        $table   = $wpdb->prefix . 'posts';
         $results = $wpdb->get_results("SELECT ID FROM $table WHERE post_content LIKE '%$customFieldsTag%'");
         return array_column($results, 'ID');
     }

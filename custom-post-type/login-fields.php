@@ -1,4 +1,5 @@
 <?php
+
 namespace mp_ssv_users;
 if (!defined('ABSPATH')) {
     exit;

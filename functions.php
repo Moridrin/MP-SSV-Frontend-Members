@@ -74,7 +74,7 @@ function mp_ssv_users_unregister()
 {
     global $wpdb;
     $customFieldsTag = SSV_Users::TAG_PROFILE_FIELDS;
-    $table = $wpdb->prefix . 'posts';
+    $table           = $wpdb->prefix . 'posts';
     $results         = $wpdb->get_results("SELECT * FROM $table WHERE post_content LIKE '%$customFieldsTag%'");
     foreach ($results as $key => $row) {
         wp_delete_post($row->ID);
@@ -244,11 +244,11 @@ function mp_ssv_users_generate_data()
         $filters = array();
         foreach ($_POST as $key => $value) {
             if (mp_ssv_starts_with($key, 'filter_')) {
-                $filterKey           = str_replace('filter_', '', $key);
+                $filterKey = str_replace('filter_', '', $key);
                 if (!isset($_POST[$filterKey])) {
                     $filters[$filterKey] = array(
-                            'after' => $_POST[$filterKey . '_after'],
-                            'before' => $_POST[$filterKey . '_before'],
+                        'after'  => $_POST[$filterKey . '_after'],
+                        'before' => $_POST[$filterKey . '_before'],
                     );
                 } else {
                     $filters[$filterKey] = $_POST[$filterKey];

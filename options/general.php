@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-$fieldNames = SSV_Users::getInputFieldNames();
+$fieldNames   = SSV_Users::getInputFieldNames();
 $fieldNames[] = 'wp_Role';
 $fieldNames[] = 'wp_Posts';
 
@@ -24,8 +24,8 @@ if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_OPTIONS)) {
         update_option(SSV_Users::OPTION_USER_COLUMNS, json_encode($userColumns));
     }
 }
-$selected   = json_decode(get_option(SSV_Users::OPTION_USER_COLUMNS));
-$selected   = $selected ?: array();
+$selected = json_decode(get_option(SSV_Users::OPTION_USER_COLUMNS));
+$selected = $selected ?: array();
 ?>
 <form method="post" action="#">
     <table class="form-table">

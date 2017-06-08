@@ -130,7 +130,7 @@ function mp_ssv_users_sort_request($query)
         return $query;
     }
 
-    $query->query_from   .= ' INNER JOIN wp_usermeta usermeta_order ON (wp_users.ID = usermeta_order.user_id AND (usermeta_order.meta_key = \'' . $_GET['orderby'] . '\'))';
+    $query->query_from .= ' INNER JOIN wp_usermeta usermeta_order ON (wp_users.ID = usermeta_order.user_id AND (usermeta_order.meta_key = \'' . $_GET['orderby'] . '\'))';
     if (isset($_GET['order'])) {
         $query->query_orderby = 'ORDER BY usermeta_order.meta_value ' . $_GET['order'];
     } else {

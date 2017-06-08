@@ -1,5 +1,7 @@
 <?php
+
 namespace mp_ssv_users;
+
 use mp_ssv_general\Form;
 use mp_ssv_general\Message;
 use mp_ssv_general\SSV_General;
