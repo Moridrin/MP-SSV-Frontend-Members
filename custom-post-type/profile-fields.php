@@ -20,6 +20,7 @@ function mp_ssv_user_save_fields($form)
     if (!SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_PROFILE)) {
         return array();
     }
+
     if (empty($_POST) || !is_user_logged_in()) {
         return array(new Message('No values to save', Message::NOTIFICATION_MESSAGE));
     }
