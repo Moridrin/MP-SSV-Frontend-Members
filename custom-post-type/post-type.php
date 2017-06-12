@@ -1,6 +1,5 @@
 <?php
 use mp_ssv_general\Form;
-use mp_ssv_general\SSV_General;
 use mp_ssv_general\User;
 use mp_ssv_users\SSV_Users;
 
@@ -80,40 +79,16 @@ add_action('save_post', 'mp_ssv_user_pages_save_meta');
 function mp_ssv_user_pages_set_content($content)
 {
     if (strpos($content, SSV_Users::TAG_PROFILE_FIELDS) !== false) {
-        $form = Form::fromDatabase(SSV_Users::CAPABILITY_ADMIN_EDIT_USERS);
-
-        $_SESSION['field_errors'] = array();
-        if (isset($_GET['view']) && $_GET['view'] == 'directDebitPDF') {
-            if (isset($_GET['user_id'])) {
-                $user = User::getByID($_GET['user_id']);
-            } else {
-                $user = User::getCurrent();
-            }
-            $_SESSION["ABSPATH"]         = ABSPATH;
-            $_SESSION["first_name"]      = $user->first_name;
-            $_SESSION["initials"]        = $user->getMeta('initials');
-            $_SESSION["last_name"]       = $user->last_name;
-            $_SESSION["gender"]          = $user->getMeta('gender');
-            $_SESSION["iban"]            = $user->getMeta('iban');
-            $_SESSION["date_of_birth"]   = $user->getMeta('date_of_birth');
-            $_SESSION["street"]          = $user->getMeta('street');
-            $_SESSION["email"]           = $user->getMeta('email');
-            $_SESSION["postal_code"]     = $user->getMeta('postal_code');
-            $_SESSION["city"]            = $user->getMeta('city');
-            $_SESSION["phone_number"]    = $user->getMeta('phone_number');
-            $_SESSION["emergency_phone"] = $user->getMeta('emergency_phone');
-            SSV_General::redirect(SSV_Users::URL . '/direct-debit-pdf.php');
-        }
-
+        $form = Form::fromDatabase();
         require_once 'profile-fields.php';
     } elseif (strpos($content, SSV_Users::TAG_REGISTER_FIELDS) !== false) {
-        $form = Form::fromDatabase(SSV_Users::CAPABILITY_ADMIN_EDIT_USERS, false);
-        require_once 'registration-fields.php';
+        $form = Form::fromDatabase(false);
         $form->addFields(User::getDefaultFields(), false);
+        require_once 'registration-fields.php';
     } elseif (strpos($content, SSV_Users::TAG_CHANGE_PASSWORD) !== false) {
-        $form = Form::fromDatabase(SSV_Users::CAPABILITY_ADMIN_EDIT_USERS, false);
-        require_once 'change-password-page.php';
+        $form = Form::fromDatabase(false);
         $form->addFields(User::getPasswordChangeFields(), false);
+        require_once 'change-password-page.php';
     } elseif (strpos($content, SSV_Users::TAG_LOGIN_FIELDS) !== false) {
         require_once 'login-fields.php';
         return mp_ssv_users\mp_ssv_user_get_fields($content);
