@@ -1,4 +1,5 @@
 <?php
+use mp_ssv_general\ExternalUser;
 use mp_ssv_general\SSV_General;
 use mp_ssv_general\User;
 use mp_ssv_users\SSV_Users;
@@ -259,7 +260,11 @@ function mp_ssv_users_generate_data()
         $users = array();
         foreach (get_users() as $user) {
             $matchesFilters = true;
-            $user           = new User($user);
+            if (get_user_meta($user->ID, 'lidnr', true)) {
+                $user = new ExternalUser($user);
+            } else {
+                $user = new User($user);
+            }
             foreach ($filters as $key => $value) {
                 if ($value == '*') {
                     if (empty($user->getMeta($key))) {

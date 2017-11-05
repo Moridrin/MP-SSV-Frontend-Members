@@ -81,7 +81,6 @@ function mp_ssv_user_pages_set_content($content)
 {
     if (strpos($content, SSV_Users::TAG_PROFILE_FIELDS) !== false) {
         $form = Form::fromDatabase(SSV_Users::CAPABILITY_ADMIN_EDIT_USERS);
-
         $_SESSION['field_errors'] = array();
         if (isset($_GET['view']) && $_GET['view'] == 'directDebitPDF') {
             if (isset($_GET['user_id'])) {
