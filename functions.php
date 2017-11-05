@@ -68,6 +68,7 @@ function mp_ssv_users_register_plugin()
 
 register_activation_hook(SSV_USERS_PATH . 'ssv-users.php', 'mp_ssv_users_register_plugin');
 register_activation_hook(SSV_USERS_PATH . 'ssv-users.php', 'mp_ssv_general_register_plugin');
+add_filter('send_password_change_email', '__return_false' );
 #endregion
 
 #region Unregister
