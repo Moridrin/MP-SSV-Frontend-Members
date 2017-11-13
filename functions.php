@@ -262,7 +262,7 @@ function mp_ssv_users_generate_data()
         $users = array();
         foreach (get_users() as $user) {
             $matchesFilters = true;
-            if (get_user_meta($user->ID, 'lidnr', true)) {
+            if (get_option('atms_enabled', false) && get_user_meta($user->ID, 'lidnr', true)) {
                 $user = new ExternalUser($user);
             } else {
                 $user = new User($user);
