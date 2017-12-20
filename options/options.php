@@ -6,6 +6,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once SSV_General::PATH.DIRECTORY_SEPARATOR.'options'.DIRECTORY_SEPARATOR.'form-fields.php';
+
 function ssv_users_add_sub_menu()
 {
     add_submenu_page('ssv_settings', 'Users Options', 'Users', 'manage_options', 'ssv-users-settings', 'ssv_users_options_page_content');

@@ -7,7 +7,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-#region Meta Boxes
 /**
  * This method adds the custom Meta Boxes
  */
@@ -47,9 +46,7 @@ function ssv_users_page_role()
     <?php
 }
 
-#endregion
 
-#region Save Meta
 /**
  * @param $post_id
  *
@@ -73,9 +70,7 @@ function mp_ssv_user_pages_save_meta($post_id)
 }
 
 add_action('save_post', 'mp_ssv_user_pages_save_meta');
-#endregion
 
-#region Set Content
 function mp_ssv_user_pages_set_content($content)
 {
     if (strpos($content, SSV_Users::TAG_PROFILE_FIELDS) !== false) {

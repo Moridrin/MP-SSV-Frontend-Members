@@ -28,20 +28,16 @@ if (!defined('ABSPATH')) {
 define('SSV_USERS_PATH', plugin_dir_path(__FILE__));
 define('SSV_USERS_URL', plugins_url() . '/ssv-users/');
 
-#region Require Once
 require_once 'general/general.php';
 require_once 'functions.php';
 
 require_once 'options/options.php';
 require_once 'users-page.php';
 require_once 'custom-post-type/post-type.php';
-#endregion
 
-#region SSV_Users class
 class SSV_Users
 {
-    #region Constants
-    const PATH = SSV_USERS_PATH;
+        const PATH = SSV_USERS_PATH;
     const URL = SSV_USERS_URL;
 
     const TAG_REGISTER_FIELDS = '[ssv-users-register-fields]';
@@ -67,10 +63,8 @@ class SSV_Users
     const CAPABILITY_EDIT_USERS = 'edit_users';
     const CAPABILITY_ADMIN_EDIT_USERS = 'admin_edit_users';
 
-    #endregion
-
-    #region resetOptions()
-    /**
+    
+        /**
      * This function sets all the options for this plugin back to their default value
      */
     public static function resetOptions()
@@ -83,8 +77,7 @@ class SSV_Users
         update_option(self::OPTION_NEW_MEMBER_ADMIN_EMAIL, true);
     }
 
-    #endregion
-
+    
     public static function CLEAN_INSTALL()
     {
         mp_ssv_users_unregister();
@@ -230,4 +223,3 @@ class SSV_Users
         exit;
     }
 }
-#endregion

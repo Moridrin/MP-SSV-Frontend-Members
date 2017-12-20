@@ -7,7 +7,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-#region Register
 function mp_ssv_users_register_plugin()
 {
     if (empty(SSV_Users::getPageIDsWithTag(SSV_Users::TAG_REGISTER_FIELDS))) {
@@ -67,9 +66,7 @@ function mp_ssv_users_register_plugin()
 
 register_activation_hook(SSV_USERS_PATH . 'ssv-users.php', 'mp_ssv_users_register_plugin');
 register_activation_hook(SSV_USERS_PATH . 'ssv-users.php', 'mp_ssv_general_register_plugin');
-#endregion
 
-#region Unregister
 function mp_ssv_users_unregister()
 {
     global $wpdb;
@@ -82,9 +79,7 @@ function mp_ssv_users_unregister()
 }
 
 register_deactivation_hook(SSV_USERS_PATH . 'ssv-users.php', 'mp_ssv_users_unregister');
-#endregion
 
-#region Reset Options
 /**
  * This function will reset the events options if the admin referer originates from the SSV Events plugin.
  *
@@ -99,9 +94,7 @@ function mp_ssv_users_reset_options($admin_referer)
 }
 
 add_filter(SSV_General::HOOK_RESET_OPTIONS, 'mp_ssv_users_reset_options');
-#endregion
 
-#region Avatar
 /**
  * This function gets the user avatar (profile picture).
  *
@@ -146,9 +139,7 @@ function ssv_users_avatar(
 }
 
 add_filter('get_avatar', 'ssv_users_avatar', 1, 6);
-#endregion
 
-#region Custom Authentication
 /**
  * This function overrides the normal WordPress login function. With this function you can login with both your
  * username and your email.
@@ -198,9 +189,7 @@ function ssv_users_authenticate($user, $login, $password)
 }
 
 add_filter('authenticate', 'ssv_users_authenticate', 20, 3);
-#endregion
 
-#region Set Profile Page Title
 function mp_ssv_users_set_profile_page_title($title, $id)
 {
     $pages       = SSV_Users::getPagesWithTag(SSV_Users::TAG_PROFILE_FIELDS);
@@ -223,9 +212,7 @@ function mp_ssv_users_set_profile_page_title($title, $id)
 }
 
 add_filter('the_title', 'mp_ssv_users_set_profile_page_title', 20, 2);
-#endregion
 
-#region Export
 function mp_ssv_users_generate_data()
 {
     if (SSV_General::isValidPOST(SSV_Users::ADMIN_REFERER_EXPORT)) {
@@ -300,9 +287,7 @@ function mp_ssv_users_generate_data()
 }
 
 add_action('admin_init', 'mp_ssv_users_generate_data');
-#endregion
 
-#region Update Settings Message.
 function mp_ssv_users_update_settings_notification()
 {
     if (empty(get_option(SSV_Users::OPTION_MEMBER_ADMINS))) {
@@ -316,9 +301,7 @@ function mp_ssv_users_update_settings_notification()
 }
 
 add_action('admin_notices', 'mp_ssv_users_update_settings_notification');
-#endregion
 
-#region Update Users Role Meta.
 function mp_ssv_user_profile_update($user_id, $old_user_data)
 {
     foreach ($old_user_data->roles as $role) {
@@ -344,4 +327,3 @@ function mp_ssv_user_role_removed($user_id, $role)
 }
 
 add_action('remove_user_role', 'mp_ssv_user_role_removed', 10, 3);
-#endregion

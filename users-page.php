@@ -8,7 +8,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-#region Columns
 /**
  * @param      $url
  * @param User $user
@@ -22,7 +21,7 @@ function mp_ssv_users_custom_profile_url($url, $user)
     $wildcardURL = null;
     foreach ($pages as $page) {
         $pageRole = get_post_meta($page->ID, SSV_Users::PAGE_ROLE_META, true);
-        if ($pageRole == $user->roles[0]) {
+        if (count($user->roles) > 0 && $pageRole == $user->roles[0]) {
             return get_permalink($page) . '?member=' . $user->ID;
         } elseif ($pageRole == -1) {
             $wildcardURL = get_permalink($page) . '?member=' . $user->ID;
@@ -75,7 +74,7 @@ function mp_ssv_users_custom_user_column_values($val, $column_name, $user_id)
         $actions = apply_filters('user_row_actions', $actions, $user);
         ob_start();
         ?>
-        <?= get_avatar($user->ID, 32, '', '', array('extra_attr' => 'style="float: left; margin-right: 5px; margin-top: 1px;"')); ?>
+        <?= get_avatar($user->ID, 32, '', '', ['extra_attr' => 'style="float: left; margin-right: 5px; margin-top: 1px;"']); ?>
         <strong><?= $user->getProfileLink('_blank') ?></strong><br/>
         <div class="row-actions">
             <?php foreach ($actions as $key => $action): ?>
@@ -140,12 +139,8 @@ function mp_ssv_users_sort_request($query)
 }
 
 add_filter('pre_user_query', 'mp_ssv_users_sort_request');
-#endregion
 
-#region Filters
-#endregion
 
-#region Export
 function mp_ssv_users_bulk_action_export($actions)
 {
     $actions['csv_export'] = 'Export';
@@ -179,4 +174,3 @@ function mp_ssv_users_exporter($redirect_to, $doaction, $user_ids)
 }
 
 add_filter('handle_bulk_actions-users', 'mp_ssv_users_exporter', 10, 3);
-#endregion
