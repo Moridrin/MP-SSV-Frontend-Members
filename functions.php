@@ -352,3 +352,6 @@ function mp_ssv_user_role_removed($user_id, $role)
 
 add_action('remove_user_role', 'mp_ssv_user_role_removed', 10, 3);
 #endregion
+
+require_once 'custom-post-type/atms-registration-fields.php';
+add_shortcode('ssv-users-atms-register-fields', array(new \mp_ssv_users\ATMSRegistrationFields(), 'render'));
