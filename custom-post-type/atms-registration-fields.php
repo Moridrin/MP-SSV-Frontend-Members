@@ -11,7 +11,7 @@ class ATMSRegistrationFields
         $success = false;
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result = ATMS_API::post('register-member', $_POST, true);
-            $success = !($result['status'] == 200);
+            $success = ($result['status'] == 200);
             $form = $result['body'];
         } else {
             $form = ATMS_API::get('registration-form');
