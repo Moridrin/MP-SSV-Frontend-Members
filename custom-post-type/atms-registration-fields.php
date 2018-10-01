@@ -19,12 +19,7 @@ class ATMSRegistrationFields
         ob_start();
         if ($success):
         ?>
-            <div class="card">
-                <div class="card-content">
-                    <span class="card-title"><?= isset($atts['success-title']) ? $atts['success-title'] : 'success-title' ?></span>
-                    <p><?= isset($atts['success-desc']) ? $atts['success-desc'] : 'success-desc' ?></p>
-                </div>
-            </div>
+            <?= $result['body']; ?>
         <?php else: ?>
         <div class="card">
             <div class="card-content">
